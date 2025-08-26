@@ -118,23 +118,23 @@ class HorarioController {
     }
 
     private function getRelatedData($db) {
-        $stmt_cursos = $db->prepare("CALL sp_get_all_cursos()");
-        $stmt_cursos->execute();
+        $stmt_cursos = $db->prepare("CALL sp_get_all_cursos(?)");
+        $stmt_cursos->execute(['']);
         $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_cursos->closeCursor();
 
-        $stmt_profesores = $db->prepare("CALL sp_get_all_profesores()");
-        $stmt_profesores->execute();
+        $stmt_profesores = $db->prepare("CALL sp_get_all_profesores(?)");
+        $stmt_profesores->execute(['']);
         $profesores = $stmt_profesores->fetchAll(PDO::FETCH_ASSOC);
         $stmt_profesores->closeCursor();
 
-        $stmt_carriles = $db->prepare("CALL sp_get_all_carriles()");
-        $stmt_carriles->execute();
+        $stmt_carriles = $db->prepare("CALL sp_get_all_carriles(?)");
+        $stmt_carriles->execute(['']);
         $carriles = $stmt_carriles->fetchAll(PDO::FETCH_ASSOC);
         $stmt_carriles->closeCursor();
 
-        $stmt_tipos_horario = $db->prepare("CALL sp_get_all_tipos_horario()");
-        $stmt_tipos_horario->execute();
+        $stmt_tipos_horario = $db->prepare("CALL sp_get_all_tipos_horario(?)");
+        $stmt_tipos_horario->execute(['']);
         $tipos_horario = $stmt_tipos_horario->fetchAll(PDO::FETCH_ASSOC);
         $stmt_tipos_horario->closeCursor();
 
