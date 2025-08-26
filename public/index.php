@@ -7,6 +7,8 @@ if (session_status() == PHP_SESSION_NONE) {
 // Cargar la configuración y clases base
 require_once '../config/database.php';
 require_once '../src/core/Database.php';
+
+// Requerir todos los controladores
 require_once '../src/controllers/AuthController.php';
 require_once '../src/controllers/AlumnoController.php';
 require_once '../src/controllers/ProfesorController.php';
@@ -22,6 +24,7 @@ require_once '../src/controllers/MatriculaController.php';
 require_once '../src/controllers/AsistenciaProfesorController.php';
 require_once '../src/controllers/ReporteController.php';
 
+
 // Simple enrutador basado en el parámetro 'url'
 $url = $_GET['url'] ?? 'home';
 
@@ -29,399 +32,216 @@ $url = $_GET['url'] ?? 'home';
 $parts = explode('/', $url);
 $route = $parts[0];
 
-// Inicializar controladores
-$authController = new AuthController();
-$alumnoController = new AlumnoController();
-$profesorController = new ProfesorController();
-$cursoController = new CursoController();
-$tipoPiscinaController = new TipoPiscinaController();
-$piscinaController = new PiscinaController();
-$carrilController = new CarrilController();
-$tipoHorarioController = new TipoHorarioController();
-$horarioController = new HorarioController();
-$formaPagoController = new FormaPagoController();
-$usuarioController = new UsuarioController();
-$matriculaController = new MatriculaController();
-$asistenciaProfesorController = new AsistenciaProfesorController();
-$reporteController = new ReporteController();
+// La inicialización de los controladores se mueve dentro de cada case
+// para evitar la verificación de autenticación en páginas públicas.
 
 switch ($route) {
     // Rutas de Autenticación
     case 'login':
+        $authController = new AuthController();
         $authController->login();
         break;
     case 'verify_2fa':
+        $authController = new AuthController();
         $authController->verify_2fa();
         break;
     case 'dashboard':
+        $authController = new AuthController();
         $authController->dashboard();
         break;
     case 'logout':
+        $authController = new AuthController();
         $authController->logout();
         break;
 
     // Rutas de Alumnos
     case 'alumnos':
+        $alumnoController = new AlumnoController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $alumnoController->index();
-                break;
-            case 'create':
-                $alumnoController->create();
-                break;
-            case 'store':
-                $alumnoController->store();
-                break;
-            case 'edit':
-                $alumnoController->edit();
-                break;
-            case 'update':
-                $alumnoController->update();
-                break;
-            case 'delete':
-                $alumnoController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Alumnos</h1>";
-                break;
+            case 'index': $alumnoController->index(); break;
+            case 'create': $alumnoController->create(); break;
+            case 'store': $alumnoController->store(); break;
+            case 'edit': $alumnoController->edit(); break;
+            case 'update': $alumnoController->update(); break;
+            case 'delete': $alumnoController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Alumnos</h1>"; break;
         }
         break;
 
     // Rutas de Profesores
     case 'profesores':
+        $profesorController = new ProfesorController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $profesorController->index();
-                break;
-            case 'create':
-                $profesorController->create();
-                break;
-            case 'store':
-                $profesorController->store();
-                break;
-            case 'edit':
-                $profesorController->edit();
-                break;
-            case 'update':
-                $profesorController->update();
-                break;
-            case 'delete':
-                $profesorController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Profesores</h1>";
-                break;
+            case 'index': $profesorController->index(); break;
+            case 'create': $profesorController->create(); break;
+            case 'store': $profesorController->store(); break;
+            case 'edit': $profesorController->edit(); break;
+            case 'update': $profesorController->update(); break;
+            case 'delete': $profesorController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Profesores</h1>"; break;
         }
         break;
 
     // Rutas de Cursos
     case 'cursos':
+        $cursoController = new CursoController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $cursoController->index();
-                break;
-            case 'create':
-                $cursoController->create();
-                break;
-            case 'store':
-                $cursoController->store();
-                break;
-            case 'edit':
-                $cursoController->edit();
-                break;
-            case 'update':
-                $cursoController->update();
-                break;
-            case 'delete':
-                $cursoController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Cursos</h1>";
-                break;
+            case 'index': $cursoController->index(); break;
+            case 'create': $cursoController->create(); break;
+            case 'store': $cursoController->store(); break;
+            case 'edit': $cursoController->edit(); break;
+            case 'update': $cursoController->update(); break;
+            case 'delete': $cursoController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Cursos</h1>"; break;
         }
         break;
 
     // Rutas de Tipos de Piscina
     case 'tipos_piscina':
+        $tipoPiscinaController = new TipoPiscinaController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $tipoPiscinaController->index();
-                break;
-            case 'create':
-                $tipoPiscinaController->create();
-                break;
-            case 'store':
-                $tipoPiscinaController->store();
-                break;
-            case 'edit':
-                $tipoPiscinaController->edit();
-                break;
-            case 'update':
-                $tipoPiscinaController->update();
-                break;
-            case 'delete':
-                $tipoPiscinaController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Tipos de Piscina</h1>";
-                break;
+            case 'index': $tipoPiscinaController->index(); break;
+            case 'create': $tipoPiscinaController->create(); break;
+            case 'store': $tipoPiscinaController->store(); break;
+            case 'edit': $tipoPiscinaController->edit(); break;
+            case 'update': $tipoPiscinaController->update(); break;
+            case 'delete': $tipoPiscinaController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Tipos de Piscina</h1>"; break;
         }
         break;
 
     // Rutas de Piscinas
     case 'piscinas':
+        $piscinaController = new PiscinaController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $piscinaController->index();
-                break;
-            case 'create':
-                $piscinaController->create();
-                break;
-            case 'store':
-                $piscinaController->store();
-                break;
-            case 'edit':
-                $piscinaController->edit();
-                break;
-            case 'update':
-                $piscinaController->update();
-                break;
-            case 'delete':
-                $piscinaController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Piscinas</h1>";
-                break;
+            case 'index': $piscinaController->index(); break;
+            case 'create': $piscinaController->create(); break;
+            case 'store': $piscinaController->store(); break;
+            case 'edit': $piscinaController->edit(); break;
+            case 'update': $piscinaController->update(); break;
+            case 'delete': $piscinaController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Piscinas</h1>"; break;
         }
         break;
 
     // Rutas de Carriles
     case 'carriles':
+        $carrilController = new CarrilController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $carrilController->index();
-                break;
-            case 'create':
-                $carrilController->create();
-                break;
-            case 'store':
-                $carrilController->store();
-                break;
-            case 'edit':
-                $carrilController->edit();
-                break;
-            case 'update':
-                $carrilController->update();
-                break;
-            case 'delete':
-                $carrilController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Carriles</h1>";
-                break;
+            case 'index': $carrilController->index(); break;
+            case 'create': $carrilController->create(); break;
+            case 'store': $carrilController->store(); break;
+            case 'edit': $carrilController->edit(); break;
+            case 'update': $carrilController->update(); break;
+            case 'delete': $carrilController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Carriles</h1>"; break;
         }
         break;
 
     // Rutas de Tipos de Horario
     case 'tipos_horario':
+        $tipoHorarioController = new TipoHorarioController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $tipoHorarioController->index();
-                break;
-            case 'create':
-                $tipoHorarioController->create();
-                break;
-            case 'store':
-                $tipoHorarioController->store();
-                break;
-            case 'edit':
-                $tipoHorarioController->edit();
-                break;
-            case 'update':
-                $tipoHorarioController->update();
-                break;
-            case 'delete':
-                $tipoHorarioController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Tipos de Horario</h1>";
-                break;
+            case 'index': $tipoHorarioController->index(); break;
+            case 'create': $tipoHorarioController->create(); break;
+            case 'store': $tipoHorarioController->store(); break;
+            case 'edit': $tipoHorarioController->edit(); break;
+            case 'update': $tipoHorarioController->update(); break;
+            case 'delete': $tipoHorarioController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Tipos de Horario</h1>"; break;
         }
         break;
 
     // Rutas de Horarios
     case 'horarios':
+        $horarioController = new HorarioController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $horarioController->index();
-                break;
-            case 'create':
-                $horarioController->create();
-                break;
-            case 'store':
-                $horarioController->store();
-                break;
-            case 'edit':
-                $horarioController->edit();
-                break;
-            case 'update':
-                $horarioController->update();
-                break;
-            case 'delete':
-                $horarioController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Horarios</h1>";
-                break;
+            case 'index': $horarioController->index(); break;
+            case 'create': $horarioController->create(); break;
+            case 'store': $horarioController->store(); break;
+            case 'edit': $horarioController->edit(); break;
+            case 'update': $horarioController->update(); break;
+            case 'delete': $horarioController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Horarios</h1>"; break;
         }
         break;
 
     // Rutas de Formas de Pago
     case 'formas_pago':
+        $formaPagoController = new FormaPagoController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $formaPagoController->index();
-                break;
-            case 'create':
-                $formaPagoController->create();
-                break;
-            case 'store':
-                $formaPagoController->store();
-                break;
-            case 'edit':
-                $formaPagoController->edit();
-                break;
-            case 'update':
-                $formaPagoController->update();
-                break;
-            case 'delete':
-                $formaPagoController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Formas de Pago</h1>";
-                break;
+            case 'index': $formaPagoController->index(); break;
+            case 'create': $formaPagoController->create(); break;
+            case 'store': $formaPagoController->store(); break;
+            case 'edit': $formaPagoController->edit(); break;
+            case 'update': $formaPagoController->update(); break;
+            case 'delete': $formaPagoController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Formas de Pago</h1>"; break;
         }
         break;
 
     // Rutas de Usuarios
     case 'usuarios':
+        $usuarioController = new UsuarioController();
         $action = $parts[1] ?? 'index';
         switch ($action) {
-            case 'index':
-                $usuarioController->index();
-                break;
-            case 'create':
-                $usuarioController->create();
-                break;
-            case 'store':
-                $usuarioController->store();
-                break;
-            case 'edit':
-                $usuarioController->edit();
-                break;
-            case 'update':
-                $usuarioController->update();
-                break;
-            case 'delete':
-                $usuarioController->delete();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Usuarios</h1>";
-                break;
+            case 'index': $usuarioController->index(); break;
+            case 'create': $usuarioController->create(); break;
+            case 'store': $usuarioController->store(); break;
+            case 'edit': $usuarioController->edit(); break;
+            case 'update': $usuarioController->update(); break;
+            case 'delete': $usuarioController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Usuarios</h1>"; break;
         }
         break;
 
     // Rutas de Matrículas
     case 'matriculas':
+        $matriculaController = new MatriculaController();
         $action = $parts[1] ?? 'index';
         switch($action) {
-            case 'index':
-                $matriculaController->index();
-                break;
-            case 'create':
-                $matriculaController->create();
-                break;
-            case 'store':
-                $matriculaController->store();
-                break;
-            case 'getHorariosByCurso':
-                $matriculaController->getHorariosByCurso();
-                break;
-            case 'show':
-                $matriculaController->show();
-                break;
-            case 'cancel':
-                $matriculaController->cancel();
-                break;
-            case 'edit':
-                $matriculaController->edit();
-                break;
-            case 'update':
-                $matriculaController->update();
-                break;
-            case 'updateDiaClase':
-                $matriculaController->updateDiaClase();
-                break;
-            case 'addRecuperacion':
-                $matriculaController->addRecuperacion();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Matrículas</h1>";
-                break;
+            case 'index': $matriculaController->index(); break;
+            case 'create': $matriculaController->create(); break;
+            case 'store': $matriculaController->store(); break;
+            case 'show': $matriculaController->show(); break;
+            case 'edit': $matriculaController->edit(); break;
+            case 'update': $matriculaController->update(); break;
+            case 'cancel': $matriculaController->cancel(); break;
+            case 'getHorariosByCurso': $matriculaController->getHorariosByCurso(); break;
+            case 'updateDiaClase': $matriculaController->updateDiaClase(); break;
+            case 'addRecuperacion': $matriculaController->addRecuperacion(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Matrículas</h1>"; break;
         }
         break;
 
     // Rutas de Asistencia de Profesores
     case 'asistencias_profesor':
+        $asistenciaProfesorController = new AsistenciaProfesorController();
         $action = $parts[1] ?? 'index';
         switch($action) {
-            case 'index':
-                $asistenciaProfesorController->index();
-                break;
-            case 'save':
-                $asistenciaProfesorController->save();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Acción no encontrada en Asistencia de Profesores</h1>";
-                break;
+            case 'index': $asistenciaProfesorController->index(); break;
+            case 'save': $asistenciaProfesorController->save(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Asistencia de Profesores</h1>"; break;
         }
         break;
 
     // Rutas de Reportes
     case 'reportes':
+        $reporteController = new ReporteController();
         $action = $parts[1] ?? 'ventas'; // Por defecto, el reporte de ventas
         switch($action) {
-            case 'ventas':
-                $reporteController->ventas();
-                break;
-            case 'profesores':
-                $reporteController->profesores();
-                break;
-            default:
-                http_response_code(404);
-                echo "<h1>404 - Reporte no encontrado</h1>";
-                break;
+            case 'ventas': $reporteController->ventas(); break;
+            case 'profesores': $reporteController->profesores(); break;
+            default: http_response_code(404); echo "<h1>404 - Reporte no encontrado</h1>"; break;
         }
         break;
 
