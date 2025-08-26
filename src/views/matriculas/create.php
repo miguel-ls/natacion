@@ -44,7 +44,7 @@ $auth = new AuthController();
                     <select id="id_curso" name="id_curso" required>
                         <option value="">Seleccione un curso</option>
                         <?php foreach ($cursos as $curso): ?>
-                            <option value="<?php echo htmlspecialchars($curso['id_curso']); ?>" data-precio="<?php echo htmlspecialchars($curso['precio_base']); ?>"><?php echo htmlspecialchars($curso['nombre']); ?></option>
+                            <option value="<?php echo htmlspecialchars($curso['id_curso']); ?>"><?php echo htmlspecialchars($curso['nombre']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

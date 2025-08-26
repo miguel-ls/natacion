@@ -89,6 +89,8 @@ if (!defined('BASE_URL')) {
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_horario">Tipos de Horario</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=horarios">Programar Horarios</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=formas_pago">Formas de Pago</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_precio">Tipos de Precio</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=precios_cursos">Lista de Precios</a>
                         </div>
                     </div>
                 <?php endif; ?>
