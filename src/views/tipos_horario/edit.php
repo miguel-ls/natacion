@@ -2,9 +2,20 @@
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 $auth = new AuthController();
-// Mapa de días corregido según DAYOFWEEK() de MySQL
-$dias_semana_map = ['2' => 'Lunes', '3' => 'Martes', '4' => 'Miércoles', '5' => 'Jueves', '6' => 'Viernes', '7' => 'Sábado', '1' => 'Domingo'];
-$dias_seleccionados = explode(',', $tipo_horario['dias_semana']);
+
+// Define el orden de los días para la visualización
+$dias_ordenados = [
+    '2' => 'Lunes',
+    '3' => 'Martes',
+    '4' => 'Miércoles',
+    '5' => 'Jueves',
+    '6' => 'Viernes',
+    '7' => 'Sábado',
+    '1' => 'Domingo'
+];
+
+// Convierte la cadena de la BD a un array, manejando el caso de que esté vacía.
+$dias_seleccionados = !empty($tipo_horario['dias_semana']) ? explode(',', $tipo_horario['dias_semana']) : [];
 ?>
 
 <style>
@@ -13,7 +24,8 @@ $dias_seleccionados = explode(',', $tipo_horario['dias_semana']);
 .form-group { margin-bottom: 1rem; }
 .form-group label { display: block; margin-bottom: 0.5rem; }
 .form-group input[type="text"] { width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; }
-.checkbox-group label { margin-right: 15px; }
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 15px; }
+.checkbox-group label { margin-right: 15px; display: flex; align-items: center; gap: 5px;}
 .form-actions { margin-top: 1rem; text-align: right; }
 .btn { padding: 10px 15px; border: none; border-radius: 4px; color: white; text-decoration: none; cursor: pointer; }
 .btn-success { background-color: #5cb85c; }
@@ -41,7 +53,7 @@ $dias_seleccionados = explode(',', $tipo_horario['dias_semana']);
         <div class="form-group">
             <label>Días de la Semana</label>
             <div class="checkbox-group">
-                <?php foreach ($dias_semana_map as $value => $label): ?>
+                <?php foreach ($dias_ordenados as $value => $label): ?>
                     <label>
                         <input type="checkbox" name="dias_semana[]" value="<?php echo $value; ?>" <?php echo in_array($value, $dias_seleccionados) ? 'checked' : ''; ?>>
                         <?php echo $label; ?>
