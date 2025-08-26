@@ -111,6 +111,11 @@ class MatriculaController {
         $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_cursos->closeCursor();
 
+        $stmt_profesores = $db->prepare("CALL sp_get_all_profesores(?)");
+        $stmt_profesores->execute(['']); // Pasar string vacío para obtener todos
+        $profesores = $stmt_profesores->fetchAll(PDO::FETCH_ASSOC);
+        $stmt_profesores->closeCursor();
+
         $stmt_formas_pago = $db->prepare("CALL sp_get_all_formas_pago(?)");
         $stmt_formas_pago->execute(['']); // Pasar string vacío para obtener todas
         $formas_pago = $stmt_formas_pago->fetchAll(PDO::FETCH_ASSOC);
@@ -125,6 +130,9 @@ class MatriculaController {
     public function getHorariosByCurso() {
         header('Content-Type: application/json');
         $id_curso = $_GET['id_curso'] ?? 0;
+        $id_profesor = $_GET['id_profesor'] ?? 0;
+        $hora_inicio = !empty($_GET['hora_inicio']) ? $_GET['hora_inicio'] : null;
+        $hora_fin = !empty($_GET['hora_fin']) ? $_GET['hora_fin'] : null;
 
         if (!$id_curso) {
             echo json_encode([]);
@@ -133,8 +141,8 @@ class MatriculaController {
 
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?)");
-            $stmt->execute([$id_curso]);
+            $stmt = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?)");
+            $stmt->execute([$id_curso, $id_profesor, $hora_inicio, $hora_fin]);
             $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($horarios);
         } catch (PDOException $e) {
@@ -155,10 +163,31 @@ class MatriculaController {
             $db->beginTransaction();
 
             try {
+                $id_alumno = $_POST['id_alumno'];
+
+                // Si no hay ID de alumno pero sí datos de nuevo alumno, crearlo primero
+                if (empty($id_alumno) && !empty($_POST['nuevo_alumno_nombres'])) {
+                    $stmt_nuevo_alumno = $db->prepare("CALL sp_create_alumno_simple(?, ?, ?, ?, ?)");
+                    $stmt_nuevo_alumno->execute([
+                        $_POST['nuevo_alumno_nombres'],
+                        $_POST['nuevo_alumno_apellidos'],
+                        $_POST['nuevo_alumno_documento'],
+                        $_POST['nuevo_alumno_telefono'],
+                        $_POST['nuevo_alumno_email']
+                    ]);
+                    $result_alumno = $stmt_nuevo_alumno->fetch(PDO::FETCH_ASSOC);
+                    $id_alumno = $result_alumno['nuevo_alumno_id'];
+                    $stmt_nuevo_alumno->closeCursor();
+                }
+
+                if (empty($id_alumno)) {
+                    throw new Exception("No se ha seleccionado ni creado un alumno.");
+                }
+
                 // 1. Crear la matrícula
                 $stmt_matricula = $db->prepare("CALL sp_create_matricula(?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt_matricula->execute([
-                    $_POST['id_alumno'],
+                    $id_alumno,
                     $_POST['id_horario'],
                     $_SESSION['user_id'],
                     $_POST['fecha_inicio'],

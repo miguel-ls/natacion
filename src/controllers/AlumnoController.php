@@ -153,5 +153,24 @@ class AlumnoController {
         header('Location: index.php?url=alumnos');
         exit;
     }
+
+    /**
+     * Busca alumnos para una llamada AJAX y devuelve JSON.
+     */
+    public function search() {
+        header('Content-Type: application/json');
+        $search_term = $_GET['term'] ?? '';
+
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_all_alumnos(?)");
+            $stmt->execute([$search_term]);
+            $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($alumnos);
+        } catch (PDOException $e) {
+            echo json_encode([]); // Devuelve array vacío en caso de error
+        }
+        exit;
+    }
 }
 ?>
