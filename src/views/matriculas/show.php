@@ -88,6 +88,7 @@ function get_status_class($status) {
         </form>
     </div>
 
+    <a href="index.php?url=matriculas/editDates&id=<?php echo $matricula['id_matricula']; ?>" class="btn btn-warning">Editar Fechas y Detalles</a>
     <a href="index.php?url=matriculas" class="btn-back">Volver al Listado</a>
 </div>
 
