@@ -1,4 +1,8 @@
 <?php
+// URL base del proyecto. ¡Asegúrate de que termine con una barra inclinada /!
+// Ejemplo: http://localhost/natacion/public/
+define('BASE_URL', 'http://localhost/natacion/public/');
+
 // Configuración de la base de datos
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
