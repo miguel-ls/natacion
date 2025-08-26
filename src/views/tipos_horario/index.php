@@ -1,10 +1,19 @@
 <?php
 require_once __DIR__ . '/../partials/header.php';
 
-// Helper function to display days
+// Helper function to display days correctly according to MySQL DAYOFWEEK()
 function format_dias_semana($dias_str) {
     if (empty($dias_str)) return 'N/A';
-    $dias_map = ['1' => 'Lun', '2' => 'Mar', '3' => 'Mié', '4' => 'Jue', '5' => 'Vie', '6' => 'Sáb', '7' => 'Dom'];
+    // Mapa correcto: 1=Dom, 2=Lun, 3=Mar, 4=Mié, 5=Jue, 6=Vie, 7=Sáb
+    $dias_map = [
+        '1' => 'Dom',
+        '2' => 'Lun',
+        '3' => 'Mar',
+        '4' => 'Mié',
+        '5' => 'Jue',
+        '6' => 'Vie',
+        '7' => 'Sáb'
+    ];
     $dias_arr = explode(',', $dias_str);
     $dias_formatted = [];
     foreach ($dias_arr as $dia) {
