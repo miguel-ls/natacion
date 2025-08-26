@@ -19,9 +19,9 @@ $auth = new AuthController();
 .horario-item:hover { background-color: #f5f5f5; }
 .horario-item.selected { border-color: #337ab7; background-color: #eaf2fa; }
 
-/* Estilos para búsqueda de alumno */
-#alumno-search-container { position: relative; }
-#alumno-search-results {
+/* Estilos para búsqueda de alumno y curso */
+.search-container { position: relative; }
+.search-results {
     position: absolute;
     background-color: white;
     border: 1px solid #ccc;
@@ -44,11 +44,11 @@ $auth = new AuthController();
 
         <div class="form-section">
             <h4>1. Seleccionar o Registrar Alumno</h4>
-            <div class="form-group" id="alumno-search-container">
+            <div class="form-group search-container">
                 <label for="alumno_search">Buscar Alumno Existente</label>
                 <input type="text" id="alumno_search" class="form-control" placeholder="Escriba nombre, apellido o documento..." autocomplete="off">
                 <input type="hidden" id="id_alumno" name="id_alumno">
-                <div id="alumno-search-results"></div>
+                <div id="alumno-search-results" class="search-results"></div>
                 <small>Si el alumno no existe, regístrelo a continuación.</small>
             </div>
 
@@ -70,14 +70,11 @@ $auth = new AuthController();
 
         <div class="form-section">
             <h4>2. Seleccionar Curso y Horario</h4>
-            <div class="form-group">
-                <label for="id_curso">Curso</label>
-                <select id="id_curso" name="id_curso" required>
-                    <option value="">Seleccione un curso para ver horarios</option>
-                    <?php foreach ($cursos as $curso): ?>
-                        <option value="<?php echo htmlspecialchars($curso['id_curso']); ?>"><?php echo htmlspecialchars($curso['nombre']); ?></option>
-                    <?php endforeach; ?>
-                </select>
+            <div class="form-group search-container">
+                <label for="curso_search">Buscar Curso</label>
+                <input type="text" id="curso_search" class="form-control" placeholder="Escriba el nombre del curso..." autocomplete="off" required>
+                <input type="hidden" id="id_curso" name="id_curso" required>
+                <div id="curso-search-results" class="search-results"></div>
             </div>
 
             <div class="schedule-filters">
@@ -190,6 +187,40 @@ document.getElementById('btn-show-nuevo-alumno').addEventListener('click', funct
     searchResults.innerHTML = '';
 });
 
+// Lógica para búsqueda de cursos
+const cursoSearchInput = document.getElementById('curso_search');
+const cursoSearchResults = document.getElementById('curso-search-results');
+const cursoHiddenInputId = document.getElementById('id_curso');
+
+cursoSearchInput.addEventListener('keyup', function() {
+    const term = this.value;
+    cursoHiddenInputId.value = '';
+    document.getElementById('horarios-disponibles-container').innerHTML = '<p>Por favor, seleccione un curso.</p>'; // Clear schedules
+    if (term.length < 2) {
+        cursoSearchResults.innerHTML = '';
+        return;
+    }
+    fetch(`index.php?url=cursos/search&term=${term}`)
+        .then(response => response.json())
+        .then(data => {
+            cursoSearchResults.innerHTML = '';
+            data.forEach(curso => {
+                const item = document.createElement('div');
+                item.className = 'search-result-item';
+                item.textContent = curso.nombre;
+                item.dataset.id = curso.id_curso;
+                item.addEventListener('click', function() {
+                    cursoSearchInput.value = this.textContent;
+                    cursoHiddenInputId.value = this.dataset.id;
+                    cursoSearchResults.innerHTML = '';
+                    buscarHorarios();
+                });
+                cursoSearchResults.appendChild(item);
+            });
+        });
+});
+
+
 // Lógica para horarios
 function buscarHorarios() {
     const cursoId = document.getElementById('id_curso').value;
@@ -241,7 +272,6 @@ function buscarHorarios() {
         });
 }
 
-document.getElementById('id_curso').addEventListener('change', buscarHorarios);
 document.getElementById('btn-filtrar-horarios').addEventListener('click', buscarHorarios);
 
 // Form validation

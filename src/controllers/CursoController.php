@@ -112,5 +112,24 @@ class CursoController {
         header('Location: index.php?url=cursos');
         exit;
     }
+
+    /**
+     * Busca cursos para una llamada AJAX y devuelve JSON.
+     */
+    public function search() {
+        header('Content-Type: application/json');
+        $search_term = $_GET['term'] ?? '';
+
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_all_cursos(?)");
+            $stmt->execute([$search_term]);
+            $cursos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($cursos);
+        } catch (PDOException $e) {
+            echo json_encode([]); // Devuelve array vacío en caso de error
+        }
+        exit;
+    }
 }
 ?>

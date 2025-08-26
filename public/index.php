@@ -128,6 +128,7 @@ switch ($route) {
             case 'edit': $cursoController->edit(); break;
             case 'update': $cursoController->update(); break;
             case 'delete': $cursoController->delete(); break;
+            case 'search': $cursoController->search(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Cursos</h1>"; break;
         }
         break;
