@@ -21,11 +21,19 @@ $auth = new AuthController();
 
 /* Estilos para búsqueda de alumno */
 #alumno-search-container { position: relative; }
-#alumno-search-results { position: absolute; background-color: white; border: 1px solid #ccc; width: 100%; max-height: 200px; overflow-y: auto; z-index: 1000; }
+#alumno-search-results {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
 .search-result-item { padding: 10px; cursor: pointer; }
 .search-result-item:hover { background-color: #f0f0f0; }
 #nuevo-alumno-form { display: none; background-color: #f9f9f9; padding: 1rem; border-radius: 5px; margin-top: 1rem;}
-.schedule-filters { display: flex; gap: 1rem; align-items: flex-end; background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-top: 1rem;}
+.schedule-filters { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-top: 1rem;}
 </style>
 
 <div class="form-container">
@@ -34,12 +42,32 @@ $auth = new AuthController();
     <form id="form-matricula" action="index.php?url=matriculas/store" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
 
-        <!-- STUDENT SECTION -->
         <div class="form-section">
-            <!-- ... (código de búsqueda y creación de alumno sin cambios) ... -->
+            <h4>1. Seleccionar o Registrar Alumno</h4>
+            <div class="form-group" id="alumno-search-container">
+                <label for="alumno_search">Buscar Alumno Existente</label>
+                <input type="text" id="alumno_search" class="form-control" placeholder="Escriba nombre, apellido o documento..." autocomplete="off">
+                <input type="hidden" id="id_alumno" name="id_alumno">
+                <div id="alumno-search-results"></div>
+                <small>Si el alumno no existe, regístrelo a continuación.</small>
+            </div>
+
+            <button type="button" id="btn-show-nuevo-alumno" class="btn btn-secondary">Registrar Nuevo Alumno</button>
+
+            <div id="nuevo-alumno-form">
+                <h5>Datos del Nuevo Alumno (Esenciales)</h5>
+                <div class="form-row">
+                    <div class="form-group"><label>Nombres:</label><input type="text" name="nuevo_alumno_nombres"></div>
+                    <div class="form-group"><label>Apellidos:</label><input type="text" name="nuevo_alumno_apellidos"></div>
+                </div>
+                 <div class="form-row">
+                    <div class="form-group"><label>Documento:</label><input type="text" name="nuevo_alumno_documento"></div>
+                    <div class="form-group"><label>Teléfono:</label><input type="text" name="nuevo_alumno_telefono"></div>
+                </div>
+                 <div class="form-group"><label>Email:</label><input type="email" name="nuevo_alumno_email"></div>
+            </div>
         </div>
 
-        <!-- SCHEDULE SECTION -->
         <div class="form-section">
             <h4>2. Seleccionar Curso y Horario</h4>
             <div class="form-group">
@@ -52,7 +80,6 @@ $auth = new AuthController();
                 </select>
             </div>
 
-            <!-- NEW FILTERS -->
             <div class="schedule-filters">
                 <div class="form-group">
                     <label for="filtro_profesor">Profesor</label>
@@ -75,15 +102,43 @@ $auth = new AuthController();
             </div>
 
             <div id="horarios-disponibles-container">
-                <p>Por favor, seleccione un curso y presione "Filtrar Horarios".</p>
+                <p>Por favor, seleccione un curso.</p>
             </div>
             <input type="hidden" id="id_horario" name="id_horario" required>
             <input type="hidden" id="dias_semana_hidden" name="dias_semana_hidden">
         </div>
 
-        <!-- PAYMENT SECTION -->
         <div class="form-section">
-            <!-- ... (código de fechas y pago sin cambios) ... -->
+            <h4>3. Fechas y Pago</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha de Inicio</label>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+                </div>
+                <div class="form-group">
+                    <label for="fecha_fin">Fecha de Fin</label>
+                    <input type="date" id="fecha_fin" name="fecha_fin" required>
+                </div>
+            </div>
+            <div class="form-row">
+                 <div class="form-group">
+                    <label for="precio_final">Precio Final (S/)</label>
+                    <input type="number" id="precio_final" name="precio_final" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_forma_pago">Forma de Pago</label>
+                    <select id="id_forma_pago" name="id_forma_pago" required>
+                        <option value="">Seleccione una forma de pago</option>
+                         <?php foreach ($formas_pago as $forma): ?>
+                            <option value="<?php echo htmlspecialchars($forma['id_forma_pago']); ?>"><?php echo htmlspecialchars($forma['nombre']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+             <div class="form-group">
+                <label for="observaciones">Observaciones</label>
+                <textarea id="observaciones" name="observaciones" rows="3"></textarea>
+            </div>
         </div>
 
         <div class="form-actions">
@@ -94,7 +149,46 @@ $auth = new AuthController();
 </div>
 
 <script>
-// ... (código de búsqueda de alumno sin cambios) ...
+// Lógica para búsqueda de alumnos
+const searchInput = document.getElementById('alumno_search');
+const searchResults = document.getElementById('alumno-search-results');
+const hiddenInputId = document.getElementById('id_alumno');
+const nuevoAlumnoForm = document.getElementById('nuevo-alumno-form');
+
+searchInput.addEventListener('keyup', function() {
+    const term = this.value;
+    hiddenInputId.value = '';
+    if (term.length < 2) {
+        searchResults.innerHTML = '';
+        return;
+    }
+    fetch(`index.php?url=alumnos/search&term=${term}`)
+        .then(response => response.json())
+        .then(data => {
+            searchResults.innerHTML = '';
+            data.forEach(alumno => {
+                const item = document.createElement('div');
+                item.className = 'search-result-item';
+                item.textContent = `${alumno.nombres} ${alumno.apellidos} (${alumno.documento_identidad || 'N/D'})`;
+                item.dataset.id = alumno.id_alumno;
+                item.addEventListener('click', function() {
+                    searchInput.value = this.textContent;
+                    hiddenInputId.value = this.dataset.id;
+                    searchResults.innerHTML = '';
+                    nuevoAlumnoForm.style.display = 'none';
+                    document.querySelectorAll('#nuevo-alumno-form input').forEach(input => input.value = '');
+                });
+                searchResults.appendChild(item);
+            });
+        });
+});
+
+document.getElementById('btn-show-nuevo-alumno').addEventListener('click', function() {
+    nuevoAlumnoForm.style.display = 'block';
+    searchInput.value = '';
+    hiddenInputId.value = '';
+    searchResults.innerHTML = '';
+});
 
 // Lógica para horarios
 function buscarHorarios() {
@@ -109,11 +203,10 @@ function buscarHorarios() {
     document.getElementById('id_horario').value = '';
 
     if (!cursoId) {
-        container.innerHTML = '<p>Por favor, seleccione un curso para ver los horarios disponibles.</p>';
+        container.innerHTML = '<p>Por favor, seleccione un curso.</p>';
         return;
     }
 
-    // Construir URL con filtros
     let fetchUrl = `index.php?url=matriculas/getHorariosByCurso&id_curso=${cursoId}&id_profesor=${profesorId}`;
     if (horaInicio) fetchUrl += `&hora_inicio=${horaInicio}`;
     if (horaFin) fetchUrl += `&hora_fin=${horaFin}`;
@@ -151,7 +244,17 @@ function buscarHorarios() {
 document.getElementById('id_curso').addEventListener('change', buscarHorarios);
 document.getElementById('btn-filtrar-horarios').addEventListener('click', buscarHorarios);
 
-// ... (código de validación de formulario sin cambios) ...
+// Form validation
+document.getElementById('form-matricula').addEventListener('submit', function(event) {
+    if (!document.getElementById('id_alumno').value && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
+        alert('Por favor, seleccione un alumno existente o registre uno nuevo.');
+        event.preventDefault();
+    }
+    if (!document.getElementById('id_horario').value) {
+        alert('Por favor, seleccione un horario disponible.');
+        event.preventDefault();
+    }
+});
 </script>
 
 <?php
