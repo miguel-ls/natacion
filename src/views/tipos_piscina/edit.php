@@ -1,0 +1,50 @@
+<?php
+require_once __DIR__ . '/../partials/header.php';
+require_once __DIR__ . '/../../controllers/AuthController.php';
+$auth = new AuthController();
+?>
+
+<style>
+/* Reutilizamos los estilos de formularios */
+.form-container { max-width: 600px; margin: 2rem auto; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; }
+.form-group input, .form-group textarea { width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; }
+.form-actions { margin-top: 1rem; text-align: right; }
+.btn { padding: 10px 15px; border: none; border-radius: 4px; color: white; text-decoration: none; cursor: pointer; }
+.btn-success { background-color: #5cb85c; }
+.btn-secondary { background-color: #6c757d; }
+</style>
+
+<div class="form-container">
+    <h2>Editar Tipo de Piscina</h2>
+
+    <?php
+    if (isset($_SESSION['error_message'])) {
+        echo '<div class="error-message">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
+        unset($_SESSION['error_message']);
+    }
+    ?>
+
+    <form action="index.php?url=tipos_piscina/update" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
+        <input type="hidden" name="id_tipo_piscina" value="<?php echo htmlspecialchars($item['id_tipo_piscina']); ?>">
+
+        <div class="form-group">
+            <label for="nombre">Nombre del Tipo</label>
+            <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($item['nombre']); ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" name="descripcion" rows="4"><?php echo htmlspecialchars($item['descripcion']); ?></textarea>
+        </div>
+        <div class="form-actions">
+            <a href="index.php?url=tipos_piscina" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-success">Actualizar Tipo</button>
+        </div>
+    </form>
+</div>
+
+<?php
+require_once __DIR__ . '/../partials/footer.php';
+?>
