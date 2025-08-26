@@ -106,13 +106,13 @@ class MatriculaController {
         $alumnos = $stmt_alumnos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_alumnos->closeCursor();
 
-        $stmt_cursos = $db->prepare("CALL sp_get_all_cursos()");
-        $stmt_cursos->execute();
+        $stmt_cursos = $db->prepare("CALL sp_get_all_cursos(?)");
+        $stmt_cursos->execute(['']); // Pasar string vacío para obtener todos los cursos
         $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_cursos->closeCursor();
 
-        $stmt_formas_pago = $db->prepare("CALL sp_get_all_formas_pago()");
-        $stmt_formas_pago->execute();
+        $stmt_formas_pago = $db->prepare("CALL sp_get_all_formas_pago(?)");
+        $stmt_formas_pago->execute(['']); // Pasar string vacío para obtener todas
         $formas_pago = $stmt_formas_pago->fetchAll(PDO::FETCH_ASSOC);
         $stmt_formas_pago->closeCursor();
 
