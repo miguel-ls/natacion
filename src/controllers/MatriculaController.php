@@ -101,8 +101,8 @@ class MatriculaController {
         $db = Database::getInstance()->getConnection();
 
         // Cargar datos necesarios para los menús desplegables iniciales
-        $stmt_alumnos = $db->prepare("CALL sp_get_all_alumnos()");
-        $stmt_alumnos->execute();
+        $stmt_alumnos = $db->prepare("CALL sp_get_all_alumnos(?)");
+        $stmt_alumnos->execute(['']); // Pasar string vacío para obtener todos los alumnos
         $alumnos = $stmt_alumnos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_alumnos->closeCursor();
 
