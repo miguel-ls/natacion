@@ -46,14 +46,37 @@ CREATE TABLE `carriles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Estructura de tabla para la tabla `cursos`
+-- Estructura de tabla para la tabla `cursos` (MODIFICADA)
 --
 CREATE TABLE `cursos` (
   `id_curso` INT AUTO_INCREMENT PRIMARY KEY,
   `nombre` VARCHAR(100) NOT NULL,
-  `descripcion` TEXT,
-  `precio_base` DECIMAL(10, 2) NOT NULL
+  `descripcion` TEXT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- NUEVA Estructura de tabla para la tabla `tipos_precio`
+--
+CREATE TABLE `tipos_precio` (
+  `id_tipo_precio` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(50) NOT NULL UNIQUE,
+  `descripcion` TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- NUEVA Estructura de tabla para la tabla `precios_cursos`
+--
+CREATE TABLE `precios_cursos` (
+  `id_precio_curso` INT AUTO_INCREMENT PRIMARY KEY,
+  `id_curso` INT NOT NULL,
+  `id_tipo_precio` INT NOT NULL,
+  `precio` DECIMAL(10, 2) NOT NULL,
+  `fecha_inicio` DATE NOT NULL,
+  `fecha_fin` DATE NOT NULL,
+  FOREIGN KEY (`id_curso`) REFERENCES `cursos`(`id_curso`) ON DELETE CASCADE,
+  FOREIGN KEY (`id_tipo_precio`) REFERENCES `tipos_precio`(`id_tipo_precio`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 --
 -- Estructura de tabla para la tabla `profesores`

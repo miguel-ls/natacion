@@ -38,10 +38,6 @@ $auth = new AuthController();
             <label for="descripcion">Descripción</label>
             <textarea id="descripcion" name="descripcion" rows="4"><?php echo htmlspecialchars($curso['descripcion']); ?></textarea>
         </div>
-        <div class="form-group">
-            <label for="precio_base">Precio Base (S/)</label>
-            <input type="number" id="precio_base" name="precio_base" step="0.01" value="<?php echo htmlspecialchars($curso['precio_base']); ?>" required>
-        </div>
         <div class="form-actions">
             <a href="index.php?url=cursos" class="btn btn-secondary">Cancelar</a>
             <button type="submit" class="btn btn-success">Actualizar Curso</button>

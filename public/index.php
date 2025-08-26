@@ -23,6 +23,8 @@ require_once '../src/controllers/UsuarioController.php';
 require_once '../src/controllers/MatriculaController.php';
 require_once '../src/controllers/AsistenciaProfesorController.php';
 require_once '../src/controllers/ReporteController.php';
+require_once '../src/controllers/TipoPrecioController.php';
+require_once '../src/controllers/PrecioCursoController.php';
 
 
 // Simple enrutador basado en el parámetro 'url'
@@ -66,6 +68,36 @@ switch ($route) {
             case 'update': $alumnoController->update(); break;
             case 'delete': $alumnoController->delete(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Alumnos</h1>"; break;
+        }
+        break;
+
+    // Rutas de Precios de Cursos
+    case 'precios_cursos':
+        $precioCursoController = new PrecioCursoController();
+        $action = $parts[1] ?? 'index';
+        switch ($action) {
+            case 'index': $precioCursoController->index(); break;
+            case 'create': $precioCursoController->create(); break;
+            case 'store': $precioCursoController->store(); break;
+            case 'edit': $precioCursoController->edit(); break;
+            case 'update': $precioCursoController->update(); break;
+            case 'delete': $precioCursoController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Precios</h1>"; break;
+        }
+        break;
+
+    // Rutas de Tipos de Precio
+    case 'tipos_precio':
+        $tipoPrecioController = new TipoPrecioController();
+        $action = $parts[1] ?? 'index';
+        switch ($action) {
+            case 'index': $tipoPrecioController->index(); break;
+            case 'create': $tipoPrecioController->create(); break;
+            case 'store': $tipoPrecioController->store(); break;
+            case 'edit': $tipoPrecioController->edit(); break;
+            case 'update': $tipoPrecioController->update(); break;
+            case 'delete': $tipoPrecioController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Tipos de Precio</h1>"; break;
         }
         break;
 

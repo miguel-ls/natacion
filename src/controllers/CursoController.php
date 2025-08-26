@@ -32,11 +32,10 @@ class CursoController {
             $this->auth->verifyCsrfToken();
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_create_curso(?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_create_curso(?, ?)");
                 $stmt->execute([
                     $_POST['nombre'],
-                    $_POST['descripcion'],
-                    $_POST['precio_base']
+                    $_POST['descripcion']
                 ]);
                 header('Location: index.php?url=cursos');
                 exit;
@@ -82,12 +81,11 @@ class CursoController {
 
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_update_curso(?, ?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_update_curso(?, ?, ?)");
                 $stmt->execute([
                     $id,
                     $_POST['nombre'],
-                    $_POST['descripcion'],
-                    $_POST['precio_base']
+                    $_POST['descripcion']
                 ]);
                 header('Location: index.php?url=cursos');
                 exit;

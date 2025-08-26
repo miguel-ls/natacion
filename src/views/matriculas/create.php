@@ -103,8 +103,8 @@ $auth = new AuthController();
 <script>
 document.getElementById('id_curso').addEventListener('change', function() {
     const cursoId = this.value;
-    const precioBase = this.options[this.selectedIndex].getAttribute('data-precio');
-    document.getElementById('precio_final').value = precioBase || '';
+    // La lógica de precio ahora viene de los horarios, no del curso.
+    document.getElementById('precio_final').value = '';
 
     const container = document.getElementById('horarios-disponibles-container');
     container.innerHTML = '<p>Cargando horarios...</p>';
@@ -142,6 +142,7 @@ document.getElementById('id_curso').addEventListener('change', function() {
                         // Set the value of the hidden input
                         document.getElementById('id_horario').value = this.dataset.id;
                         document.getElementById('dias_semana_hidden').value = this.dataset.dias;
+                        document.getElementById('precio_final').value = horario.precio_actual || '';
                     });
                     container.appendChild(div);
                 });
