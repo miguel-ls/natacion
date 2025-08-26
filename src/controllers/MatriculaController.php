@@ -15,10 +15,11 @@ class MatriculaController {
      * Muestra la lista de todas las matrículas.
      */
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_all_matriculas_details()");
-            $stmt->execute();
+            $stmt = $db->prepare("CALL sp_get_all_matriculas_details(?)");
+            $stmt->execute([$search_term]);
             $matriculas = $stmt->fetchAll(PDO::FETCH_ASSOC);
             require_once __DIR__ . '/../views/matriculas/index.php';
         } catch (PDOException $e) {

@@ -12,10 +12,11 @@ class TipoPiscinaController {
     }
 
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_all_tipos_piscina()");
-            $stmt->execute();
+            $stmt = $db->prepare("CALL sp_get_all_tipos_piscina(?)");
+            $stmt->execute([$search_term]);
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
             require_once __DIR__ . '/../views/tipos_piscina/index.php';
         } catch (PDOException $e) {

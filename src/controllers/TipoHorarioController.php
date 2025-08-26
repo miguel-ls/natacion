@@ -12,9 +12,10 @@ class TipoHorarioController {
     }
 
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("CALL sp_get_all_tipos_horario()");
-        $stmt->execute();
+        $stmt = $db->prepare("CALL sp_get_all_tipos_horario(?)");
+        $stmt->execute([$search_term]);
         $tipos_horario = $stmt->fetchAll(PDO::FETCH_ASSOC);
         require_once __DIR__ . '/../views/tipos_horario/index.php';
     }

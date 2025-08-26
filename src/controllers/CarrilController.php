@@ -12,9 +12,10 @@ class CarrilController {
     }
 
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("CALL sp_get_all_carriles()");
-        $stmt->execute();
+        $stmt = $db->prepare("CALL sp_get_all_carriles(?)");
+        $stmt->execute([$search_term]);
         $carriles = $stmt->fetchAll(PDO::FETCH_ASSOC);
         require_once __DIR__ . '/../views/carriles/index.php';
     }

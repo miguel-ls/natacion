@@ -12,9 +12,10 @@ class HorarioController {
     }
 
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("CALL sp_get_all_horarios_details()");
-        $stmt->execute();
+        $stmt = $db->prepare("CALL sp_get_all_horarios_details(?)");
+        $stmt->execute([$search_term]);
         $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         require_once __DIR__ . '/../views/horarios/index.php';
     }

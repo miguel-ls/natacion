@@ -12,9 +12,10 @@ class PiscinaController {
     }
 
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("CALL sp_get_all_piscinas()");
-        $stmt->execute();
+        $stmt = $db->prepare("CALL sp_get_all_piscinas(?)");
+        $stmt->execute([$search_term]);
         $piscinas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         require_once __DIR__ . '/../views/piscinas/index.php';
     }
