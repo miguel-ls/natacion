@@ -1,6 +1,6 @@
 <?php
 // Cargar la configuración para tener acceso a BASE_URL
-require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../../config/database.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -9,7 +9,8 @@ require_once __DIR__ . '/../../config/database.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Matrícula de Natación</title>
     <!-- La URL del CSS también debe ser absoluta -->
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>src/views/assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
+    
 </head>
 <body>
     <header>
