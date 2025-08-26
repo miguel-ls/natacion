@@ -32,7 +32,20 @@ $auth = new AuthController();
     <form id="form-change-horario" action="index.php?url=matriculas/update" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
         <input type="hidden" name="id_matricula" value="<?php echo htmlspecialchars($matricula['id_matricula']); ?>">
-        <input type="hidden" id="id_horario" name="id_horario" required>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="fecha_inicio">Nueva Fecha de Inicio</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($matricula['fecha_inicio']); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="fecha_fin">Nueva Fecha de Fin</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($matricula['fecha_fin']); ?>" required>
+            </div>
+        </div>
+        <hr>
+        <h4>Seleccione un Nuevo Horario (si desea cambiarlo)</h4>
+        <input type="hidden" id="id_horario" name="id_horario" value="<?php echo htmlspecialchars($matricula['id_horario']); ?>" required>
 
         <div class="horarios-list">
             <?php if (empty($horarios_disponibles)): ?>

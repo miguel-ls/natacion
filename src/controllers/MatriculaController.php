@@ -79,17 +79,21 @@ class MatriculaController {
             $this->auth->verifyCsrfToken();
             $id_matricula = $_POST['id_matricula'] ?? null;
             $new_id_horario = $_POST['id_horario'] ?? null;
+            $fecha_inicio = $_POST['fecha_inicio'] ?? null;
+            $fecha_fin = $_POST['fecha_fin'] ?? null;
 
-            if ($id_matricula && $new_id_horario) {
+            if ($id_matricula && $new_id_horario && $fecha_inicio && $fecha_fin) {
                 $db = Database::getInstance()->getConnection();
                 try {
-                    $stmt = $db->prepare("CALL sp_change_horario_matricula(?, ?)");
-                    $stmt->execute([$id_matricula, $new_id_horario]);
+                    $stmt = $db->prepare("CALL sp_change_horario_matricula(?, ?, ?, ?)");
+                    $stmt->execute([$id_matricula, $new_id_horario, $fecha_inicio, $fecha_fin]);
                 } catch (PDOException $e) {
-                    $_SESSION['error_message'] = "Error al cambiar el horario: " . $e->getMessage();
+                    $_SESSION['error_message'] = "Error al actualizar la matrícula: " . $e->getMessage();
                 }
+            } else {
+                $_SESSION['error_message'] = "Faltan datos para actualizar la matrícula.";
             }
-            header('Location: index.php?url=matriculas');
+            header('Location: index.php?url=matriculas/show&id=' . $id_matricula);
             exit;
         }
     }
@@ -334,53 +338,5 @@ class MatriculaController {
         exit;
     }
 
-    /**
-     * Muestra el formulario para editar las fechas de una matrícula.
-     */
-    public function editDates() {
-        $id = $_GET['id'] ?? null;
-        if (!$id) {
-            header('Location: index.php?url=matriculas');
-            exit;
-        }
-
-        $db = Database::getInstance()->getConnection();
-        // Usamos el SP de detalles que ya existe
-        $stmt = $db->prepare("CALL sp_get_matricula_details_by_id(?)");
-        $stmt->execute([$id]);
-        $matricula = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($matricula) {
-            require_once __DIR__ . '/../views/matriculas/edit_dates.php';
-        } else {
-            http_response_code(404);
-            echo "Matrícula no encontrada.";
-        }
-    }
-
-    /**
-     * Procesa la actualización de las fechas de una matrícula.
-     */
-    public function updateDates() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->auth->verifyCsrfToken();
-            $id_matricula = $_POST['id_matricula'] ?? null;
-            $fecha_inicio = $_POST['fecha_inicio'] ?? null;
-            $fecha_fin = $_POST['fecha_fin'] ?? null;
-
-            if ($id_matricula && $fecha_inicio && $fecha_fin) {
-                $db = Database::getInstance()->getConnection();
-                try {
-                    $stmt = $db->prepare("CALL sp_update_matricula_dates(?, ?, ?)");
-                    $stmt->execute([$id_matricula, $fecha_inicio, $fecha_fin]);
-                } catch (PDOException $e) {
-                    $_SESSION['error_message'] = "Error al actualizar las fechas: " . $e->getMessage();
-                }
-            }
-            // Redirigir de vuelta a la página de detalles
-            header('Location: index.php?url=matriculas/show&id=' . $id_matricula);
-            exit;
-        }
-    }
 }
 ?>

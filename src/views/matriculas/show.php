@@ -119,7 +119,7 @@ function get_spanish_day_name($date_str) {
         </form>
     </div>
 
-    <a href="index.php?url=matriculas/editDates&id=<?php echo $matricula['id_matricula']; ?>" class="btn btn-warning">Editar Fechas y Detalles</a>
+    <a href="index.php?url=matriculas/edit&id=<?php echo $matricula['id_matricula']; ?>" class="btn btn-warning">Editar Matrícula</a>
     <a href="index.php?url=matriculas" class="btn-back">Volver al Listado</a>
 </div>
 

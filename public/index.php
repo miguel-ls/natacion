@@ -250,8 +250,6 @@ switch ($route) {
             case 'edit': $matriculaController->edit(); break;
             case 'update': $matriculaController->update(); break;
             case 'cancel': $matriculaController->cancel(); break;
-            case 'editDates': $matriculaController->editDates(); break;
-            case 'updateDates': $matriculaController->updateDates(); break;
             case 'getHorariosByCurso': $matriculaController->getHorariosByCurso(); break;
             case 'updateDiaClase': $matriculaController->updateDiaClase(); break;
             case 'addRecuperacion': $matriculaController->addRecuperacion(); break;
