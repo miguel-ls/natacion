@@ -12,6 +12,12 @@ function get_status_class($status) {
         default: return 'status-programada';
     }
 }
+
+function get_spanish_day_name($date_str) {
+    $days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    $day_index = date('w', strtotime($date_str));
+    return $days[$day_index];
+}
 ?>
 
 <style>
@@ -41,7 +47,24 @@ function get_status_class($status) {
     </div>
 
     <div class="details-grid">
-        <!-- ... (detalles de la matrícula) ... -->
+        <div class="detail-item">
+            <strong>Curso:</strong> <?php echo htmlspecialchars($matricula['curso_nombre']); ?>
+        </div>
+        <div class="detail-item">
+            <strong>Profesor:</strong> <?php echo htmlspecialchars($matricula['profesor_nombre']); ?>
+        </div>
+        <div class="detail-item">
+            <strong>Horario:</strong> <?php echo htmlspecialchars($matricula['tipo_horario_nombre']); ?> de <?php echo htmlspecialchars(date('h:i A', strtotime($matricula['hora_inicio']))) . ' a ' . htmlspecialchars(date('h:i A', strtotime($matricula['hora_fin']))); ?>
+        </div>
+        <div class="detail-item">
+            <strong>Lugar:</strong> <?php echo htmlspecialchars($matricula['carril_nombre']); ?>
+        </div>
+        <div class="detail-item">
+            <strong>Periodo:</strong> <?php echo htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_inicio']))); ?> - <?php echo htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_fin']))); ?>
+        </div>
+        <div class="detail-item">
+            <strong>Estado de Matrícula:</strong> <?php echo htmlspecialchars(ucfirst($matricula['estado'])); ?>
+        </div>
     </div>
 
     <div class="dias-clase-container">
@@ -49,6 +72,7 @@ function get_status_class($status) {
         <table class="dias-table">
             <thead>
                 <tr>
+                    <th>Día</th>
                     <th>Fecha</th>
                     <th>Estado</th>
                     <th>Observación</th>
@@ -56,21 +80,28 @@ function get_status_class($status) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($dias_clase as $dia): ?>
+                <?php if (empty($dias_clase)): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($dia['fecha_clase']))); ?></td>
-                        <td class="status-cell <?php echo get_status_class($dia['estado']); ?>"><?php echo htmlspecialchars(ucfirst($dia['estado'])); ?></td>
-                        <td><?php echo htmlspecialchars($dia['observacion']); ?></td>
-                        <td>
-                            <select class="action-select" data-id="<?php echo $dia['id_matricula_dia']; ?>">
-                                <option value="programada" <?php echo $dia['estado'] == 'programada' ? 'selected' : ''; ?>>Programada</option>
-                                <option value="asistio" <?php echo $dia['estado'] == 'asistio' ? 'selected' : ''; ?>>Asistió</option>
-                                <option value="falto" <?php echo $dia['estado'] == 'falto' ? 'selected' : ''; ?>>Faltó</option>
-                                <option value="postergada" <?php echo $dia['estado'] == 'postergada' ? 'selected' : ''; ?>>Postergada</option>
-                            </select>
-                        </td>
+                        <td colspan="5">No hay días de clase generados para esta matrícula.</td>
                     </tr>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <?php foreach ($dias_clase as $dia): ?>
+                        <tr>
+                            <td><?php echo get_spanish_day_name($dia['fecha_clase']); ?></td>
+                            <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($dia['fecha_clase']))); ?></td>
+                            <td class="status-cell <?php echo get_status_class($dia['estado']); ?>"><?php echo htmlspecialchars(ucfirst($dia['estado'])); ?></td>
+                            <td><?php echo htmlspecialchars($dia['observacion']); ?></td>
+                            <td>
+                                <select class="action-select" data-id="<?php echo $dia['id_matricula_dia']; ?>">
+                                    <option value="programada" <?php echo $dia['estado'] == 'programada' ? 'selected' : ''; ?>>Programada</option>
+                                    <option value="asistio" <?php echo $dia['estado'] == 'asistio' ? 'selected' : ''; ?>>Asistió</option>
+                                    <option value="falto" <?php echo $dia['estado'] == 'falto' ? 'selected' : ''; ?>>Faltó</option>
+                                    <option value="postergada" <?php echo $dia['estado'] == 'postergada' ? 'selected' : ''; ?>>Postergada</option>
+                                </select>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
