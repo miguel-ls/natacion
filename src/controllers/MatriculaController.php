@@ -59,8 +59,8 @@ class MatriculaController {
             $stmt_curso_id->closeCursor();
 
             // Obtener otros horarios disponibles para ese curso
-            $stmt_horarios = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?)");
-            $stmt_horarios->execute([$curso_id]);
+            $stmt_horarios = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?)");
+            $stmt_horarios->execute([$curso_id, 0, null, null]); // Se pasan valores por defecto para los filtros no usados aquí
             $horarios_disponibles = $stmt_horarios->fetchAll(PDO::FETCH_ASSOC);
             $stmt_horarios->closeCursor();
 
