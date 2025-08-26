@@ -61,9 +61,13 @@ BEGIN
 END$$
 
 -- Obtener todos los cursos
-CREATE PROCEDURE `sp_get_all_cursos`()
+CREATE PROCEDURE `sp_get_all_cursos`(IN p_search_term VARCHAR(255))
 BEGIN
-    SELECT id_curso, nombre, descripcion FROM cursos;
+    SELECT id_curso, nombre, descripcion
+    FROM cursos
+    WHERE p_search_term = ''
+       OR nombre LIKE CONCAT('%', p_search_term, '%')
+       OR descripcion LIKE CONCAT('%', p_search_term, '%');
 END$$
 
 -- Obtener un curso por ID
@@ -156,9 +160,15 @@ BEGIN
 END$$
 
 -- Obtener todos los profesores
-CREATE PROCEDURE `sp_get_all_profesores`()
+CREATE PROCEDURE `sp_get_all_profesores`(IN p_search_term VARCHAR(255))
 BEGIN
-    SELECT id_profesor, nombres, apellidos, documento_identidad, telefono, email, direccion, fecha_contratacion, estado FROM profesores;
+    SELECT id_profesor, nombres, apellidos, documento_identidad, telefono, email, direccion, fecha_contratacion, estado
+    FROM profesores
+    WHERE p_search_term = ''
+       OR nombres LIKE CONCAT('%', p_search_term, '%')
+       OR apellidos LIKE CONCAT('%', p_search_term, '%')
+       OR documento_identidad LIKE CONCAT('%', p_search_term, '%')
+       OR email LIKE CONCAT('%', p_search_term, '%');
 END$$
 
 -- Obtener un profesor por ID
@@ -221,10 +231,14 @@ BEGIN
 END$$
 
 -- Obtener todos los alumnos
-CREATE PROCEDURE `sp_get_all_alumnos`()
+CREATE PROCEDURE `sp_get_all_alumnos`(IN p_search_term VARCHAR(255))
 BEGIN
     SELECT id_alumno, nombres, apellidos, documento_identidad, fecha_nacimiento, grupo_sanguineo, direccion, telefono, email, nombre_padre_tutor, telefono_emergencia, fecha_registro
-    FROM alumnos;
+    FROM alumnos
+    WHERE p_search_term = ''
+       OR nombres LIKE CONCAT('%', p_search_term, '%')
+       OR apellidos LIKE CONCAT('%', p_search_term, '%')
+       OR documento_identidad LIKE CONCAT('%', p_search_term, '%');
 END$$
 
 -- Obtener un alumno por ID
@@ -308,9 +322,13 @@ BEGIN
 END$$
 
 -- Obtener todos los usuarios
-CREATE PROCEDURE `sp_get_all_users`()
+CREATE PROCEDURE `sp_get_all_users`(IN p_search_term VARCHAR(255))
 BEGIN
-    SELECT id_usuario, nombre, email, rol FROM usuarios;
+    SELECT id_usuario, nombre, email, rol
+    FROM usuarios
+    WHERE p_search_term = ''
+       OR nombre LIKE CONCAT('%', p_search_term, '%')
+       OR email LIKE CONCAT('%', p_search_term, '%');
 END$$
 
 -- =============================================

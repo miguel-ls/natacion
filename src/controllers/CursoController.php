@@ -12,10 +12,11 @@ class CursoController {
     }
 
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_all_cursos()");
-            $stmt->execute();
+            $stmt = $db->prepare("CALL sp_get_all_cursos(?)");
+            $stmt->execute([$search_term]);
             $cursos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             require_once __DIR__ . '/../views/cursos/index.php';
         } catch (PDOException $e) {

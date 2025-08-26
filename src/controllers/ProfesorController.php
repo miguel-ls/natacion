@@ -15,10 +15,11 @@ class ProfesorController {
      * Muestra la lista de profesores.
      */
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_all_profesores()");
-            $stmt->execute();
+            $stmt = $db->prepare("CALL sp_get_all_profesores(?)");
+            $stmt->execute([$search_term]);
             $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
             require_once __DIR__ . '/../views/profesores/index.php';
         } catch (PDOException $e) {

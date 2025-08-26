@@ -16,10 +16,11 @@ class AlumnoController {
      * Muestra la lista de todos los alumnos.
      */
     public function index() {
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_all_alumnos()");
-            $stmt->execute();
+            $stmt = $db->prepare("CALL sp_get_all_alumnos(?)");
+            $stmt->execute([$search_term]);
             $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Cargar la vista y pasarle los datos

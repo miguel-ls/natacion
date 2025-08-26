@@ -23,6 +23,16 @@ require_once __DIR__ . '/../partials/header.php';
         <a href="index.php?url=usuarios/create" class="btn btn-primary">Añadir Nuevo Usuario</a>
     </div>
 
+    <!-- Formulario de Búsqueda -->
+    <div class="filter-container" style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <form action="index.php" method="GET">
+            <input type="hidden" name="url" value="usuarios">
+            <label for="search">Buscar Usuario:</label>
+            <input type="text" name="search" id="search" value="<?php echo htmlspecialchars($search_term); ?>" placeholder="Nombre o email...">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+    </div>
+
     <?php
     if (isset($_SESSION['error_message'])) {
         echo '<div class="error-message" style="color: #a94442; background-color: #f2dede; border: 1px solid #ebccd1; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">' . htmlspecialchars($_SESSION['error_message']) . '</div>';

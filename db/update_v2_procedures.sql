@@ -96,4 +96,17 @@ BEGIN
     HAVING vacantes_disponibles > 0;
 END$$
 
+-- Obtener todos los horarios de un profesor específico
+CREATE PROCEDURE `sp_get_horarios_by_profesor`(IN p_id_profesor INT)
+BEGIN
+    SELECT
+        h.id_horario,
+        h.hora_inicio,
+        h.hora_fin,
+        th.dias_semana
+    FROM horarios h
+    JOIN tipos_horario th ON h.id_tipo_horario = th.id_tipo_horario
+    WHERE h.id_profesor = p_id_profesor;
+END$$
+
 DELIMITER ;
