@@ -279,6 +279,7 @@ switch ($route) {
         switch($action) {
             case 'ventas': $reporteController->ventas(); break;
             case 'profesores': $reporteController->profesores(); break;
+            case 'exportarVentas': $reporteController->exportarVentas(); break; // Ruta añadida
             default: http_response_code(404); echo "<h1>404 - Reporte no encontrado</h1>"; break;
         }
         break;
