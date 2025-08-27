@@ -2,6 +2,18 @@
 require_once __DIR__ . '/../partials/header.php';
 ?>
 
+<style>
+.container { padding: 2rem; }
+.page-header h1 { margin-bottom: 1rem; }
+.filter-container { background-color: #f9f9f9; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+.filter-form { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+.form-group { display: flex; flex-direction: column; }
+.report-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+.report-table th, .report-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+.report-table th { background-color: #f2f2f2; }
+.total-row { font-weight: bold; background-color: #f2f2f2; }
+</style>
+
 <div class="container">
     <div class="page-header">
         <h1>Reporte de Ventas por Curso</h1>
