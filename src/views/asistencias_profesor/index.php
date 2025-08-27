@@ -7,7 +7,17 @@ require_once __DIR__ . '/../partials/header.php';
 <style>
 /* Fix para que el autocompletado de jQuery UI aparezca sobre otros elementos */
 .ui-autocomplete {
-    z-index: 1050; /* Un valor alto para asegurar que esté al frente */
+    z-index: 1050;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.search-details {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
 }
 </style>
 
@@ -25,10 +35,16 @@ require_once __DIR__ . '/../partials/header.php';
         <input type="hidden" name="url" value="asistencias_profesor">
 
         <div class="form-group">
-            <label for="profesor_autocomplete">Profesor:</label>
-            <input type="text" id="profesor_autocomplete" class="form-control"
+            <label for="profesor_search">Profesor:</label>
+            <input type="text" id="profesor_search" class="form-control"
+                   placeholder="Escriba nombre o apellido..."
                    value="<?php echo $profesor_seleccionado ? htmlspecialchars($profesor_seleccionado['nombres'] . ' ' . $profesor_seleccionado['apellidos']) : ''; ?>">
             <input type="hidden" name="id_profesor" id="id_profesor" value="<?php echo htmlspecialchars($id_profesor); ?>">
+            <div id="profesor_details" class="search-details" style="<?php echo $profesor_seleccionado ? '' : 'display: none;'; ?>">
+                <?php if ($profesor_seleccionado): ?>
+                    <strong>Profesor Seleccionado:</strong> <?php echo htmlspecialchars($profesor_seleccionado['nombres'] . ' ' . $profesor_seleccionado['apellidos']); ?> (ID: <?php echo $profesor_seleccionado['id_profesor']; ?>)
+                <?php endif; ?>
+            </div>
         </div>
 
         <div class="form-group">
@@ -94,18 +110,27 @@ require_once __DIR__ . '/../partials/header.php';
 
 <script>
 $(function() {
-    $("#profesor_autocomplete").autocomplete({
+    $("#profesor_search").autocomplete({
         source: "index.php?url=profesores/search",
         minLength: 2,
         select: function(event, ui) {
             $("#id_profesor").val(ui.item.id);
+            $("#profesor_search").val(ui.item.value);
+            $("#profesor_details").html("<strong>Profesor Seleccionado:</strong> " + ui.item.value + " (ID: " + ui.item.id + ")").show();
+            return false; // previene que el valor por defecto de jQuery UI se ponga en el input
+        },
+        focus: function(event, ui) {
+            // Sincroniza el valor del input con el elemento enfocado en la lista
+            $("#profesor_search").val(ui.item.value);
+            return false;
         }
     });
 
-    // Limpiar el ID oculto si el usuario borra el campo
-    $("#profesor_autocomplete").on('keyup', function() {
+    // Limpiar el ID oculto y los detalles si el usuario borra el campo de búsqueda
+    $("#profesor_search").on('input', function() {
         if ($(this).val() === '') {
-            $("#id_profesor").val('0');
+            $("#id_profesor").val('0'); // Usar '0' para "todos"
+            $("#profesor_details").hide().html('');
         }
     });
 });
