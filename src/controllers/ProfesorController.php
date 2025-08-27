@@ -141,5 +141,36 @@ class ProfesorController {
         header('Location: index.php?url=profesores');
         exit;
     }
+
+    /**
+     * Busca profesores para un campo de autocompletar (AJAX).
+     */
+    public function search() {
+        header('Content-Type: application/json');
+        $searchTerm = $_GET['term'] ?? '';
+
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_all_profesores(?)");
+            $stmt->execute([$searchTerm]);
+            $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $results = [];
+            foreach ($profesores as $profesor) {
+                // Formato esperado por muchos plugins de autocompletar (ej. jQuery UI)
+                $results[] = [
+                    'id' => $profesor['id_profesor'],
+                    'label' => $profesor['nombres'] . ' ' . $profesor['apellidos'],
+                    'value' => $profesor['nombres'] . ' ' . $profesor['apellidos']
+                ];
+            }
+            echo json_encode($results);
+
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error en la base de datos: ' . $e->getMessage()]);
+        }
+        exit;
+    }
 }
 ?>

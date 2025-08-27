@@ -1,77 +1,82 @@
 <?php
 require_once __DIR__ . '/../partials/header.php';
-require_once __DIR__ . '/../../controllers/AuthController.php';
-$auth = new AuthController();
+// Variables pasadas desde el controlador:
+// $horarios, $cursos, $id_profesor, $id_curso, $estado, $profesor_seleccionado
 ?>
-
-<style>
-/* Estilos para la tabla y acciones */
-.container { padding: 2rem; }
-.table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-.table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-.table th { background-color: #f2f2f2; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;}
-.filter-form { display: flex; align-items: center; gap: 1rem; }
-.action-select { padding: 5px; border-radius: 4px; }
-.status-presente { color: green; }
-.status-falta_justificada { color: orange; }
-.status-falta_injustificada { color: red; }
-.status-permiso { color: blue; }
-</style>
 
 <div class="container">
     <div class="page-header">
         <h1>Control de Asistencia de Profesores</h1>
     </div>
 
-    <div class="filter-form">
-        <form action="index.php" method="GET">
-            <input type="hidden" name="url" value="asistencias_profesor">
-            <label for="fecha">Seleccionar Fecha:</label>
-            <input type="date" id="fecha" name="fecha" value="<?php echo htmlspecialchars($fecha_seleccionada); ?>">
-            <button type="submit">Filtrar</button>
-        </form>
-    </div>
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <div class="error-message"><?php echo htmlspecialchars($_SESSION['error_message']); unset($_SESSION['error_message']); ?></div>
+    <?php endif; ?>
 
-    <?php
-    if (isset($_SESSION['error_message'])) {
-        echo '<div class="error-message">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
-        unset($_SESSION['error_message']);
-    }
-    ?>
+    <!-- Formulario de Filtros -->
+    <form action="index.php" method="GET" class="filter-form form-inline mb-4">
+        <input type="hidden" name="url" value="asistencias_profesor">
 
-    <table class="table">
+        <div class="form-group">
+            <label for="profesor_autocomplete">Profesor:</label>
+            <input type="text" id="profesor_autocomplete" class="form-control"
+                   value="<?php echo $profesor_seleccionado ? htmlspecialchars($profesor_seleccionado['nombres'] . ' ' . $profesor_seleccionado['apellidos']) : ''; ?>">
+            <input type="hidden" name="id_profesor" id="id_profesor" value="<?php echo htmlspecialchars($id_profesor); ?>">
+        </div>
+
+        <div class="form-group">
+            <label for="id_curso">Curso:</label>
+            <select name="id_curso" id="id_curso" class="form-control">
+                <option value="0">Todos</option>
+                <?php foreach ($cursos as $curso): ?>
+                    <option value="<?php echo $curso['id_curso']; ?>" <?php echo ($id_curso == $curso['id_curso']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($curso['nombre']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="estado">Estado:</label>
+            <select name="estado" id="estado" class="form-control">
+                <option value="Todos" <?php echo ($estado == 'Todos') ? 'selected' : ''; ?>>Todos</option>
+                <option value="Futuro" <?php echo ($estado == 'Futuro') ? 'selected' : ''; ?>>Futuro</option>
+                <option value="En Curso" <?php echo ($estado == 'En Curso') ? 'selected' : ''; ?>>En Curso</option>
+                <option value="Finalizado" <?php echo ($estado == 'Finalizado') ? 'selected' : ''; ?>>Finalizado</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a href="index.php?url=asistencias_profesor" class="btn btn-secondary">Limpiar Filtros</a>
+    </form>
+
+    <!-- Tabla de Horarios Asignados -->
+    <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>Horario</th>
-                <th>Curso</th>
                 <th>Profesor</th>
-                <th>Estado Asistencia</th>
-                <th>Observaciones</th>
+                <th>Curso</th>
+                <th>Horario</th>
+                <th>Periodo</th>
+                <th>Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            <?php if (empty($horarios_del_dia)): ?>
+            <?php if (empty($horarios)): ?>
                 <tr>
-                    <td colspan="6">No hay clases programadas para la fecha seleccionada.</td>
+                    <td colspan="6" class="text-center">No se encontraron horarios con los filtros seleccionados.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($horarios_del_dia as $horario): ?>
+                <?php foreach ($horarios as $h): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars(date('h:i A', strtotime($horario['hora_inicio']))) . ' - ' . htmlspecialchars(date('h:i A', strtotime($horario['hora_fin']))); ?></td>
-                        <td><?php echo htmlspecialchars($horario['curso_nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($horario['profesor_nombre']); ?></td>
-                        <td class="status-<?php echo strtolower($horario['estado_asistencia'] ?? ''); ?>"><?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $horario['estado_asistencia'] ?? 'No marcado'))); ?></td>
-                        <td><?php echo htmlspecialchars($horario['observaciones_asistencia'] ?? ''); ?></td>
+                        <td><?php echo htmlspecialchars($h['profesor_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($h['curso_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($h['tipo_horario_nombre'] . ' (' . date('g:i A', strtotime($h['hora_inicio'])) . ' - ' . date('g:i A', strtotime($h['hora_fin'])) . ')'); ?></td>
+                        <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($h['fecha_inicio']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($h['fecha_fin']))); ?></td>
+                        <td><span class="badge badge-<?php echo strtolower(str_replace(' ', '-', $h['estado_calculado'])); ?>"><?php echo htmlspecialchars($h['estado_calculado']); ?></span></td>
                         <td>
-                            <select class="action-select" data-profesor-id="<?php echo $horario['id_profesor']; ?>" data-horario-id="<?php echo $horario['id_horario']; ?>">
-                                <option value="">Marcar como...</option>
-                                <option value="presente">Presente</option>
-                                <option value="falta_justificada">Falta Justificada</option>
-                                <option value="falta_injustificada">Falta Injustificada</option>
-                                <option value="permiso">Permiso</option>
-                            </select>
+                            <a href="index.php?url=asistencias_profesor/show&id=<?php echo $h['id_horario']; ?>" class="btn btn-info btn-sm">Marcar Asistencia</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -81,41 +86,22 @@ $auth = new AuthController();
 </div>
 
 <script>
-document.querySelectorAll('.action-select').forEach(select => {
-    select.addEventListener('change', function() {
-        const estado = this.value;
-        if (!estado) return;
+$(function() {
+    $("#profesor_autocomplete").autocomplete({
+        source: "index.php?url=profesores/search",
+        minLength: 2,
+        select: function(event, ui) {
+            $("#id_profesor").val(ui.item.id);
+        }
+    });
 
-        const id_profesor = this.dataset.profesorId;
-        const id_horario = this.dataset.horarioId;
-        const fecha = document.getElementById('fecha').value;
-        const observaciones = prompt("Añadir una observación (opcional):");
-
-        const formData = new FormData();
-        formData.append('id_profesor', id_profesor);
-        formData.append('id_horario', id_horario);
-        formData.append('fecha', fecha);
-        formData.append('estado', estado);
-        formData.append('observaciones', observaciones || '');
-        formData.append('csrf_token', '<?php echo $auth->getCsrfToken(); ?>');
-
-        fetch('index.php?url=asistencias_profesor/save', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error al guardar la asistencia: ' + data.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
+    // Limpiar el ID oculto si el usuario borra el campo
+    $("#profesor_autocomplete").on('keyup', function() {
+        if ($(this).val() === '') {
+            $("#id_profesor").val('0');
+        }
     });
 });
 </script>
 
-<?php
-require_once __DIR__ . '/../partials/footer.php';
-?>
+<?php require_once __DIR__ . '/../partials/footer.php'; ?>

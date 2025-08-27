@@ -12,19 +12,42 @@ class AsistenciaProfesorController {
     }
 
     /**
-     * Muestra la interfaz para gestionar la asistencia de profesores para una fecha dada.
+     * Muestra la lista filtrable de horarios asignados a profesores.
      */
     public function index() {
-        $search_term = $_GET['search'] ?? '';
+        // Valores de los filtros
+        $id_profesor = (int)($_GET['id_profesor'] ?? 0);
+        $id_curso = (int)($_GET['id_curso'] ?? 0);
+        $estado = $_GET['estado'] ?? 'Todos';
+
         $db = Database::getInstance()->getConnection();
+        $horarios = [];
+        $cursos = [];
+        $profesor_seleccionado = null;
+
         try {
-            // Reutilizamos el sp_get_all_horarios_details que ya tiene un filtro
-            $stmt = $db->prepare("CALL sp_get_all_horarios_details(?)");
-            $stmt->execute([$search_term]);
+            // 1. Obtener los horarios filtrados
+            $stmt = $db->prepare("CALL sp_listar_horarios_profesor_filtrado(?, ?, ?)");
+            $stmt->execute([$id_profesor, $id_curso, $estado]);
             $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+
+            // 2. Obtener todos los cursos para el dropdown de filtro
+            $stmt_cursos = $db->prepare("CALL sp_get_all_cursos('')"); // '' para traer todos
+            $stmt_cursos->execute();
+            $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_cursos->closeCursor();
+
+            // 3. Si se ha seleccionado un profesor, obtener sus datos para mostrarlos en el campo
+            if ($id_profesor > 0) {
+                $stmt_profesor = $db->prepare("CALL sp_get_profesor_by_id(?)");
+                $stmt_profesor->execute([$id_profesor]);
+                $profesor_seleccionado = $stmt_profesor->fetch(PDO::FETCH_ASSOC);
+                $stmt_profesor->closeCursor();
+            }
+
         } catch (PDOException $e) {
-            $_SESSION['error_message'] = "Error al cargar los horarios: " . $e->getMessage();
-            $horarios = [];
+            $_SESSION['error_message'] = "Error al cargar datos de asistencia: " . $e->getMessage();
         }
 
         require_once __DIR__ . '/../views/asistencias_profesor/index.php';
