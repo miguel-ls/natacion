@@ -146,6 +146,30 @@ $auth = new AuthController();
 </div>
 
 <script>
+// Lógica para pre-selección desde el dashboard
+const preselectedSchedule = <?php echo isset($selected_schedule) ? json_encode($selected_schedule) : 'null'; ?>;
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (preselectedSchedule) {
+        // Pre-llenar el campo de búsqueda de curso
+        const cursoSearchInput = document.getElementById('curso_search');
+        const cursoHiddenInputId = document.getElementById('id_curso');
+        cursoSearchInput.value = preselectedSchedule.curso_nombre;
+        cursoHiddenInputId.value = preselectedSchedule.id_curso;
+
+        // Deshabilitar la búsqueda de curso para evitar cambios
+        cursoSearchInput.disabled = true;
+
+        // Buscar y seleccionar el horario
+        buscarHorarios(function() {
+            const horarioItem = document.querySelector(`.horario-item[data-id='${preselectedSchedule.id_horario}']`);
+            if (horarioItem) {
+                horarioItem.click();
+            }
+        });
+    }
+});
+
 // Lógica para búsqueda de alumnos
 const searchInput = document.getElementById('alumno_search');
 const searchResults = document.getElementById('alumno-search-results');
@@ -222,16 +246,18 @@ cursoSearchInput.addEventListener('keyup', function() {
 
 
 // Lógica para horarios
-function buscarHorarios() {
+function buscarHorarios(callback) { // Aceptar un callback
     const cursoId = document.getElementById('id_curso').value;
     const profesorId = document.getElementById('filtro_profesor').value;
     const horaInicio = document.getElementById('filtro_hora_inicio').value;
     const horaFin = document.getElementById('filtro_hora_fin').value;
+    const fechaFinInput = document.getElementById('fecha_fin');
 
     document.getElementById('precio_final').value = '';
     const container = document.getElementById('horarios-disponibles-container');
     container.innerHTML = '<p>Cargando horarios...</p>';
     document.getElementById('id_horario').value = '';
+    fechaFinInput.readOnly = false; // Desbloquear la fecha final si se busca de nuevo
 
     if (!cursoId) {
         container.innerHTML = '<p>Por favor, seleccione un curso.</p>';
@@ -254,6 +280,7 @@ function buscarHorarios() {
                     div.className = 'horario-item';
                     div.dataset.id = horario.id_horario;
                     div.dataset.dias = horario.dias_semana;
+                    div.dataset.fechaFinCurso = horario.fecha_fin_curso; // Guardar la fecha fin
                     div.innerHTML = `<strong>Profesor:</strong> ${horario.profesor_nombre}<br>
                                      <strong>Lugar:</strong> ${horario.carril_nombre}<br>
                                      <strong>Días:</strong> ${horario.tipo_horario_nombre}<br>
@@ -265,9 +292,21 @@ function buscarHorarios() {
                         document.getElementById('id_horario').value = this.dataset.id;
                         document.getElementById('dias_semana_hidden').value = this.dataset.dias;
                         document.getElementById('precio_final').value = horario.precio_actual || '';
+
+                        // Restricción de fecha
+                        if (this.dataset.fechaFinCurso) {
+                            fechaFinInput.value = this.dataset.fechaFinCurso;
+                            fechaFinInput.readOnly = true;
+                        } else {
+                            fechaFinInput.readOnly = false;
+                        }
                     });
                     container.appendChild(div);
                 });
+            }
+            // Ejecutar el callback si existe
+            if (typeof callback === 'function') {
+                callback();
             }
         });
 }
