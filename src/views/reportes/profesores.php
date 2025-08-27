@@ -30,6 +30,17 @@ require_once __DIR__ . '/../partials/header.php';
                 <label for="fecha_fin">Fecha Fin</label>
                 <input type="date" name="fecha_fin" value="<?php echo htmlspecialchars($fecha_fin); ?>">
             </div>
+            <div class="form-group">
+                <label for="id_profesor">Profesor</label>
+                <select name="id_profesor" id="id_profesor">
+                    <option value="0">Todos los Profesores</option>
+                    <?php foreach ($profesores as $profesor): ?>
+                        <option value="<?php echo $profesor['id_profesor']; ?>" <?php echo (isset($id_profesor) && $profesor['id_profesor'] == $id_profesor) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($profesor['nombres'] . ' ' . $profesor['apellidos']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary" style="align-self: flex-end;">Generar Reporte</button>
         </form>
     </div>

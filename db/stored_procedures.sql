@@ -970,7 +970,8 @@ DELIMITER $$
 -- Reporte de horas trabajadas por profesor
 CREATE PROCEDURE `sp_reporte_horas_profesor`(
     IN p_fecha_inicio DATE,
-    IN p_fecha_fin DATE
+    IN p_fecha_fin DATE,
+    IN p_id_profesor INT
 )
 BEGIN
     SELECT
@@ -984,6 +985,7 @@ BEGIN
     WHERE
         ap.estado = 'presente'
         AND ap.fecha BETWEEN p_fecha_inicio AND p_fecha_fin
+        AND (p_id_profesor = 0 OR ap.id_profesor = p_id_profesor)
     GROUP BY p.id_profesor, profesor_nombre
     ORDER BY profesor_nombre;
 END$$
