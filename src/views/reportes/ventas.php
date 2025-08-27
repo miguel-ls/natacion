@@ -68,33 +68,47 @@ require_once __DIR__ . '/../partials/header.php';
         </form>
     </div>
 
+    <div style="margin-bottom: 1rem; text-align: right;">
+        <button id="btn-exportar" class="btn btn-success">Exportar a Excel</button>
+    </div>
+
     <table class="report-table">
         <thead>
             <tr>
                 <th>Fecha Matrícula</th>
                 <th>Alumno</th>
                 <th>Curso</th>
-                <th>Forma de Pago</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Precio Original</th>
+                <th>Descuento</th>
                 <th>Precio Final</th>
             </tr>
         </thead>
         <tbody>
             <?php
             $total_ventas = 0;
+            $total_descuentos = 0;
+            $total_base = 0;
             if (empty($reporte_data)):
             ?>
                 <tr>
-                    <td colspan="5">No se encontraron resultados para los filtros seleccionados.</td>
+                    <td colspan="8">No se encontraron resultados para los filtros seleccionados.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($reporte_data as $row):
+                    $total_base += $row['precio_base'];
+                    $total_descuentos += $row['descuento'];
                     $total_ventas += $row['precio_final'];
                 ?>
                     <tr>
-                        <td><?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($row['fecha_matricula']))); ?></td>
+                        <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($row['fecha_matricula']))); ?></td>
                         <td><?php echo htmlspecialchars($row['alumno_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($row['curso_nombre']); ?></td>
-                        <td><?php echo htmlspecialchars($row['forma_pago_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($row['fecha_inicio']))); ?></td>
+                        <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($row['fecha_fin']))); ?></td>
+                        <td>S/ <?php echo htmlspecialchars(number_format($row['precio_base'], 2)); ?></td>
+                        <td>S/ <?php echo htmlspecialchars(number_format($row['descuento'], 2)); ?></td>
                         <td>S/ <?php echo htmlspecialchars(number_format($row['precio_final'], 2)); ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -102,12 +116,22 @@ require_once __DIR__ . '/../partials/header.php';
         </tbody>
         <tfoot>
             <tr class="total-row">
-                <td colspan="4" style="text-align: right;">Total de Ventas:</td>
-                <td>S/ <?php echo htmlspecialchars(number_format($total_ventas, 2)); ?></td>
+                <td colspan="5" style="text-align: right;"><strong>Totales:</strong></td>
+                <td><strong>S/ <?php echo htmlspecialchars(number_format($total_base, 2)); ?></strong></td>
+                <td><strong>S/ <?php echo htmlspecialchars(number_format($total_descuentos, 2)); ?></strong></td>
+                <td><strong>S/ <?php echo htmlspecialchars(number_format($total_ventas, 2)); ?></strong></td>
             </tr>
         </tfoot>
     </table>
 </div>
+
+<script>
+document.getElementById('btn-exportar').addEventListener('click', function() {
+    const form = document.querySelector('.filter-form');
+    const params = new URLSearchParams(new FormData(form)).toString();
+    window.location.href = 'index.php?url=reportes/exportarVentas&' + params;
+});
+</script>
 
 <?php
 require_once __DIR__ . '/../partials/footer.php';

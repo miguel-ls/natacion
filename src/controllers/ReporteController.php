@@ -90,5 +90,68 @@ class ReporteController {
 
         require_once __DIR__ . '/../views/reportes/profesores.php';
     }
+
+    /**
+     * Exporta el reporte de ventas a un archivo CSV.
+     */
+    public function exportarVentas() {
+        $db = Database::getInstance()->getConnection();
+
+        // Captura de filtros del GET
+        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+        $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+        $id_alumno = (int)($_GET['id_alumno'] ?? 0);
+        $id_curso = (int)($_GET['id_curso'] ?? 0);
+        $id_forma_pago = (int)($_GET['id_forma_pago'] ?? 0);
+
+        // Obtener los datos del reporte
+        try {
+            $stmt_reporte = $db->prepare("CALL sp_reporte_ventas(?, ?, ?, ?, ?)");
+            $stmt_reporte->execute([$fecha_inicio, $fecha_fin, $id_alumno, $id_curso, $id_forma_pago]);
+            $reporte_data = $stmt_reporte->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_reporte->closeCursor();
+        } catch (PDOException $e) {
+            // Manejar el error, quizás redirigir con un mensaje
+            $_SESSION['error_message'] = "Error al exportar el reporte: " . $e->getMessage();
+            header('Location: index.php?url=reportes/ventas');
+            exit;
+        }
+
+        // Generar el archivo CSV
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="reporte_ventas_' . date('Y-m-d') . '.csv"');
+
+        $output = fopen('php://output', 'w');
+
+        // Escribir la cabecera
+        fputcsv($output, ['Fecha Matrícula', 'Alumno', 'Curso', 'Fecha Inicio', 'Fecha Fin', 'Precio Original', 'Descuento', 'Precio Final']);
+
+        // Escribir los datos
+        $total_base = 0;
+        $total_descuentos = 0;
+        $total_ventas = 0;
+        foreach ($reporte_data as $row) {
+            fputcsv($output, [
+                date('d/m/Y', strtotime($row['fecha_matricula'])),
+                $row['alumno_nombre'],
+                $row['curso_nombre'],
+                date('d/m/Y', strtotime($row['fecha_inicio'])),
+                date('d/m/Y', strtotime($row['fecha_fin'])),
+                number_format($row['precio_base'], 2),
+                number_format($row['descuento'], 2),
+                number_format($row['precio_final'], 2)
+            ]);
+            $total_base += $row['precio_base'];
+            $total_descuentos += $row['descuento'];
+            $total_ventas += $row['precio_final'];
+        }
+
+        // Escribir la fila de totales
+        fputcsv($output, []); // Línea en blanco
+        fputcsv($output, ['TOTALES', '', '', '', '', number_format($total_base, 2), number_format($total_descuentos, 2), number_format($total_ventas, 2)]);
+
+        fclose($output);
+        exit;
+    }
 }
 ?>
