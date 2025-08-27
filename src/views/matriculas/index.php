@@ -31,44 +31,55 @@ require_once __DIR__ . '/../partials/header.php';
     <div class="filter-container" style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
         <form action="index.php" method="GET" class="form-filters">
             <input type="hidden" name="url" value="matriculas">
-            <div class="filter-group search-container">
-                <label for="alumno_search">Alumno:</label>
-                <input type="text" id="alumno_search" class="form-control" placeholder="Buscar por nombre..." value="<?php echo htmlspecialchars($filters['alumno_nombre'] ?? ''); ?>" autocomplete="off">
-                <input type="hidden" id="id_alumno" name="id_alumno" value="<?php echo htmlspecialchars($filters['id_alumno'] ?? '0'); ?>">
-                <div id="alumno-search-results" class="search-results"></div>
+            <div class="filter-row">
+                <div class="filter-group search-container full-width">
+                    <label for="alumno_search">Alumno:</label>
+                    <input type="text" id="alumno_search" class="form-control" placeholder="Buscar por nombre..." value="<?php echo htmlspecialchars($filters['alumno_nombre'] ?? ''); ?>" autocomplete="off">
+                    <input type="hidden" id="id_alumno" name="id_alumno" value="<?php echo htmlspecialchars($filters['id_alumno'] ?? '0'); ?>">
+                    <div id="alumno-search-results" class="search-results"></div>
+                </div>
             </div>
-            <div class="filter-group search-container">
-                <label for="curso_search">Curso:</label>
-                <input type="text" id="curso_search" class="form-control" placeholder="Buscar por curso..." value="<?php echo htmlspecialchars($filters['curso_nombre'] ?? ''); ?>" autocomplete="off">
-                <input type="hidden" id="id_curso" name="id_curso" value="<?php echo htmlspecialchars($filters['id_curso'] ?? '0'); ?>">
-                <div id="curso-search-results" class="search-results"></div>
+            <div class="filter-row">
+                <div class="filter-group search-container full-width">
+                    <label for="curso_search">Curso:</label>
+                    <input type="text" id="curso_search" class="form-control" placeholder="Buscar por curso..." value="<?php echo htmlspecialchars($filters['curso_nombre'] ?? ''); ?>" autocomplete="off">
+                    <input type="hidden" id="id_curso" name="id_curso" value="<?php echo htmlspecialchars($filters['id_curso'] ?? '0'); ?>">
+                    <div id="curso-search-results" class="search-results"></div>
+                </div>
             </div>
-            <div class="filter-group">
-                <label for="fecha_inicio_desde">Desde:</label>
-                <input type="date" name="fecha_inicio_desde" id="fecha_inicio_desde" value="<?php echo htmlspecialchars($filters['fecha_inicio_desde'] ?? ''); ?>">
-            </div>
-            <div class="filter-group">
-                <label for="fecha_inicio_hasta">Hasta:</label>
-                <input type="date" name="fecha_inicio_hasta" id="fecha_inicio_hasta" value="<?php echo htmlspecialchars($filters['fecha_inicio_hasta'] ?? ''); ?>">
-            </div>
-            <div class="filter-group">
-                <label for="estado">Estado:</label>
-                <select name="estado" id="estado">
-                    <option value="Todos" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Todos') ? 'selected' : ''; ?>>Todos</option>
-                    <option value="Activa" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Activa') ? 'selected' : ''; ?>>Activa</option>
-                    <option value="Vigente" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Vigente') ? 'selected' : ''; ?>>Vigente</option>
-                    <option value="Anulada" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Anulada') ? 'selected' : ''; ?>>Anulada</option>
-                    <option value="Finalizada" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Finalizada') ? 'selected' : ''; ?>>Finalizada</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <button type="submit" class="btn btn-primary">Filtrar</button>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="fecha_inicio_desde">Desde:</label>
+                    <input type="date" name="fecha_inicio_desde" id="fecha_inicio_desde" value="<?php echo htmlspecialchars($filters['fecha_inicio_desde'] ?? ''); ?>">
+                </div>
+                <div class="filter-group">
+                    <label for="fecha_inicio_hasta">Hasta:</label>
+                    <input type="date" name="fecha_inicio_hasta" id="fecha_inicio_hasta" value="<?php echo htmlspecialchars($filters['fecha_inicio_hasta'] ?? ''); ?>">
+                </div>
+                <div class="filter-group">
+                    <label for="estado">Estado:</label>
+                    <select name="estado" id="estado">
+                        <option value="Todos" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Todos') ? 'selected' : ''; ?>>Todos</option>
+                        <option value="Activa" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Activa') ? 'selected' : ''; ?>>Activa</option>
+                        <option value="Vigente" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Vigente') ? 'selected' : ''; ?>>Vigente</option>
+                        <option value="Anulada" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Anulada') ? 'selected' : ''; ?>>Anulada</option>
+                        <option value="Finalizada" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Finalizada') ? 'selected' : ''; ?>>Finalizada</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
             </div>
         </form>
     </div>
 
     <style>
         .form-filters {
+            display: flex;
+            flex-direction: column; /* Cambiado a columna */
+            gap: 1rem;
+        }
+        .filter-row {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
@@ -77,6 +88,14 @@ require_once __DIR__ . '/../partials/header.php';
         .filter-group {
             display: flex;
             flex-direction: column;
+            flex-grow: 1; /* Para que los grupos se expandan */
+        }
+        .filter-group.full-width {
+            width: 100%;
+            flex-basis: 100%; /* Ocupa toda la fila */
+        }
+        .filter-group button {
+             align-self: flex-end; /* Alinea el botón a la derecha en su contenedor */
         }
         .filter-group label {
             margin-bottom: 0.25rem;
