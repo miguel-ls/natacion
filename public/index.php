@@ -22,6 +22,7 @@ require_once '../src/controllers/FormaPagoController.php';
 require_once '../src/controllers/UsuarioController.php';
 require_once '../src/controllers/MatriculaController.php';
 require_once '../src/controllers/AsistenciaProfesorController.php';
+require_once '../src/controllers/AsistenciaAlumnoController.php';
 require_once '../src/controllers/ReporteController.php';
 require_once '../src/controllers/TipoPrecioController.php';
 require_once '../src/controllers/PrecioCursoController.php';
@@ -269,6 +270,18 @@ switch ($route) {
             case 'show': $asistenciaProfesorController->show(); break;
             case 'save': $asistenciaProfesorController->save(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Asistencia de Profesores</h1>"; break;
+        }
+        break;
+
+    // Rutas de Asistencia de Alumnos
+    case 'asistencias_alumnos':
+        $asistenciaAlumnoController = new AsistenciaAlumnoController();
+        $action = $parts[1] ?? 'index';
+        switch($action) {
+            case 'index': $asistenciaAlumnoController->index(); break;
+            case 'show': $asistenciaAlumnoController->show(); break;
+            case 'save': $asistenciaAlumnoController->save(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Asistencia de Alumnos</h1>"; break;
         }
         break;
 
