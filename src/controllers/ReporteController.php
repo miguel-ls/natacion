@@ -25,13 +25,13 @@ class ReporteController {
         $id_forma_pago = (int)($_GET['id_forma_pago'] ?? 0);
 
         // Cargar datos para los menús desplegables de los filtros
-        $stmt_alumnos = $db->prepare("CALL sp_get_all_alumnos()");
-        $stmt_alumnos->execute();
+        $stmt_alumnos = $db->prepare("CALL sp_get_all_alumnos(?)");
+        $stmt_alumnos->execute(['']);
         $alumnos = $stmt_alumnos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_alumnos->closeCursor();
 
-        $stmt_cursos = $db->prepare("CALL sp_get_all_cursos()");
-        $stmt_cursos->execute();
+        $stmt_cursos = $db->prepare("CALL sp_get_all_cursos(?)");
+        $stmt_cursos->execute(['']);
         $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_cursos->closeCursor();
 
@@ -63,11 +63,23 @@ class ReporteController {
         // Valores por defecto y captura de filtros del GET
         $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
         $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+        $id_profesor = (int)($_GET['id_profesor'] ?? 0);
+
+        // Cargar profesores para el filtro
+        try {
+            $stmt_profesores = $db->prepare("CALL sp_get_all_profesores(?)");
+            $stmt_profesores->execute(['']);
+            $profesores = $stmt_profesores->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_profesores->closeCursor();
+        } catch (PDOException $e) {
+            $profesores = [];
+            $_SESSION['error_message'] = "Error al cargar la lista de profesores: " . $e->getMessage();
+        }
 
         // Obtener los datos del reporte con los filtros aplicados
         try {
-            $stmt_reporte = $db->prepare("CALL sp_reporte_horas_profesor(?, ?)");
-            $stmt_reporte->execute([$fecha_inicio, $fecha_fin]);
+            $stmt_reporte = $db->prepare("CALL sp_reporte_horas_profesor(?, ?, ?)");
+            $stmt_reporte->execute([$fecha_inicio, $fecha_fin, $id_profesor]);
             $reporte_data = $stmt_reporte->fetchAll(PDO::FETCH_ASSOC);
             $stmt_reporte->closeCursor();
         } catch (PDOException $e) {
