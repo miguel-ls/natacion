@@ -281,7 +281,11 @@ function buscarHorarios(callback) { // Aceptar un callback
                     div.dataset.id = horario.id_horario;
                     div.dataset.dias = horario.dias_semana;
                     div.dataset.fechaFinCurso = horario.fecha_fin_curso; // Guardar la fecha fin
+                    const fechaInicio = horario.fecha_inicio ? new Date(horario.fecha_inicio.replace(/-/g, '/')).toLocaleDateString('es-ES') : 'No definida';
+                    const fechaFin = horario.fecha_fin ? new Date(horario.fecha_fin.replace(/-/g, '/')).toLocaleDateString('es-ES') : 'No definida';
+
                     div.innerHTML = `<strong>Profesor:</strong> ${horario.profesor_nombre}<br>
+                                     <strong>Periodo:</strong> ${fechaInicio} - ${fechaFin}<br>
                                      <strong>Lugar:</strong> ${horario.carril_nombre}<br>
                                      <strong>Días:</strong> ${horario.tipo_horario_nombre}<br>
                                      <strong>Horario:</strong> ${horario.hora_inicio} - ${horario.hora_fin}<br>
