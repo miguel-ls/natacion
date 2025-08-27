@@ -146,6 +146,20 @@ $auth = new AuthController();
 </div>
 
 <script>
+function formatDateDDMMYYYY(dateString) {
+    if (!dateString) return 'No definida';
+    // El formato de la DB es YYYY-MM-DD, que JS puede interpretar como UTC.
+    // Para evitar que la fecha cambie por la zona horaria, la ajustamos.
+    const date = new Date(dateString);
+    const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+    const adjustedDate = new Date(date.getTime() + userTimezoneOffset);
+
+    const day = String(adjustedDate.getDate()).padStart(2, '0');
+    const month = String(adjustedDate.getMonth() + 1).padStart(2, '0'); // Los meses son base 0
+    const year = adjustedDate.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 // Lógica para pre-selección desde el dashboard
 const preselectedSchedule = <?php echo isset($selected_schedule) ? json_encode($selected_schedule) : 'null'; ?>;
 
@@ -280,9 +294,9 @@ function buscarHorarios(callback) { // Aceptar un callback
                     div.className = 'horario-item';
                     div.dataset.id = horario.id_horario;
                     div.dataset.dias = horario.dias_semana;
-                    div.dataset.fechaFinCurso = horario.fecha_fin_curso; // Guardar la fecha fin
-                    const fechaInicio = horario.fecha_inicio ? new Date(horario.fecha_inicio.replace(/-/g, '/')).toLocaleDateString('es-ES') : 'No definida';
-                    const fechaFin = horario.fecha_fin ? new Date(horario.fecha_fin.replace(/-/g, '/')).toLocaleDateString('es-ES') : 'No definida';
+                    div.dataset.fechaFinCurso = horario.fecha_fin; // Guardar la fecha fin. Asegurarse que el alias es fecha_fin
+                    const fechaInicio = formatDateDDMMYYYY(horario.fecha_inicio);
+                    const fechaFin = formatDateDDMMYYYY(horario.fecha_fin);
 
                     div.innerHTML = `<strong>Profesor:</strong> ${horario.profesor_nombre}<br>
                                      <strong>Periodo:</strong> ${fechaInicio} - ${fechaFin}<br>
