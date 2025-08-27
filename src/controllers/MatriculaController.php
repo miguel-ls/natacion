@@ -78,6 +78,14 @@ class MatriculaController {
             $horarios_disponibles = $stmt_horarios->fetchAll(PDO::FETCH_ASSOC);
             $stmt_horarios->closeCursor();
 
+            // Excluir el horario actual de la lista de horarios disponibles
+            if (isset($matricula['id_horario'])) {
+                $current_horario_id = $matricula['id_horario'];
+                $horarios_disponibles = array_filter($horarios_disponibles, function($horario) use ($current_horario_id) {
+                    return $horario['id_horario'] != $current_horario_id;
+                });
+            }
+
             require_once __DIR__ . '/../views/matriculas/edit.php';
 
         } catch (PDOException $e) {
