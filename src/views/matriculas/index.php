@@ -84,7 +84,14 @@ require_once __DIR__ . '/../partials/header.php';
                             <a href="index.php?url=matriculas/show&id=<?php echo $matricula['id_matricula']; ?>" class="btn btn-info">Ver Días</a>
                             <?php if ($matricula['estado'] !== 'anulada' && $matricula['estado'] !== 'finalizada'): ?>
                                 <a href="index.php?url=matriculas/edit&id=<?php echo $matricula['id_matricula']; ?>" class="btn btn-warning">Cambiar Hor.</a>
-                                <a href="index.php?url=matriculas/cancel&id=<?php echo $matricula['id_matricula']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea anular esta matrícula?');">Anular</a>
+                                <a href="index.php?url=matriculas/cancel&id=<?php echo $matricula['id_matricula']; ?>" class="btn btn-secondary" onclick="return confirm('¿Está seguro de que desea anular esta matrícula?');">Anular</a>
+
+                                <!-- Formulario para Eliminación Permanente -->
+                                <form action="index.php?url=matriculas/delete" method="POST" style="display:inline-block; margin-left: 5px;">
+                                    <input type="hidden" name="id_matricula" value="<?php echo $matricula['id_matricula']; ?>">
+                                    <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('¡ADVERTENCIA! Está a punto de ELIMINAR PERMANENTEMENTE esta matrícula y todos sus datos asociados. Esta acción no se puede deshacer. ¿Está absolutamente seguro?');">Eliminar</button>
+                                </form>
                             <?php endif; ?>
                         </td>
                     </tr>
