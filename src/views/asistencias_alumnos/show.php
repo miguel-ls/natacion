@@ -30,31 +30,29 @@ require_once __DIR__ . '/../partials/header.php';
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($dias_clase as $fecha => $data): ?>
-            <tr id="row-<?php echo $fecha; ?>">
-                <td><?php echo date('d/m/Y', strtotime($fecha)); ?> (<?php echo ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][date('w', strtotime($fecha))]; ?>)</td>
+            <?php foreach ($dias_clase as $dia): ?>
+            <tr id="row-<?php echo $dia['id_matricula_dia']; ?>">
+                <td><?php echo date('d/m/Y', strtotime($dia['fecha_clase'])); ?> (<?php echo ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][date('w', strtotime($dia['fecha_clase']))]; ?>)</td>
                 <td class="status-cell">
                     <?php
-                    $estado_class = 'secondary'; // Default for 'no_marcado'
-                    if ($data['estado'] === 'asistio') {
-                        $estado_class = 'primary';
-                    } elseif ($data['estado'] === 'falto') {
-                        $estado_class = 'warning';
-                    } elseif ($data['estado'] === 'postergado') {
-                        $estado_class = 'info';
-                    }
+                    $estado_class = 'secondary'; // Default
+                    if ($dia['estado'] === 'asistio') $estado_class = 'primary';
+                    elseif ($dia['estado'] === 'falto') $estado_class = 'warning';
+                    elseif ($dia['estado'] === 'postergada') $estado_class = 'info';
+                    elseif ($dia['estado'] === 'recuperada') $estado_class = 'success';
+                    elseif ($dia['estado'] === 'programada') $estado_class = 'light';
                     ?>
                     <span class="badge badge-<?php echo $estado_class; ?>">
-                        <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $data['estado']))); ?>
+                        <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $dia['estado']))); ?>
                     </span>
                 </td>
                 <td class="actions-cell">
-                    <button class="btn btn-primary btn-sm" onclick="marcarAsistencia('<?php echo $fecha; ?>', 'asistio')">Asistió</button>
-                    <button class="btn btn-warning btn-sm" onclick="marcarAsistencia('<?php echo $fecha; ?>', 'falto')">Faltó</button>
-                    <button class="btn btn-info btn-sm" onclick="marcarAsistencia('<?php echo $fecha; ?>', 'postergado')">Postergado</button>
+                    <button class="btn btn-primary btn-sm" onclick="marcarAsistencia(<?php echo $dia['id_matricula_dia']; ?>, 'asistio')">Asistió</button>
+                    <button class="btn btn-warning btn-sm" onclick="marcarAsistencia(<?php echo $dia['id_matricula_dia']; ?>, 'falto')">Faltó</button>
+                    <button class="btn btn-info btn-sm" onclick="marcarAsistencia(<?php echo $dia['id_matricula_dia']; ?>, 'postergada')">Postergada</button>
                 </td>
                 <td class="obs-cell">
-                    <textarea class="form-control" onchange="guardarObservaciones('<?php echo $fecha; ?>')"><?php echo htmlspecialchars($data['observaciones']); ?></textarea>
+                    <textarea class="form-control" onchange="guardarObservaciones(<?php echo $dia['id_matricula_dia']; ?>)"><?php echo htmlspecialchars($dia['observacion'] ?? ''); ?></textarea>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -68,28 +66,28 @@ require_once __DIR__ . '/../partials/header.php';
 </div>
 
 <script>
-function marcarAsistencia(fecha, estado) {
-    const observaciones = document.querySelector(`#row-${fecha} textarea`).value;
-    guardarAsistencia(fecha, estado, observaciones);
+function marcarAsistencia(id_dia, estado) {
+    const observaciones = document.querySelector(`#row-${id_dia} textarea`).value;
+    guardarAsistencia(id_dia, estado, observaciones);
 }
 
-function guardarObservaciones(fecha) {
-    const estadoActual = document.querySelector(`#row-${fecha} .status-cell .badge`).textContent.trim().toLowerCase().replace(' ', '_');
-    if (estadoActual !== 'no_marcado') {
-        const observaciones = document.querySelector(`#row-${fecha} textarea`).value;
-        guardarAsistencia(fecha, estadoActual, observaciones);
+function guardarObservaciones(id_dia) {
+    const estadoActualBadge = document.querySelector(`#row-${id_dia} .status-cell .badge`);
+    // Extraer el estado del texto del badge, puede ser "Programada", "Asistio", etc.
+    const estadoActual = estadoActualBadge.textContent.trim().toLowerCase().replace(' ', '_');
+
+    // Solo guardar si ya hay un estado significativo
+    if (estadoActual !== 'programada' && estadoActual !== 'no_marcado') {
+        const observaciones = document.querySelector(`#row-${id_dia} textarea`).value;
+        guardarAsistencia(id_dia, estadoActual, observaciones);
     }
 }
 
-function guardarAsistencia(fecha, estado, observaciones) {
-    const id_matricula = <?php echo $matricula['id_matricula']; ?>;
-    const id_alumno = <?php echo $matricula['id_alumno']; ?>;
+function guardarAsistencia(id_dia, estado, observaciones) {
     const csrf_token = '<?php echo $_SESSION['csrf_token']; ?>';
 
     const formData = new FormData();
-    formData.append('id_matricula', id_matricula);
-    formData.append('id_alumno', id_alumno);
-    formData.append('fecha_clase', fecha);
+    formData.append('id_matricula_dia', id_dia);
     formData.append('estado', estado);
     formData.append('observaciones', observaciones);
     formData.append('csrf_token', csrf_token);
@@ -101,11 +99,17 @@ function guardarAsistencia(fecha, estado, observaciones) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const statusCell = document.querySelector(`#row-${fecha} .status-cell`);
-            let estadoClass = estado.toLowerCase().replace('_', '-');
-            let estadoText = estado.charAt(0).toUpperCase() + estado.slice(1).replace('_', ' ');
+            // Actualizar la UI dinámicamente
+            const statusCell = document.querySelector(`#row-${id_dia} .status-cell`);
+            let estadoClass = 'secondary';
+            if (estado === 'asistio') estadoClass = 'primary';
+            else if (estado === 'falto') estadoClass = 'warning';
+            else if (estado === 'postergada') estadoClass = 'info';
+            else if (estado === 'recuperada') estadoClass = 'success';
+            else if (estado === 'programada') estadoClass = 'light';
+
+            const estadoText = estado.charAt(0).toUpperCase() + estado.slice(1).replace('_', ' ');
             statusCell.innerHTML = `<span class="badge badge-${estadoClass}">${estadoText}</span>`;
-            // Opcional: mostrar un mensaje de éxito
         } else {
             alert('Error al guardar la asistencia: ' + data.message);
         }

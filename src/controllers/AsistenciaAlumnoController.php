@@ -84,39 +84,11 @@ class AsistenciaAlumnoController {
                 throw new Exception("Matrícula no encontrada.");
             }
 
-            // 2. Generar las fechas de clase esperadas
-            $dias_semana_num = explode(',', $matricula['dias_semana']);
-            $fecha_actual = new DateTime($matricula['fecha_inicio']);
-            $fecha_fin = new DateTime($matricula['fecha_fin']);
-
-            while ($fecha_actual <= $fecha_fin) {
-                $dayOfWeek = (int)$fecha_actual->format('w') + 1;
-                if (in_array($dayOfWeek, $dias_semana_num)) {
-                    $dias_clase[$fecha_actual->format('Y-m-d')] = [
-                        'fecha_clase' => $fecha_actual->format('Y-m-d'),
-                        'estado' => 'no_marcado',
-                        'observaciones' => ''
-                    ];
-                }
-                $fecha_actual->modify('+1 day');
-            }
-
-            // 3. Obtener los registros de asistencia que ya existen
-            $stmt_asistencias = $db->prepare("
-                SELECT fecha_clase, estado, observaciones
-                FROM asistencias_alumnos
-                WHERE id_matricula = ?
-            ");
-            $stmt_asistencias->execute([$id_matricula]);
-            $asistencias_guardadas = $stmt_asistencias->fetchAll(PDO::FETCH_ASSOC);
-
-            // 4. Fusionar los estados guardados
-            foreach ($asistencias_guardadas as $asistencia) {
-                if (isset($dias_clase[$asistencia['fecha_clase']])) {
-                    $dias_clase[$asistencia['fecha_clase']]['estado'] = $asistencia['estado'];
-                    $dias_clase[$asistencia['fecha_clase']]['observaciones'] = $asistencia['observaciones'];
-                }
-            }
+            // 2. Obtener los días de clase y sus estados desde `matricula_dias`
+            $stmt_dias = $db->prepare("CALL sp_get_matricula_dias(?)");
+            $stmt_dias->execute([$id_matricula]);
+            $dias_clase = $stmt_dias->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_dias->closeCursor();
 
         } catch (Exception $e) {
             $_SESSION['error_message'] = "Error: " . $e->getMessage();
@@ -128,27 +100,26 @@ class AsistenciaAlumnoController {
     }
 
     /**
-     * Guarda la asistencia de un alumno (vía AJAX).
+     * Guarda la asistencia de un alumno (vía AJAX), reutilizando la lógica de Matrícula.
      */
     public function save() {
         header('Content-Type: application/json');
         $this->auth->verifyCsrfToken();
 
-        $id_matricula = $_POST['id_matricula'] ?? null;
-        $id_alumno = $_POST['id_alumno'] ?? null;
-        $fecha_clase = $_POST['fecha_clase'] ?? null;
+        $id_matricula_dia = $_POST['id_matricula_dia'] ?? null;
         $estado = $_POST['estado'] ?? null;
         $observaciones = $_POST['observaciones'] ?? '';
 
-        if (!$id_matricula || !$id_alumno || !$fecha_clase || !$estado) {
+        if (!$id_matricula_dia || !$estado) {
             echo json_encode(['success' => false, 'message' => 'Datos incompletos.']);
             exit;
         }
 
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_create_or_update_asistencia_alumno(?, ?, ?, ?, ?)");
-            $stmt->execute([$id_matricula, $id_alumno, $fecha_clase, $estado, $observaciones]);
+            // Llamar al mismo SP que usa la página de detalles de matrícula para consistencia
+            $stmt = $db->prepare("CALL sp_update_asistencia_alumno(?, ?, ?)");
+            $stmt->execute([$id_matricula_dia, $estado, $observaciones]);
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => 'Error al guardar la asistencia: ' . $e->getMessage()]);
