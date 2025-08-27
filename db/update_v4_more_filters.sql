@@ -111,7 +111,9 @@ BEGIN
         m.precio_final,
         m.estado,
         u.nombre as admin_nombre,
-        m.fecha_matricula
+        m.fecha_matricula,
+        (SELECT pc.fecha_inicio FROM precios_cursos pc WHERE pc.id_curso = c.id_curso AND m.fecha_matricula BETWEEN pc.fecha_inicio AND pc.fecha_fin ORDER BY pc.id_tipo_precio DESC LIMIT 1) AS fecha_inicio_curso,
+        (SELECT pc.fecha_fin FROM precios_cursos pc WHERE pc.id_curso = c.id_curso AND m.fecha_matricula BETWEEN pc.fecha_inicio AND pc.fecha_fin ORDER BY pc.id_tipo_precio DESC LIMIT 1) AS fecha_fin_curso
     FROM matriculas m
     JOIN alumnos a ON m.id_alumno = a.id_alumno
     JOIN horarios h ON m.id_horario = h.id_horario

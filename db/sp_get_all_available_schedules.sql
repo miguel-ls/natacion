@@ -5,6 +5,7 @@ BEGIN
     SELECT
         h.id_horario,
         c.nombre AS curso_nombre,
+        (SELECT pc.fecha_inicio FROM precios_cursos pc WHERE pc.id_curso = h.id_curso AND CURDATE() BETWEEN pc.fecha_inicio AND pc.fecha_fin ORDER BY pc.id_tipo_precio DESC LIMIT 1) AS fecha_inicio_curso,
         (SELECT pc.fecha_fin FROM precios_cursos pc WHERE pc.id_curso = h.id_curso AND CURDATE() BETWEEN pc.fecha_inicio AND pc.fecha_fin ORDER BY pc.id_tipo_precio DESC LIMIT 1) AS fecha_fin_curso,
         CONCAT(p.nombres, ' ', p.apellidos) AS profesor_nombre,
         pi.nombre as piscina_nombre,

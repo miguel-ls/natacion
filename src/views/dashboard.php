@@ -26,6 +26,7 @@ require_once __DIR__ . '/partials/header.php';
                     </div>
                     <div class="card-body">
                         <p><strong>Profesor:</strong> <?php echo htmlspecialchars($schedule['profesor_nombre']); ?></p>
+                        <p><strong>Periodo:</strong> <?php echo ($schedule['fecha_inicio_curso'] && $schedule['fecha_fin_curso']) ? htmlspecialchars(date('d/m/Y', strtotime($schedule['fecha_inicio_curso']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($schedule['fecha_fin_curso']))) : 'No definido'; ?></p>
                         <p><strong>Horario:</strong> <?php echo htmlspecialchars($schedule['tipo_horario_nombre']); ?> (<?php echo htmlspecialchars($schedule['hora_inicio'] . ' - ' . $schedule['hora_fin']); ?>)</p>
                         <p><strong>Ubicación:</strong> Piscina <?php echo htmlspecialchars($schedule['piscina_nombre']); ?>, Carril <?php echo htmlspecialchars($schedule['numero_carril']); ?></p>
                     </div>
