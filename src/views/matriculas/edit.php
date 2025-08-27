@@ -24,6 +24,7 @@ $auth = new AuthController();
         <h4>Información Actual</h4>
         <p><strong>Alumno:</strong> <?php echo htmlspecialchars($matricula['alumno_nombre']); ?></p>
         <p><strong>Curso:</strong> <?php echo htmlspecialchars($matricula['curso_nombre']); ?></p>
+        <p><strong>Periodo del Curso:</strong> <?php echo isset($matricula['fecha_inicio_curso']) ? htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_inicio_curso']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_fin_curso']))) : 'No definido'; ?></p>
         <p><strong>Horario Actual:</strong> <?php echo htmlspecialchars($matricula['tipo_horario_nombre']); ?> de <?php echo htmlspecialchars(date('h:i A', strtotime($matricula['hora_inicio']))) . ' a ' . htmlspecialchars(date('h:i A', strtotime($matricula['hora_fin']))); ?> (Prof. <?php echo htmlspecialchars($matricula['profesor_nombre']); ?>)</p>
     </div>
 
@@ -52,7 +53,8 @@ $auth = new AuthController();
                 <p>No hay otros horarios con vacantes disponibles para este curso.</p>
             <?php else: ?>
                 <?php foreach ($horarios_disponibles as $horario): ?>
-                    <div class="horario-item" data-id="<?php echo $horario['id_horario']; ?>">
+                    <div class="horario-item" data-id="<?php echo $horario['id_horario']; ?>" data-fecha-fin="<?php echo htmlspecialchars($horario['fecha_fin']); ?>">
+                        <strong>Periodo:</strong> <?php echo htmlspecialchars(date('d/m/Y', strtotime($horario['fecha_inicio']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($horario['fecha_fin']))); ?><br>
                         <strong>Profesor:</strong> <?php echo htmlspecialchars($horario['profesor_nombre']); ?><br>
                         <strong>Lugar:</strong> <?php echo htmlspecialchars($horario['carril_nombre']); ?><br>
                         <strong>Días:</strong> <?php echo htmlspecialchars($horario['tipo_horario_nombre']); ?><br>
@@ -65,26 +67,44 @@ $auth = new AuthController();
 
         <div class="form-actions">
             <a href="index.php?url=matriculas" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-success" <?php echo empty($horarios_disponibles) ? 'disabled' : ''; ?>>Confirmar Cambio de Horario</button>
+            <button type="submit" class="btn btn-success">Confirmar Cambio</button>
         </div>
     </form>
 </div>
 
 <script>
-document.querySelectorAll('.horario-item').forEach(item => {
-    item.addEventListener('click', function() {
-        document.querySelectorAll('.horario-item').forEach(el => el.classList.remove('selected'));
-        this.classList.add('selected');
-        document.getElementById('id_horario').value = this.dataset.id;
-    });
-});
+document.addEventListener('DOMContentLoaded', function() {
+    const fechaFinCursoActual = '<?php echo $matricula['fecha_fin_curso'] ?? ''; ?>';
+    const fechaFinInput = document.getElementById('fecha_fin');
 
-document.getElementById('form-change-horario').addEventListener('submit', function(event) {
-    const horarioId = document.getElementById('id_horario').value;
-    if (!horarioId) {
-        alert('Por favor, seleccione un nuevo horario.');
-        event.preventDefault();
+    if (fechaFinCursoActual) {
+        fechaFinInput.max = fechaFinCursoActual;
     }
+
+    document.querySelectorAll('.horario-item').forEach(item => {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.horario-item').forEach(el => el.classList.remove('selected'));
+            this.classList.add('selected');
+            document.getElementById('id_horario').value = this.dataset.id;
+
+            // Actualizar la restricción de la fecha final
+            const fechaFinNuevoCurso = this.dataset.fechaFin;
+            if (fechaFinNuevoCurso) {
+                fechaFinInput.max = fechaFinNuevoCurso;
+                if (fechaFinInput.value > fechaFinNuevoCurso) {
+                    fechaFinInput.value = fechaFinNuevoCurso;
+                }
+            }
+        });
+    });
+
+    document.getElementById('form-change-horario').addEventListener('submit', function(event) {
+        const horarioId = document.getElementById('id_horario').value;
+        if (!horarioId) {
+            alert('Por favor, seleccione un nuevo horario.');
+            event.preventDefault();
+        }
+    });
 });
 </script>
 
