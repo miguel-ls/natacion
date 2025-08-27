@@ -34,12 +34,22 @@ require_once __DIR__ . '/../partials/header.php';
             <tr id="row-<?php echo $fecha; ?>">
                 <td><?php echo date('d/m/Y', strtotime($fecha)); ?> (<?php echo ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][date('w', strtotime($fecha))]; ?>)</td>
                 <td class="status-cell">
-                    <span class="badge badge-<?php echo strtolower(str_replace('_', '-', $data['estado'])); ?>">
+                    <?php
+                    $estado_class = 'secondary'; // Default for 'no_marcado'
+                    if ($data['estado'] === 'asistio') {
+                        $estado_class = 'primary';
+                    } elseif ($data['estado'] === 'falto') {
+                        $estado_class = 'warning';
+                    } elseif ($data['estado'] === 'postergado') {
+                        $estado_class = 'info';
+                    }
+                    ?>
+                    <span class="badge badge-<?php echo $estado_class; ?>">
                         <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $data['estado']))); ?>
                     </span>
                 </td>
                 <td class="actions-cell">
-                    <button class="btn btn-success btn-sm" onclick="marcarAsistencia('<?php echo $fecha; ?>', 'asistio')">Asistió</button>
+                    <button class="btn btn-primary btn-sm" onclick="marcarAsistencia('<?php echo $fecha; ?>', 'asistio')">Asistió</button>
                     <button class="btn btn-warning btn-sm" onclick="marcarAsistencia('<?php echo $fecha; ?>', 'falto')">Faltó</button>
                     <button class="btn btn-info btn-sm" onclick="marcarAsistencia('<?php echo $fecha; ?>', 'postergado')">Postergado</button>
                 </td>

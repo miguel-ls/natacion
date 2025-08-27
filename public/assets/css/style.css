@@ -141,7 +141,29 @@ footer {
 .btn-info { background-color: #17a2b8; }
 .btn-warning { background-color: #ffc107; color: #212529; }
 .btn-danger { background-color: #dc3545; }
+.btn-success { background-color: #28a745; }
 .btn-disabled { background-color: #ccc; cursor: not-allowed; opacity: 0.6; }
+
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.badge-primary { background-color: #0056b3; }
+.badge-secondary { background-color: #6c757d; }
+.badge-info { background-color: #17a2b8; }
+.badge-warning { background-color: #ffc107; color: #212529; }
+.badge-danger { background-color: #dc3545; }
 
 
 /* Tables */
