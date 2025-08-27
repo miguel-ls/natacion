@@ -71,30 +71,44 @@ if (!defined('BASE_URL')) {
             <div class="nav-links">
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="<?php echo BASE_URL; ?>index.php?url=dashboard">Dashboard</a>
-                    <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Alumnos</a>
-                    <a href="<?php echo BASE_URL; ?>index.php?url=profesores">Profesores</a>
-                    <a href="<?php echo BASE_URL; ?>index.php?url=cursos">Cursos</a>
-                    <a href="<?php echo BASE_URL; ?>index.php?url=matriculas">Matrículas</a>
-                    <a href="<?php echo BASE_URL; ?>index.php?url=asistencias_profesor">Asistencia Prof.</a>
-                    <div class="dropdown">
-                        <a href="#">Reportes &#9662;</a>
-                        <div class="dropdown-content">
-                            <a href="<?php echo BASE_URL; ?>index.php?url=reportes/ventas">Reporte de Ventas</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=reportes/profesores">Reporte de Profesores</a>
-                        </div>
-                    </div>
+
                     <div class="dropdown">
                         <a href="#">Configuración &#9662;</a>
                         <div class="dropdown-content">
-                            <a href="<?php echo BASE_URL; ?>index.php?url=usuarios">Usuarios</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_piscina">Tipos de Piscina</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=piscinas">Piscinas</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_piscina">Tipos de piscina</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=piscinas">Piscina</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=carriles">Carriles</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_horario">Tipos de Horario</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=horarios">Programar Horarios</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=formas_pago">Formas de Pago</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_precio">Tipos de Precio</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_precio">Tipos de pago</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=formas_pago">Forma de pago</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_horario">Tipo de horario</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=cursos">Cursos</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=precios_cursos">Lista de Precios</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=profesores">Profesores</a>
+                        </div>
+                    </div>
+
+                    <div class="dropdown">
+                        <a href="#">Operaciones &#9662;</a>
+                        <div class="dropdown-content">
+                            <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Alumnos</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=matriculas">Matriculas</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=horarios">Programar horarios</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=asistencias_profesor">Asistencia prof.</a>
+                        </div>
+                    </div>
+
+                    <div class="dropdown">
+                        <a href="#">Reportes &#9662;</a>
+                        <div class="dropdown-content">
+                            <a href="<?php echo BASE_URL; ?>index.php?url=reportes/ventas">Reporte de ventas</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=reportes/profesores">Reporte de profesores</a>
+                        </div>
+                    </div>
+
+                    <div class="dropdown">
+                        <a href="#">Seguridad &#9662;</a>
+                        <div class="dropdown-content">
+                            <a href="<?php echo BASE_URL; ?>index.php?url=usuarios">Usuarios</a>
                         </div>
                     </div>
                 <?php endif; ?>
