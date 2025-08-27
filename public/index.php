@@ -25,6 +25,7 @@ require_once '../src/controllers/AsistenciaProfesorController.php';
 require_once '../src/controllers/ReporteController.php';
 require_once '../src/controllers/TipoPrecioController.php';
 require_once '../src/controllers/PrecioCursoController.php';
+require_once '../src/controllers/DashboardController.php';
 
 
 // Simple enrutador basado en el parámetro 'url'
@@ -48,8 +49,8 @@ switch ($route) {
         $authController->verify_2fa();
         break;
     case 'dashboard':
-        $authController = new AuthController();
-        $authController->dashboard();
+        $dashboardController = new DashboardController();
+        $dashboardController->index();
         break;
     case 'logout':
         $authController = new AuthController();

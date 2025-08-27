@@ -103,6 +103,19 @@ class MatriculaController {
      */
     public function create() {
         $db = Database::getInstance()->getConnection();
+        $selected_schedule = null;
+        $id_horario = $_GET['id_horario'] ?? null;
+
+        if ($id_horario) {
+            try {
+                $stmt_horario = $db->prepare("CALL sp_get_horario_details_for_enrollment(?)");
+                $stmt_horario->execute([$id_horario]);
+                $selected_schedule = $stmt_horario->fetch(PDO::FETCH_ASSOC);
+                $stmt_horario->closeCursor();
+            } catch (PDOException $e) {
+                $_SESSION['error_message'] = "Error al cargar los detalles del horario seleccionado: " . $e->getMessage();
+            }
+        }
 
         // Cargar datos necesarios para los menús desplegables iniciales
         $stmt_alumnos = $db->prepare("CALL sp_get_all_alumnos(?)");
@@ -120,8 +133,8 @@ class MatriculaController {
         $profesores = $stmt_profesores->fetchAll(PDO::FETCH_ASSOC);
         $stmt_profesores->closeCursor();
 
-        $stmt_formas_pago = $db->prepare("CALL sp_get_all_formas_pago(?)");
-        $stmt_formas_pago->execute(['']); // Pasar string vacío para obtener todas
+        $stmt_formas_pago = $db->prepare("CALL sp_get_all_formas_pago()");
+        $stmt_formas_pago->execute();
         $formas_pago = $stmt_formas_pago->fetchAll(PDO::FETCH_ASSOC);
         $stmt_formas_pago->closeCursor();
 
