@@ -32,16 +32,40 @@ class HorarioController {
             $this->auth->verifyCsrfToken();
             $db = Database::getInstance()->getConnection();
 
-            // Validar conflicto de horario para el profesor
-            $isConflict = $this->checkProfesorConflict($db, $_POST['id_profesor'], $_POST['id_tipo_horario'], $_POST['hora_inicio'], $_POST['hora_fin'], $_POST['fecha_inicio'], $_POST['fecha_fin']);
-            if ($isConflict) {
-                $_SESSION['error_message'] = "Conflicto de horario: El profesor ya tiene una clase asignada en un día, hora y rango de fechas que se superponen.";
+            // Llamada al nuevo SP de validación unificada
+            $stmt = $db->prepare("CALL sp_check_schedule_conflict(?, ?, ?, ?, ?, ?, ?, @conflict_type, @conflicting_id)");
+            $stmt->execute([
+                $_POST['id_profesor'],
+                $_POST['id_carril'],
+                $_POST['fecha_inicio'],
+                $_POST['fecha_fin'],
+                $_POST['hora_inicio'],
+                $_POST['hora_fin'],
+                0 // id_horario_a_excluir = 0 porque estamos creando uno nuevo
+            ]);
+            $stmt->closeCursor();
+
+            // Obtener los resultados de los parámetros OUT
+            $result = $db->query("SELECT @conflict_type AS conflict_type, @conflicting_id AS conflicting_id")->fetch(PDO::FETCH_ASSOC);
+            $conflict_type = $result['conflict_type'];
+
+            if ($conflict_type !== 'NONE') {
+                $message = "Error de validación desconocido.";
+                if ($conflict_type === 'TEACHER') {
+                    $message = "Conflicto de Horario: El profesor ya está asignado a otro curso en un horario que se cruza.";
+                } elseif ($conflict_type === 'LANE') {
+                    $message = "Conflicto de Horario: El carril ya está ocupado por otro curso en un horario que se cruza.";
+                }
+                $_SESSION['error_message'] = $message;
+                // Guardar los datos del formulario para no perderlos
+                $_SESSION['form_data'] = $_POST;
                 header('Location: index.php?url=horarios/create');
                 exit;
             }
 
-            $stmt = $db->prepare("CALL sp_create_horario(?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([
+            // Si no hay conflictos, proceder a crear el horario
+            $stmt_create = $db->prepare("CALL sp_create_horario(?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_create->execute([
                 $_POST['id_curso'],
                 $_POST['id_profesor'],
                 $_POST['id_carril'],
@@ -51,6 +75,7 @@ class HorarioController {
                 $_POST['fecha_inicio'],
                 $_POST['fecha_fin']
             ]);
+            unset($_SESSION['form_data']); // Limpiar datos guardados
             header('Location: index.php?url=horarios');
             exit;
         }
@@ -81,16 +106,39 @@ class HorarioController {
             $id = $_POST['id_horario'];
             $db = Database::getInstance()->getConnection();
 
-            // Validar conflicto de horario para el profesor, excluyendo el horario actual
-            $isConflict = $this->checkProfesorConflict($db, $_POST['id_profesor'], $_POST['id_tipo_horario'], $_POST['hora_inicio'], $_POST['hora_fin'], $_POST['fecha_inicio'], $_POST['fecha_fin'], $id);
-            if ($isConflict) {
-                $_SESSION['error_message'] = "Conflicto de horario: El profesor ya tiene una clase asignada en un día, hora y rango de fechas que se superponen.";
+            // Llamada al nuevo SP de validación unificada
+            $stmt = $db->prepare("CALL sp_check_schedule_conflict(?, ?, ?, ?, ?, ?, ?, @conflict_type, @conflicting_id)");
+            $stmt->execute([
+                $_POST['id_profesor'],
+                $_POST['id_carril'],
+                $_POST['fecha_inicio'],
+                $_POST['fecha_fin'],
+                $_POST['hora_inicio'],
+                $_POST['hora_fin'],
+                $id // id_horario_a_excluir, para que no compare consigo mismo
+            ]);
+            $stmt->closeCursor();
+
+            // Obtener los resultados de los parámetros OUT
+            $result = $db->query("SELECT @conflict_type AS conflict_type, @conflicting_id AS conflicting_id")->fetch(PDO::FETCH_ASSOC);
+            $conflict_type = $result['conflict_type'];
+
+            if ($conflict_type !== 'NONE') {
+                $message = "Error de validación desconocido.";
+                if ($conflict_type === 'TEACHER') {
+                    $message = "Conflicto de Horario: El profesor ya está asignado a otro curso en un horario que se cruza.";
+                } elseif ($conflict_type === 'LANE') {
+                    $message = "Conflicto de Horario: El carril ya está ocupado por otro curso en un horario que se cruza.";
+                }
+                $_SESSION['error_message'] = $message;
+                $_SESSION['form_data'] = $_POST;
                 header('Location: index.php?url=horarios/edit&id=' . $id);
                 exit;
             }
 
-            $stmt = $db->prepare("CALL sp_update_horario(?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([
+            // Si no hay conflictos, proceder a actualizar
+            $stmt_update = $db->prepare("CALL sp_update_horario(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_update->execute([
                 $id,
                 $_POST['id_curso'],
                 $_POST['id_profesor'],
@@ -101,6 +149,7 @@ class HorarioController {
                 $_POST['fecha_inicio'],
                 $_POST['fecha_fin']
             ]);
+            unset($_SESSION['form_data']);
             header('Location: index.php?url=horarios');
             exit;
         }
@@ -145,61 +194,5 @@ class HorarioController {
         return compact('cursos', 'profesores', 'carriles', 'tipos_horario');
     }
 
-    private function checkProfesorConflict($db, $id_profesor, $id_tipo_horario, $hora_inicio, $hora_fin, $fecha_inicio, $fecha_fin, $id_horario_excluir = 0) {
-        // Obtener los días para el nuevo horario
-        $stmt_dias_nuevos = $db->prepare("SELECT dias_semana FROM tipos_horario WHERE id_tipo_horario = ?");
-        $stmt_dias_nuevos->execute([$id_tipo_horario]);
-        $dias_nuevos_str = $stmt_dias_nuevos->fetchColumn();
-        $stmt_dias_nuevos->closeCursor();
-        if (!$dias_nuevos_str) return false;
-        $dias_nuevos = explode(',', $dias_nuevos_str);
-
-        // Obtener todos los horarios existentes para el profesor
-        $stmt_existentes = $db->prepare("CALL sp_get_horarios_by_profesor(?)");
-        $stmt_existentes->execute([$id_profesor]);
-        $horarios_existentes = $stmt_existentes->fetchAll(PDO::FETCH_ASSOC);
-        $stmt_existentes->closeCursor();
-
-        foreach ($horarios_existentes as $h_existente) {
-            // Omitir el mismo horario si estamos actualizando
-            if ($h_existente['id_horario'] == $id_horario_excluir) {
-                continue;
-            }
-
-            // Revisar si hay superposición de días
-            $dias_existentes = explode(',', $h_existente['dias_semana']);
-            $dias_comunes = array_intersect($dias_nuevos, $dias_existentes);
-
-            if (!empty($dias_comunes)) {
-                // Si los días se superponen, revisar si las horas se superponen
-                $time_overlap = false;
-                $inicio_existente_t = strtotime($h_existente['hora_inicio']);
-                $fin_existente_t = strtotime($h_existente['hora_fin']);
-                $inicio_nuevo_t = strtotime($hora_inicio);
-                $fin_nuevo_t = strtotime($hora_fin);
-                if ($inicio_nuevo_t < $fin_existente_t && $fin_nuevo_t > $inicio_existente_t) {
-                    $time_overlap = true;
-                }
-
-                if ($time_overlap) {
-                    // Si las horas se superponen, revisar si las fechas se superponen
-                    $date_overlap = false;
-                    $inicio_existente_f = strtotime($h_existente['fecha_inicio']);
-                    $fin_existente_f = strtotime($h_existente['fecha_fin']);
-                    $inicio_nuevo_f = strtotime($fecha_inicio);
-                    $fin_nuevo_f = strtotime($fecha_fin);
-                    if ($inicio_nuevo_f < $fin_existente_f && $fin_nuevo_f > $inicio_existente_f) {
-                        $date_overlap = true;
-                    }
-
-                    if ($date_overlap) {
-                        return true; // Conflicto encontrado
-                    }
-                }
-            }
-        }
-
-        return false; // No hay conflicto
-    }
 }
 ?>

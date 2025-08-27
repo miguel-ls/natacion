@@ -25,6 +25,9 @@ $auth = new AuthController();
         echo '<div class="error-message">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
         unset($_SESSION['error_message']);
     }
+    // Recuperar datos del formulario en caso de error
+    $form_data = $_SESSION['form_data'] ?? [];
+    unset($_SESSION['form_data']);
     ?>
 
     <form action="index.php?url=horarios/store" method="POST">
@@ -35,7 +38,9 @@ $auth = new AuthController();
                 <select id="id_curso" name="id_curso" required>
                     <option value="">Seleccione un curso</option>
                     <?php foreach ($cursos as $curso): ?>
-                        <option value="<?php echo htmlspecialchars($curso['id_curso']); ?>"><?php echo htmlspecialchars($curso['nombre']); ?></option>
+                        <option value="<?php echo htmlspecialchars($curso['id_curso']); ?>" <?php echo (isset($form_data['id_curso']) && $form_data['id_curso'] == $curso['id_curso']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($curso['nombre']); ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -44,7 +49,9 @@ $auth = new AuthController();
                 <select id="id_profesor" name="id_profesor" required>
                     <option value="">Seleccione un profesor</option>
                     <?php foreach ($profesores as $profesor): ?>
-                        <option value="<?php echo htmlspecialchars($profesor['id_profesor']); ?>"><?php echo htmlspecialchars($profesor['nombres'] . ' ' . $profesor['apellidos']); ?></option>
+                        <option value="<?php echo htmlspecialchars($profesor['id_profesor']); ?>" <?php echo (isset($form_data['id_profesor']) && $form_data['id_profesor'] == $profesor['id_profesor']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($profesor['nombres'] . ' ' . $profesor['apellidos']); ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -55,7 +62,9 @@ $auth = new AuthController();
                 <select id="id_carril" name="id_carril" required>
                     <option value="">Seleccione un carril</option>
                     <?php foreach ($carriles as $carril): ?>
-                        <option value="<?php echo htmlspecialchars($carril['id_carril']); ?>"><?php echo htmlspecialchars($carril['piscina_nombre'] . ' - Carril ' . $carril['numero_carril']); ?></option>
+                        <option value="<?php echo htmlspecialchars($carril['id_carril']); ?>" <?php echo (isset($form_data['id_carril']) && $form_data['id_carril'] == $carril['id_carril']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($carril['piscina_nombre'] . ' - Carril ' . $carril['numero_carril']); ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -64,7 +73,9 @@ $auth = new AuthController();
                 <select id="id_tipo_horario" name="id_tipo_horario" required>
                     <option value="">Seleccione los días</option>
                     <?php foreach ($tipos_horario as $tipo): ?>
-                        <option value="<?php echo htmlspecialchars($tipo['id_tipo_horario']); ?>"><?php echo htmlspecialchars($tipo['nombre']); ?></option>
+                        <option value="<?php echo htmlspecialchars($tipo['id_tipo_horario']); ?>" <?php echo (isset($form_data['id_tipo_horario']) && $form_data['id_tipo_horario'] == $tipo['id_tipo_horario']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($tipo['nombre']); ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -72,21 +83,21 @@ $auth = new AuthController();
         <div class="form-row">
             <div class="form-group">
                 <label for="hora_inicio">Hora de Inicio</label>
-                <input type="time" id="hora_inicio" name="hora_inicio" required>
+                <input type="time" id="hora_inicio" name="hora_inicio" value="<?php echo htmlspecialchars($form_data['hora_inicio'] ?? ''); ?>" required>
             </div>
             <div class="form-group">
                 <label for="hora_fin">Hora de Fin</label>
-                <input type="time" id="hora_fin" name="hora_fin" required>
+                <input type="time" id="hora_fin" name="hora_fin" value="<?php echo htmlspecialchars($form_data['hora_fin'] ?? ''); ?>" required>
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label for="fecha_inicio">Fecha de Inicio del Horario</label>
-                <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($form_data['fecha_inicio'] ?? ''); ?>" required>
             </div>
             <div class="form-group">
                 <label for="fecha_fin">Fecha de Fin del Horario</label>
-                <input type="date" id="fecha_fin" name="fecha_fin" required>
+                <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($form_data['fecha_fin'] ?? ''); ?>" required>
             </div>
         </div>
         <div class="form-actions">
