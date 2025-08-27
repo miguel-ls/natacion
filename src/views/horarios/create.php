@@ -79,6 +79,16 @@ $auth = new AuthController();
                 <input type="time" id="hora_fin" name="hora_fin" required>
             </div>
         </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="fecha_inicio">Fecha de Inicio del Horario</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+            </div>
+            <div class="form-group">
+                <label for="fecha_fin">Fecha de Fin del Horario</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" required>
+            </div>
+        </div>
         <div class="form-actions">
             <a href="index.php?url=horarios" class="btn btn-secondary">Cancelar</a>
             <button type="submit" class="btn btn-success">Guardar Horario</button>

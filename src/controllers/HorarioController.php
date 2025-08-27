@@ -33,21 +33,23 @@ class HorarioController {
             $db = Database::getInstance()->getConnection();
 
             // Validar conflicto de horario para el profesor
-            $isConflict = $this->checkProfesorConflict($db, $_POST['id_profesor'], $_POST['id_tipo_horario'], $_POST['hora_inicio'], $_POST['hora_fin']);
+            $isConflict = $this->checkProfesorConflict($db, $_POST['id_profesor'], $_POST['id_tipo_horario'], $_POST['hora_inicio'], $_POST['hora_fin'], $_POST['fecha_inicio'], $_POST['fecha_fin']);
             if ($isConflict) {
-                $_SESSION['error_message'] = "Conflicto de horario: El profesor ya tiene una clase asignada en un día y hora que se superponen.";
+                $_SESSION['error_message'] = "Conflicto de horario: El profesor ya tiene una clase asignada en un día, hora y rango de fechas que se superponen.";
                 header('Location: index.php?url=horarios/create');
                 exit;
             }
 
-            $stmt = $db->prepare("CALL sp_create_horario(?, ?, ?, ?, ?, ?)");
+            $stmt = $db->prepare("CALL sp_create_horario(?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $_POST['id_curso'],
                 $_POST['id_profesor'],
                 $_POST['id_carril'],
                 $_POST['id_tipo_horario'],
                 $_POST['hora_inicio'],
-                $_POST['hora_fin']
+                $_POST['hora_fin'],
+                $_POST['fecha_inicio'],
+                $_POST['fecha_fin']
             ]);
             header('Location: index.php?url=horarios');
             exit;
@@ -80,14 +82,14 @@ class HorarioController {
             $db = Database::getInstance()->getConnection();
 
             // Validar conflicto de horario para el profesor, excluyendo el horario actual
-            $isConflict = $this->checkProfesorConflict($db, $_POST['id_profesor'], $_POST['id_tipo_horario'], $_POST['hora_inicio'], $_POST['hora_fin'], $id);
+            $isConflict = $this->checkProfesorConflict($db, $_POST['id_profesor'], $_POST['id_tipo_horario'], $_POST['hora_inicio'], $_POST['hora_fin'], $_POST['fecha_inicio'], $_POST['fecha_fin'], $id);
             if ($isConflict) {
-                $_SESSION['error_message'] = "Conflicto de horario: El profesor ya tiene una clase asignada en un día y hora que se superponen.";
+                $_SESSION['error_message'] = "Conflicto de horario: El profesor ya tiene una clase asignada en un día, hora y rango de fechas que se superponen.";
                 header('Location: index.php?url=horarios/edit&id=' . $id);
                 exit;
             }
 
-            $stmt = $db->prepare("CALL sp_update_horario(?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $db->prepare("CALL sp_update_horario(?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $id,
                 $_POST['id_curso'],
@@ -95,7 +97,9 @@ class HorarioController {
                 $_POST['id_carril'],
                 $_POST['id_tipo_horario'],
                 $_POST['hora_inicio'],
-                $_POST['hora_fin']
+                $_POST['hora_fin'],
+                $_POST['fecha_inicio'],
+                $_POST['fecha_fin']
             ]);
             header('Location: index.php?url=horarios');
             exit;
@@ -141,7 +145,7 @@ class HorarioController {
         return compact('cursos', 'profesores', 'carriles', 'tipos_horario');
     }
 
-    private function checkProfesorConflict($db, $id_profesor, $id_tipo_horario, $hora_inicio, $hora_fin, $id_horario_excluir = 0) {
+    private function checkProfesorConflict($db, $id_profesor, $id_tipo_horario, $hora_inicio, $hora_fin, $fecha_inicio, $fecha_fin, $id_horario_excluir = 0) {
         // Obtener los días para el nuevo horario
         $stmt_dias_nuevos = $db->prepare("SELECT dias_semana FROM tipos_horario WHERE id_tipo_horario = ?");
         $stmt_dias_nuevos->execute([$id_tipo_horario]);
@@ -168,13 +172,29 @@ class HorarioController {
 
             if (!empty($dias_comunes)) {
                 // Si los días se superponen, revisar si las horas se superponen
-                $inicio_existente = strtotime($h_existente['hora_inicio']);
-                $fin_existente = strtotime($h_existente['hora_fin']);
-                $inicio_nuevo = strtotime($hora_inicio);
-                $fin_nuevo = strtotime($hora_fin);
+                $time_overlap = false;
+                $inicio_existente_t = strtotime($h_existente['hora_inicio']);
+                $fin_existente_t = strtotime($h_existente['hora_fin']);
+                $inicio_nuevo_t = strtotime($hora_inicio);
+                $fin_nuevo_t = strtotime($hora_fin);
+                if ($inicio_nuevo_t < $fin_existente_t && $fin_nuevo_t > $inicio_existente_t) {
+                    $time_overlap = true;
+                }
 
-                if ($inicio_nuevo < $fin_existente && $fin_nuevo > $inicio_existente) {
-                    return true; // Conflicto encontrado
+                if ($time_overlap) {
+                    // Si las horas se superponen, revisar si las fechas se superponen
+                    $date_overlap = false;
+                    $inicio_existente_f = strtotime($h_existente['fecha_inicio']);
+                    $fin_existente_f = strtotime($h_existente['fecha_fin']);
+                    $inicio_nuevo_f = strtotime($fecha_inicio);
+                    $fin_nuevo_f = strtotime($fecha_fin);
+                    if ($inicio_nuevo_f < $fin_existente_f && $fin_nuevo_f > $inicio_existente_f) {
+                        $date_overlap = true;
+                    }
+
+                    if ($date_overlap) {
+                        return true; // Conflicto encontrado
+                    }
                 }
             }
         }

@@ -48,13 +48,15 @@ require_once __DIR__ . '/../partials/header.php';
                 <th>Piscina y Carril</th>
                 <th>Días</th>
                 <th>Horario</th>
+                <th>Vigencia Inicio</th>
+                <th>Vigencia Fin</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($horarios)): ?>
                 <tr>
-                    <td colspan="7">No hay horarios registrados.</td>
+                    <td colspan="9">No hay horarios registrados.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($horarios as $horario): ?>
@@ -65,6 +67,8 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($horario['carril_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($horario['tipo_horario_nombre']); ?></td>
                         <td><?php echo htmlspecialchars(date('h:i A', strtotime($horario['hora_inicio']))) . ' - ' . htmlspecialchars(date('h:i A', strtotime($horario['hora_fin']))); ?></td>
+                        <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($horario['fecha_inicio']))); ?></td>
+                        <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($horario['fecha_fin']))); ?></td>
                         <td class="action-links">
                             <a href="index.php?url=horarios/edit&id=<?php echo $horario['id_horario']; ?>" class="btn btn-warning">Editar</a>
                             <a href="index.php?url=horarios/delete&id=<?php echo $horario['id_horario']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este horario?');">Eliminar</a>

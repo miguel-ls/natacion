@@ -15,19 +15,93 @@ class AsistenciaProfesorController {
      * Muestra la interfaz para gestionar la asistencia de profesores para una fecha dada.
      */
     public function index() {
-        $fecha_seleccionada = $_GET['fecha'] ?? date('Y-m-d');
-        $horarios_del_dia = [];
-
+        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_horarios_for_day(?)");
-            $stmt->execute([$fecha_seleccionada]);
-            $horarios_del_dia = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // Reutilizamos el sp_get_all_horarios_details que ya tiene un filtro
+            $stmt = $db->prepare("CALL sp_get_all_horarios_details(?)");
+            $stmt->execute([$search_term]);
+            $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            $_SESSION['error_message'] = "Error al cargar los horarios del día: " . $e->getMessage();
+            $_SESSION['error_message'] = "Error al cargar los horarios: " . $e->getMessage();
+            $horarios = [];
         }
 
         require_once __DIR__ . '/../views/asistencias_profesor/index.php';
+    }
+
+    /**
+     * Muestra la página de detalle para marcar la asistencia de un profesor para un horario específico.
+     */
+    public function show() {
+        $id_horario = $_GET['id'] ?? null;
+        if (!$id_horario) {
+            header('Location: index.php?url=asistencias_profesor');
+            exit;
+        }
+
+        $db = Database::getInstance()->getConnection();
+
+        // 1. Obtener detalles del horario
+        $stmt_horario = $db->prepare("
+            SELECT h.*, th.dias_semana, c.nombre as curso_nombre, CONCAT(p.nombres, ' ', p.apellidos) as profesor_nombre
+            FROM horarios h
+            JOIN tipos_horario th ON h.id_tipo_horario = th.id_tipo_horario
+            JOIN cursos c ON h.id_curso = c.id_curso
+            JOIN profesores p ON h.id_profesor = p.id_profesor
+            WHERE h.id_horario = ?
+        ");
+        $stmt_horario->execute([$id_horario]);
+        $horario = $stmt_horario->fetch(PDO::FETCH_ASSOC);
+        $stmt_horario->closeCursor();
+
+        if (!$horario) {
+            http_response_code(404);
+            echo "Horario no encontrado.";
+            exit;
+        }
+
+        // 2. Generar las fechas de clase esperadas en PHP
+        $dias_clase = [];
+        if ($horario['fecha_inicio'] && $horario['fecha_fin']) {
+            $dias_semana = explode(',', $horario['dias_semana']);
+            $fecha_actual = new DateTime($horario['fecha_inicio']);
+            $fecha_fin = new DateTime($horario['fecha_fin']);
+
+            while ($fecha_actual <= $fecha_fin) {
+                // date('w') es 0-6 (Dom-Sab), DAYOFWEEK() es 1-7 (Dom-Sab). La correspondencia es date('w') + 1.
+                $dayOfWeek = (int)$fecha_actual->format('w') + 1;
+                if (in_array($dayOfWeek, $dias_semana)) {
+                    $dias_clase[$fecha_actual->format('Y-m-d')] = [
+                        'fecha_clase' => $fecha_actual->format('Y-m-d'),
+                        'estado' => 'no_marcado', // Estado por defecto
+                        'observaciones' => ''
+                    ];
+                }
+                $fecha_actual->modify('+1 day');
+            }
+        }
+
+        // 3. Obtener los registros de asistencia que ya existen
+        $stmt_asistencias = $db->prepare("
+            SELECT fecha, estado, observaciones
+            FROM asistencias_profesores
+            WHERE id_horario = ? AND id_profesor = ?
+        ");
+        $stmt_asistencias->execute([$id_horario, $horario['id_profesor']]);
+        $asistencias_guardadas = $stmt_asistencias->fetchAll(PDO::FETCH_ASSOC);
+        $stmt_asistencias->closeCursor();
+
+        // 4. Fusionar los estados guardados con la lista generada
+        foreach ($asistencias_guardadas as $asistencia) {
+            $fecha = $asistencia['fecha'];
+            if (isset($dias_clase[$fecha])) {
+                $dias_clase[$fecha]['estado'] = $asistencia['estado'];
+                $dias_clase[$fecha]['observaciones'] = $asistencia['observaciones'];
+            }
+        }
+
+        require_once __DIR__ . '/../views/asistencias_profesor/show.php';
     }
 
     /**
