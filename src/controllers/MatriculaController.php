@@ -223,15 +223,16 @@ class MatriculaController {
                     throw new Exception("No se ha seleccionado ni creado un alumno.");
                 }
 
-                // 1. Crear la matrícula
-                $stmt_matricula = $db->prepare("CALL sp_create_matricula(?, ?, ?, ?, ?, ?, ?, ?)");
+                // 1. Crear la matrícula (Lógica corregida)
+                $stmt_matricula = $db->prepare("CALL sp_create_matricula(?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt_matricula->execute([
                     $id_alumno,
                     $_POST['id_horario'],
                     $_SESSION['user_id'],
                     $_POST['fecha_inicio'],
                     $_POST['fecha_fin'],
-                    $_POST['precio_final'],
+                    $_POST['precio_base'], // Se envía el precio base
+                    $_POST['descuento'],
                     $_POST['id_forma_pago'],
                     $_POST['observaciones']
                 ]);

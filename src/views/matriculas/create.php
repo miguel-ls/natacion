@@ -103,6 +103,7 @@ $auth = new AuthController();
             </div>
             <input type="hidden" id="id_horario" name="id_horario" required>
             <input type="hidden" id="dias_semana_hidden" name="dias_semana_hidden">
+            <input type="hidden" id="precio_base" name="precio_base">
         </div>
 
         <div class="form-section">
@@ -118,10 +119,16 @@ $auth = new AuthController();
                 </div>
             </div>
             <div class="form-row">
+                <div class="form-group">
+                    <label for="descuento">Descuento (S/)</label>
+                    <input type="number" id="descuento" name="descuento" step="0.01" value="0">
+                </div>
                  <div class="form-group">
                     <label for="precio_final">Precio Final (S/)</label>
-                    <input type="number" id="precio_final" name="precio_final" step="0.01" required>
+                    <input type="number" id="precio_final" name="precio_final" step="0.01" required readonly>
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="form-group">
                     <label for="id_forma_pago">Forma de Pago</label>
                     <select id="id_forma_pago" name="id_forma_pago" required>
@@ -260,6 +267,15 @@ cursoSearchInput.addEventListener('keyup', function() {
 
 
 // Lógica para horarios
+let precioBaseCurso = 0;
+
+function calcularPrecioFinal() {
+    const descuento = parseFloat(document.getElementById('descuento').value) || 0;
+    const precioFinal = precioBaseCurso - descuento;
+    document.getElementById('precio_final').value = precioFinal.toFixed(2);
+    document.getElementById('precio_base').value = precioBaseCurso;
+}
+
 function buscarHorarios(callback) { // Aceptar un callback
     const cursoId = document.getElementById('id_curso').value;
     const profesorId = document.getElementById('filtro_profesor').value;
@@ -268,6 +284,9 @@ function buscarHorarios(callback) { // Aceptar un callback
     const fechaFinInput = document.getElementById('fecha_fin');
 
     document.getElementById('precio_final').value = '';
+    document.getElementById('descuento').value = 0;
+    precioBaseCurso = 0;
+
     const container = document.getElementById('horarios-disponibles-container');
     container.innerHTML = '<p>Cargando horarios...</p>';
     document.getElementById('id_horario').value = '';
@@ -293,6 +312,7 @@ function buscarHorarios(callback) { // Aceptar un callback
                     const div = document.createElement('div');
                     div.className = 'horario-item';
                     div.dataset.id = horario.id_horario;
+                    div.dataset.precio = horario.precio_actual;
                     div.dataset.dias = horario.dias_semana;
                     div.dataset.fechaFinCurso = horario.fecha_fin; // Guardar la fecha fin. Asegurarse que el alias es fecha_fin
                     const fechaInicio = formatDateDDMMYYYY(horario.fecha_inicio);
@@ -309,7 +329,9 @@ function buscarHorarios(callback) { // Aceptar un callback
                         this.classList.add('selected');
                         document.getElementById('id_horario').value = this.dataset.id;
                         document.getElementById('dias_semana_hidden').value = this.dataset.dias;
-                        document.getElementById('precio_final').value = horario.precio_actual || '';
+
+                        precioBaseCurso = parseFloat(this.dataset.precio) || 0;
+                        calcularPrecioFinal();
 
                         // Restricción de fecha
                         if (this.dataset.fechaFinCurso) {
@@ -328,6 +350,8 @@ function buscarHorarios(callback) { // Aceptar un callback
             }
         });
 }
+
+document.getElementById('descuento').addEventListener('input', calcularPrecioFinal);
 
 document.getElementById('btn-filtrar-horarios').addEventListener('click', buscarHorarios);
 
