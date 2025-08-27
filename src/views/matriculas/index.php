@@ -27,15 +27,72 @@ require_once __DIR__ . '/../partials/header.php';
         <a href="index.php?url=matriculas/create" class="btn btn-primary">Nueva Matrícula</a>
     </div>
 
-    <!-- Formulario de Búsqueda -->
+    <!-- Filtros de Búsqueda Avanzada -->
     <div class="filter-container" style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <form action="index.php" method="GET">
+        <form action="index.php" method="GET" class="form-filters">
             <input type="hidden" name="url" value="matriculas">
-            <label for="search">Buscar Matrícula:</label>
-            <input type="text" name="search" id="search" value="<?php echo htmlspecialchars($search_term); ?>" placeholder="Nombre de alumno, curso o estado...">
-            <button type="submit" class="btn btn-primary">Buscar</button>
+            <div class="filter-group">
+                <label for="id_alumno">Alumno:</label>
+                <select name="id_alumno" id="id_alumno">
+                    <option value="0">Todos</option>
+                    <?php foreach ($alumnos as $alumno): ?>
+                        <option value="<?php echo $alumno['id_alumno']; ?>" <?php echo (isset($filters['id_alumno']) && $filters['id_alumno'] == $alumno['id_alumno']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($alumno['nombres'] . ' ' . $alumno['apellidos']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="id_curso">Curso:</label>
+                <select name="id_curso" id="id_curso">
+                    <option value="0">Todos</option>
+                    <?php foreach ($cursos as $curso): ?>
+                        <option value="<?php echo $curso['id_curso']; ?>" <?php echo (isset($filters['id_curso']) && $filters['id_curso'] == $curso['id_curso']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($curso['nombre']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="fecha_inicio_desde">Desde:</label>
+                <input type="date" name="fecha_inicio_desde" id="fecha_inicio_desde" value="<?php echo htmlspecialchars($filters['fecha_inicio_desde'] ?? ''); ?>">
+            </div>
+            <div class="filter-group">
+                <label for="fecha_inicio_hasta">Hasta:</label>
+                <input type="date" name="fecha_inicio_hasta" id="fecha_inicio_hasta" value="<?php echo htmlspecialchars($filters['fecha_inicio_hasta'] ?? ''); ?>">
+            </div>
+            <div class="filter-group">
+                <label for="estado">Estado:</label>
+                <select name="estado" id="estado">
+                    <option value="Todos" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Todos') ? 'selected' : ''; ?>>Todos</option>
+                    <option value="Activa" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Activa') ? 'selected' : ''; ?>>Activa</option>
+                    <option value="Vigente" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Vigente') ? 'selected' : ''; ?>>Vigente</option>
+                    <option value="Anulada" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Anulada') ? 'selected' : ''; ?>>Anulada</option>
+                    <option value="Finalizada" <?php echo (isset($filters['estado']) && $filters['estado'] == 'Finalizada') ? 'selected' : ''; ?>>Finalizada</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
         </form>
     </div>
+
+    <style>
+        .form-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            margin-bottom: 0.25rem;
+            font-weight: bold;
+        }
+    </style>
 
     <?php
     if (isset($_SESSION['error_message'])) {

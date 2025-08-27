@@ -12,17 +12,47 @@ class MatriculaController {
     }
 
     /**
-     * Muestra la lista de todas las matrículas.
+     * Muestra la lista de todas las matrículas con filtros.
      */
     public function index() {
-        $search_term = $_GET['search'] ?? '';
         $db = Database::getInstance()->getConnection();
+
+        // Valores por defecto para los filtros
+        $filters = [
+            'id_alumno' => $_GET['id_alumno'] ?? 0,
+            'id_curso' => $_GET['id_curso'] ?? 0,
+            'fecha_inicio_desde' => $_GET['fecha_inicio_desde'] ?? null,
+            'fecha_inicio_hasta' => $_GET['fecha_inicio_hasta'] ?? null,
+            'estado' => $_GET['estado'] ?? 'Todos'
+        ];
+
         try {
-            $stmt = $db->prepare("CALL sp_get_all_matriculas_details(?)");
-            $stmt->execute([$search_term]);
+            // Cargar datos para los filtros
+            $stmt_alumnos = $db->prepare("CALL sp_get_all_alumnos(?)");
+            $stmt_alumnos->execute(['']);
+            $alumnos = $stmt_alumnos->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_alumnos->closeCursor();
+
+            $stmt_cursos = $db->prepare("CALL sp_get_all_cursos(?)");
+            $stmt_cursos->execute(['']);
+            $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_cursos->closeCursor();
+
+            // Cargar matrículas filtradas
+            $stmt = $db->prepare("CALL sp_get_matriculas_filtradas(?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $filters['id_alumno'],
+                $filters['id_curso'],
+                $filters['fecha_inicio_desde'],
+                $filters['fecha_inicio_hasta'],
+                $filters['estado']
+            ]);
             $matriculas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+
             $csrf_token = $this->auth->getCsrfToken();
             require_once __DIR__ . '/../views/matriculas/index.php';
+
         } catch (PDOException $e) {
             echo "Error al cargar las matrículas: " . $e->getMessage();
         }
