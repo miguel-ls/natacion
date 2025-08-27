@@ -31,27 +31,17 @@ require_once __DIR__ . '/../partials/header.php';
     <div class="filter-container" style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
         <form action="index.php" method="GET" class="form-filters">
             <input type="hidden" name="url" value="matriculas">
-            <div class="filter-group">
-                <label for="id_alumno">Alumno:</label>
-                <select name="id_alumno" id="id_alumno">
-                    <option value="0">Todos</option>
-                    <?php foreach ($alumnos as $alumno): ?>
-                        <option value="<?php echo $alumno['id_alumno']; ?>" <?php echo (isset($filters['id_alumno']) && $filters['id_alumno'] == $alumno['id_alumno']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($alumno['nombres'] . ' ' . $alumno['apellidos']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+            <div class="filter-group search-container">
+                <label for="alumno_search">Alumno:</label>
+                <input type="text" id="alumno_search" class="form-control" placeholder="Buscar por nombre..." value="<?php echo htmlspecialchars($filters['alumno_nombre'] ?? ''); ?>" autocomplete="off">
+                <input type="hidden" id="id_alumno" name="id_alumno" value="<?php echo htmlspecialchars($filters['id_alumno'] ?? '0'); ?>">
+                <div id="alumno-search-results" class="search-results"></div>
             </div>
-            <div class="filter-group">
-                <label for="id_curso">Curso:</label>
-                <select name="id_curso" id="id_curso">
-                    <option value="0">Todos</option>
-                    <?php foreach ($cursos as $curso): ?>
-                        <option value="<?php echo $curso['id_curso']; ?>" <?php echo (isset($filters['id_curso']) && $filters['id_curso'] == $curso['id_curso']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($curso['nombre']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+            <div class="filter-group search-container">
+                <label for="curso_search">Curso:</label>
+                <input type="text" id="curso_search" class="form-control" placeholder="Buscar por curso..." value="<?php echo htmlspecialchars($filters['curso_nombre'] ?? ''); ?>" autocomplete="off">
+                <input type="hidden" id="id_curso" name="id_curso" value="<?php echo htmlspecialchars($filters['id_curso'] ?? '0'); ?>">
+                <div id="curso-search-results" class="search-results"></div>
             </div>
             <div class="filter-group">
                 <label for="fecha_inicio_desde">Desde:</label>
@@ -91,6 +81,27 @@ require_once __DIR__ . '/../partials/header.php';
         .filter-group label {
             margin-bottom: 0.25rem;
             font-weight: bold;
+        }
+        .search-container {
+            position: relative;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .search-result-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .search-result-item:hover {
+            background-color: #f0f0f0;
         }
     </style>
 
@@ -157,6 +168,80 @@ require_once __DIR__ . '/../partials/header.php';
         </tbody>
     </table>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lógica para búsqueda de alumnos
+    const alumnoSearchInput = document.getElementById('alumno_search');
+    const alumnoSearchResults = document.getElementById('alumno-search-results');
+    const alumnoHiddenInputId = document.getElementById('id_alumno');
+
+    alumnoSearchInput.addEventListener('keyup', function() {
+        const term = this.value;
+        if (term.length < 2) {
+            alumnoSearchResults.innerHTML = '';
+            return;
+        }
+        fetch(`index.php?url=alumnos/search&term=${term}`)
+            .then(response => response.json())
+            .then(data => {
+                alumnoSearchResults.innerHTML = '';
+                data.forEach(alumno => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.textContent = `${alumno.nombres} ${alumno.apellidos} (${alumno.documento_identidad || 'N/D'})`;
+                    item.dataset.id = alumno.id_alumno;
+                    item.addEventListener('click', function() {
+                        alumnoSearchInput.value = this.textContent;
+                        alumnoHiddenInputId.value = this.dataset.id;
+                        alumnoSearchResults.innerHTML = '';
+                    });
+                    alumnoSearchResults.appendChild(item);
+                });
+            });
+    });
+
+    // Lógica para búsqueda de cursos
+    const cursoSearchInput = document.getElementById('curso_search');
+    const cursoSearchResults = document.getElementById('curso-search-results');
+    const cursoHiddenInputId = document.getElementById('id_curso');
+
+    cursoSearchInput.addEventListener('keyup', function() {
+        const term = this.value;
+        if (term.length < 2) {
+            cursoSearchResults.innerHTML = '';
+            return;
+        }
+        fetch(`index.php?url=cursos/search&term=${term}`)
+            .then(response => response.json())
+            .then(data => {
+                cursoSearchResults.innerHTML = '';
+                data.forEach(curso => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.textContent = curso.nombre;
+                    item.dataset.id = curso.id_curso;
+                    item.addEventListener('click', function() {
+                        cursoSearchInput.value = this.textContent;
+                        cursoHiddenInputId.value = this.dataset.id;
+                        cursoSearchResults.innerHTML = '';
+                    });
+                    cursoSearchResults.appendChild(item);
+                });
+            });
+    });
+
+    // Ocultar resultados si se hace clic fuera
+    document.addEventListener('click', function(e) {
+        if (!alumnoSearchInput.contains(e.target)) {
+            alumnoSearchResults.innerHTML = '';
+        }
+        if (!cursoSearchInput.contains(e.target)) {
+            cursoSearchResults.innerHTML = '';
+        }
+    });
+});
+</script>
 
 <?php
 require_once __DIR__ . '/../partials/footer.php';

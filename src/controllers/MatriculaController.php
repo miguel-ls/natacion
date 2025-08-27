@@ -23,10 +23,33 @@ class MatriculaController {
             'id_curso' => $_GET['id_curso'] ?? 0,
             'fecha_inicio_desde' => $_GET['fecha_inicio_desde'] ?? null,
             'fecha_inicio_hasta' => $_GET['fecha_inicio_hasta'] ?? null,
-            'estado' => $_GET['estado'] ?? 'Todos'
+            'estado' => $_GET['estado'] ?? 'Todos',
+            'alumno_nombre' => '', // Nuevo
+            'curso_nombre' => ''  // Nuevo
         ];
 
         try {
+            // Cargar nombres para filtros si los IDs están presentes
+            if ($filters['id_alumno'] != 0) {
+                $stmt_alumno = $db->prepare("CALL sp_get_alumno_by_id(?)");
+                $stmt_alumno->execute([$filters['id_alumno']]);
+                $alumno_data = $stmt_alumno->fetch(PDO::FETCH_ASSOC);
+                if ($alumno_data) {
+                    $filters['alumno_nombre'] = $alumno_data['nombres'] . ' ' . $alumno_data['apellidos'];
+                }
+                $stmt_alumno->closeCursor();
+            }
+
+            if ($filters['id_curso'] != 0) {
+                $stmt_curso = $db->prepare("CALL sp_get_curso_by_id(?)");
+                $stmt_curso->execute([$filters['id_curso']]);
+                $curso_data = $stmt_curso->fetch(PDO::FETCH_ASSOC);
+                if ($curso_data) {
+                    $filters['curso_nombre'] = $curso_data['nombre'];
+                }
+                $stmt_curso->closeCursor();
+            }
+
             // Cargar datos para los filtros
             $stmt_alumnos = $db->prepare("CALL sp_get_all_alumnos(?)");
             $stmt_alumnos->execute(['']);
