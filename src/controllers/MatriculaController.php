@@ -21,6 +21,7 @@ class MatriculaController {
             $stmt = $db->prepare("CALL sp_get_all_matriculas_details(?)");
             $stmt->execute([$search_term]);
             $matriculas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $csrf_token = $this->auth->getCsrfToken();
             require_once __DIR__ . '/../views/matriculas/index.php';
         } catch (PDOException $e) {
             echo "Error al cargar las matrículas: " . $e->getMessage();
@@ -351,5 +352,28 @@ class MatriculaController {
         exit;
     }
 
+    /**
+     * Elimina permanentemente una matrícula.
+     */
+    public function delete() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->auth->verifyCsrfToken();
+            $id_matricula = $_POST['id_matricula'] ?? null;
+
+            if ($id_matricula) {
+                $db = Database::getInstance()->getConnection();
+                try {
+                    $stmt = $db->prepare("CALL sp_delete_matricula(?)");
+                    $stmt->execute([$id_matricula]);
+                } catch (PDOException $e) {
+                    // Consider logging the error message for debugging
+                    // error_log($e->getMessage());
+                    $_SESSION['error_message'] = "Error al eliminar la matrícula. Es posible que tenga registros dependientes.";
+                }
+            }
+        }
+        header('Location: index.php?url=matriculas');
+        exit;
+    }
 }
 ?>
