@@ -96,12 +96,20 @@ function get_spanish_day_name_prof($date_str) {
 document.querySelectorAll('.action-select').forEach(select => {
     select.addEventListener('change', function() {
         const estado = this.value;
-        if (estado === 'no_marcado') return;
-
         const fecha = this.dataset.fecha;
         const id_horario = this.dataset.horarioId;
         const id_profesor = this.dataset.profesorId;
-        const observaciones = prompt("Añadir una observación (opcional):");
+        let observaciones = '';
+
+        // Solo pedir observaciones si se está marcando una asistencia, no al borrarla.
+        if (estado !== 'no_marcado') {
+            observaciones = prompt("Añadir una observación (opcional):");
+            // Si el usuario cancela el prompt, no hacemos nada.
+            if (observaciones === null) {
+                location.reload(); // Recargar para resetear el dropdown
+                return;
+            }
+        }
 
         const formData = new FormData();
         formData.append('id_horario', id_horario);
