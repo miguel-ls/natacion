@@ -8,13 +8,14 @@ class ReporteController {
 
     public function __construct() {
         $this->auth = new AuthController();
-        $this->auth->checkAuth();
+        // $this->auth->checkAuth(); // Movido a cada método para la prueba
     }
 
     /**
      * Muestra el formulario de filtros y los resultados del reporte de ventas.
      */
     public function ventas() {
+        $this->auth->checkAuth(); // Comprobación de autenticación
         $db = Database::getInstance()->getConnection();
 
         // Valores por defecto y captura de filtros del GET
@@ -59,6 +60,7 @@ class ReporteController {
      * Muestra el reporte de horas trabajadas por profesor.
      */
     public function profesores() {
+        $this->auth->checkAuth(); // Comprobación de autenticación
         $db = Database::getInstance()->getConnection();
 
         // Valores por defecto y captura de filtros del GET
@@ -95,6 +97,7 @@ class ReporteController {
      * Exporta el reporte de ventas a un archivo CSV.
      */
     public function exportarVentas() {
+        $this->auth->checkAuth(); // Se añade la autenticación aquí
         $db = Database::getInstance()->getConnection();
 
         // Captura de filtros del GET
