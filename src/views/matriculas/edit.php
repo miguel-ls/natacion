@@ -26,6 +26,7 @@ $auth = new AuthController();
         <p><strong>Curso:</strong> <?php echo htmlspecialchars($matricula['curso_nombre']); ?></p>
         <p><strong>Periodo del Curso:</strong> <?php echo isset($matricula['fecha_inicio_curso']) ? htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_inicio_curso']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_fin_curso']))) : 'No definido'; ?></p>
         <p><strong>Horario Actual:</strong> <?php echo htmlspecialchars($matricula['tipo_horario_nombre']); ?> de <?php echo htmlspecialchars(date('h:i A', strtotime($matricula['hora_inicio']))) . ' a ' . htmlspecialchars(date('h:i A', strtotime($matricula['hora_fin']))); ?> (Prof. <?php echo htmlspecialchars($matricula['profesor_nombre']); ?>)</p>
+        <p><strong>Lugar:</strong> <?php echo htmlspecialchars($matricula['carril_nombre']); ?></p>
     </div>
 
     <h4>Seleccione un Nuevo Horario Disponible para "<?php echo htmlspecialchars($matricula['curso_nombre']); ?>"</h4>
