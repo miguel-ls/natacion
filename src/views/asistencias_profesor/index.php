@@ -1,25 +1,8 @@
 <?php
 require_once __DIR__ . '/../partials/header.php';
 // Variables pasadas desde el controlador:
-// $horarios, $cursos, $id_profesor, $id_curso, $estado, $profesor_seleccionado
+// $horarios, $cursos, $profesores, $id_profesor, $id_curso, $estado
 ?>
-
-<style>
-/* Fix para que el autocompletado de jQuery UI aparezca sobre otros elementos */
-.ui-autocomplete {
-    z-index: 1050;
-    max-height: 200px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-.search-details {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #e9ecef;
-    border-radius: 4px;
-    border: 1px solid #dee2e6;
-}
-</style>
 
 <div class="container">
     <div class="page-header">
@@ -35,16 +18,15 @@ require_once __DIR__ . '/../partials/header.php';
         <input type="hidden" name="url" value="asistencias_profesor">
 
         <div class="form-group">
-            <label for="profesor_search">Profesor:</label>
-            <input type="text" id="profesor_search" class="form-control"
-                   placeholder="Escriba nombre o apellido..."
-                   value="<?php echo $profesor_seleccionado ? htmlspecialchars($profesor_seleccionado['nombres'] . ' ' . $profesor_seleccionado['apellidos']) : ''; ?>">
-            <input type="hidden" name="id_profesor" id="id_profesor" value="<?php echo htmlspecialchars($id_profesor); ?>">
-            <div id="profesor_details" class="search-details" style="<?php echo $profesor_seleccionado ? '' : 'display: none;'; ?>">
-                <?php if ($profesor_seleccionado): ?>
-                    <strong>Profesor Seleccionado:</strong> <?php echo htmlspecialchars($profesor_seleccionado['nombres'] . ' ' . $profesor_seleccionado['apellidos']); ?> (ID: <?php echo $profesor_seleccionado['id_profesor']; ?>)
-                <?php endif; ?>
-            </div>
+            <label for="id_profesor">Profesor:</label>
+            <select name="id_profesor" id="id_profesor" class="form-control">
+                <option value="0">Todos</option>
+                <?php foreach ($profesores as $profesor): ?>
+                    <option value="<?php echo $profesor['id_profesor']; ?>" <?php echo ($id_profesor == $profesor['id_profesor']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($profesor['nombres'] . ' ' . $profesor['apellidos']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <div class="form-group">
@@ -107,33 +89,5 @@ require_once __DIR__ . '/../partials/header.php';
         </tbody>
     </table>
 </div>
-
-<script>
-$(function() {
-    $("#profesor_search").autocomplete({
-        source: "index.php?url=profesores/search",
-        minLength: 2,
-        select: function(event, ui) {
-            $("#id_profesor").val(ui.item.id);
-            $("#profesor_search").val(ui.item.value);
-            $("#profesor_details").html("<strong>Profesor Seleccionado:</strong> " + ui.item.value + " (ID: " + ui.item.id + ")").show();
-            return false; // previene que el valor por defecto de jQuery UI se ponga en el input
-        },
-        focus: function(event, ui) {
-            // Sincroniza el valor del input con el elemento enfocado en la lista
-            $("#profesor_search").val(ui.item.value);
-            return false;
-        }
-    });
-
-    // Limpiar el ID oculto y los detalles si el usuario borra el campo de búsqueda
-    $("#profesor_search").on('input', function() {
-        if ($(this).val() === '') {
-            $("#id_profesor").val('0'); // Usar '0' para "todos"
-            $("#profesor_details").hide().html('');
-        }
-    });
-});
-</script>
 
 <?php require_once __DIR__ . '/../partials/footer.php'; ?>

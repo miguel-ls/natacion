@@ -23,7 +23,7 @@ class AsistenciaProfesorController {
         $db = Database::getInstance()->getConnection();
         $horarios = [];
         $cursos = [];
-        $profesor_seleccionado = null;
+        $profesores = [];
 
         try {
             // 1. Obtener los horarios filtrados
@@ -38,13 +38,11 @@ class AsistenciaProfesorController {
             $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
             $stmt_cursos->closeCursor();
 
-            // 3. Si se ha seleccionado un profesor, obtener sus datos para mostrarlos en el campo
-            if ($id_profesor > 0) {
-                $stmt_profesor = $db->prepare("CALL sp_get_profesor_by_id(?)");
-                $stmt_profesor->execute([$id_profesor]);
-                $profesor_seleccionado = $stmt_profesor->fetch(PDO::FETCH_ASSOC);
-                $stmt_profesor->closeCursor();
-            }
+            // 3. Obtener todos los profesores para el nuevo dropdown de filtro
+            $stmt_profesores = $db->prepare("CALL sp_get_all_profesores('')"); // '' para traer todos
+            $stmt_profesores->execute();
+            $profesores = $stmt_profesores->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_profesores->closeCursor();
 
         } catch (PDOException $e) {
             $_SESSION['error_message'] = "Error al cargar datos de asistencia: " . $e->getMessage();
