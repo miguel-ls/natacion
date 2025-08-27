@@ -35,8 +35,9 @@ class ReporteController {
         $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_cursos->closeCursor();
 
-        $stmt_formas_pago = $db->prepare("CALL sp_get_all_formas_pago()");
-        $stmt_formas_pago->execute();
+        $stmt_formas_pago = $db->prepare("CALL sp_get_all_formas_pago(?)");
+        $stmt_formas_pago->execute([$id_forma_pago]);
+
         $formas_pago = $stmt_formas_pago->fetchAll(PDO::FETCH_ASSOC);
         $stmt_formas_pago->closeCursor();
 
