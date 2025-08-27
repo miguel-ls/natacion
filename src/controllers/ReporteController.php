@@ -156,5 +156,97 @@ class ReporteController {
         fclose($output);
         exit;
     }
+
+    /**
+     * Muestra el reporte de ventas agrupado por forma de pago.
+     */
+    public function ventasPorFormaPago() {
+        $this->auth->checkAuth();
+        $db = Database::getInstance()->getConnection();
+
+        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+        $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+
+        try {
+            $stmt = $db->prepare("CALL sp_reporte_ventas_por_forma_pago(?, ?)");
+            $stmt->execute([$fecha_inicio, $fecha_fin]);
+            $reporte_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+        } catch (PDOException $e) {
+            $_SESSION['error_message'] = "Error al generar el reporte: " . $e->getMessage();
+            $reporte_data = [];
+        }
+
+        require_once __DIR__ . '/../views/reportes/ventas_por_forma_pago.php';
+    }
+
+    /**
+     * Muestra el reporte de ventas agrupado por curso.
+     */
+    public function ventasPorCurso() {
+        $this->auth->checkAuth();
+        $db = Database::getInstance()->getConnection();
+
+        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+        $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+
+        try {
+            $stmt = $db->prepare("CALL sp_reporte_ventas_por_curso(?, ?)");
+            $stmt->execute([$fecha_inicio, $fecha_fin]);
+            $reporte_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+        } catch (PDOException $e) {
+            $_SESSION['error_message'] = "Error al generar el reporte: " . $e->getMessage();
+            $reporte_data = [];
+        }
+
+        require_once __DIR__ . '/../views/reportes/ventas_por_curso.php';
+    }
+
+    /**
+     * Muestra el reporte de ventas agrupado por profesor.
+     */
+    public function ventasPorProfesor() {
+        $this->auth->checkAuth();
+        $db = Database::getInstance()->getConnection();
+
+        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+        $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+
+        try {
+            $stmt = $db->prepare("CALL sp_reporte_ventas_por_profesor(?, ?)");
+            $stmt->execute([$fecha_inicio, $fecha_fin]);
+            $reporte_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+        } catch (PDOException $e) {
+            $_SESSION['error_message'] = "Error al generar el reporte: " . $e->getMessage();
+            $reporte_data = [];
+        }
+
+        require_once __DIR__ . '/../views/reportes/ventas_por_profesor.php';
+    }
+
+    /**
+     * Muestra el reporte de ventas agrupado por piscina y carril.
+     */
+    public function ventasPorPiscinaCarril() {
+        $this->auth->checkAuth();
+        $db = Database::getInstance()->getConnection();
+
+        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+        $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+
+        try {
+            $stmt = $db->prepare("CALL sp_reporte_ventas_por_piscina_carril(?, ?)");
+            $stmt->execute([$fecha_inicio, $fecha_fin]);
+            $reporte_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+        } catch (PDOException $e) {
+            $_SESSION['error_message'] = "Error al generar el reporte: " . $e->getMessage();
+            $reporte_data = [];
+        }
+
+        require_once __DIR__ . '/../views/reportes/ventas_por_piscina_carril.php';
+    }
 }
 ?>

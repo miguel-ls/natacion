@@ -102,6 +102,10 @@ if (!defined('BASE_URL')) {
                         <div class="dropdown-content">
                             <a href="<?php echo BASE_URL; ?>index.php?url=reportes/ventas">Reporte de ventas</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=reportes/profesores">Reporte de profesores</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=reportes/ventasPorFormaPago">Ventas por Forma de Pago</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=reportes/ventasPorCurso">Ventas por Curso</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=reportes/ventasPorProfesor">Ventas por Profesor</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=reportes/ventasPorPiscinaCarril">Ventas por Piscina y Carril</a>
                         </div>
                     </div>
 
