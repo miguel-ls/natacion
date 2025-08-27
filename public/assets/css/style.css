@@ -209,3 +209,34 @@ footer {
 .status-programada { color: #007bff; font-weight: bold; }
 .status-finalizada { color: #6c757d; font-weight: bold; }
 .status-vigente { color: #17a2b8; font-weight: bold; }
+
+/* Report specific styles */
+.filter-container {
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+.report-table th, .report-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.report-table th {
+    background-color: #f2f2f2;
+}
+.total-row {
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
