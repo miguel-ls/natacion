@@ -264,6 +264,7 @@ switch ($route) {
         $action = $parts[1] ?? 'index';
         switch($action) {
             case 'index': $asistenciaProfesorController->index(); break;
+            case 'show': $asistenciaProfesorController->show(); break;
             case 'save': $asistenciaProfesorController->save(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Asistencia de Profesores</h1>"; break;
         }

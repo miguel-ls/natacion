@@ -4,6 +4,13 @@ require_once __DIR__ . '/../partials/header.php';
 // $horarios, $cursos, $id_profesor, $id_curso, $estado, $profesor_seleccionado
 ?>
 
+<style>
+/* Fix para que el autocompletado de jQuery UI aparezca sobre otros elementos */
+.ui-autocomplete {
+    z-index: 1050; /* Un valor alto para asegurar que esté al frente */
+}
+</style>
+
 <div class="container">
     <div class="page-header">
         <h1>Control de Asistencia de Profesores</h1>
