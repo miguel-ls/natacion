@@ -256,6 +256,7 @@ switch ($route) {
             case 'getHorariosByCurso': $matriculaController->getHorariosByCurso(); break;
             case 'updateDiaClase': $matriculaController->updateDiaClase(); break;
             case 'addRecuperacion': $matriculaController->addRecuperacion(); break;
+            case 'getPrecioByFecha': $matriculaController->getPrecioByFecha(); break;
             case 'delete': $matriculaController->delete(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Matrículas</h1>"; break;
         }
