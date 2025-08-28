@@ -113,8 +113,31 @@ class MatriculaController {
             $stmt_curso_id->closeCursor();
 
             // Obtener otros horarios disponibles para ese curso, excluyendo el actual
-            $stmt_horarios = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?, ?)");
-            $stmt_horarios->execute([$curso_id, 0, null, null, $matricula['id_horario']]);
+            $sql = "
+                SELECT
+                    h.id_horario,
+                    c.nombre AS curso_nombre,
+                    h.fecha_inicio,
+                    h.fecha_fin,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS profesor_nombre,
+                    CONCAT(pi.nombre, ' - Carril ', ca.numero_carril) as carril_nombre,
+                    th.nombre as tipo_horario_nombre,
+                    h.hora_inicio,
+                    h.hora_fin,
+                    (ca.capacidad_maxima - (
+                        SELECT COUNT(*) FROM matriculas m WHERE m.id_horario = h.id_horario AND m.estado IN ('activa', 'vigente')
+                    )) AS vacantes_disponibles
+                FROM horarios h
+                JOIN cursos c ON h.id_curso = c.id_curso
+                JOIN profesores p ON h.id_profesor = p.id_profesor
+                JOIN carriles ca ON h.id_carril = ca.id_carril
+                JOIN piscinas pi ON ca.id_piscina = pi.id_piscina
+                JOIN tipos_horario th ON h.id_tipo_horario = th.id_tipo_horario
+                WHERE h.id_curso = :id_curso AND h.id_horario != :id_horario_a_excluir
+                HAVING vacantes_disponibles > 0
+            ";
+            $stmt_horarios = $db->prepare($sql);
+            $stmt_horarios->execute([':id_curso' => $curso_id, ':id_horario_a_excluir' => $matricula['id_horario']]);
             $horarios_disponibles = $stmt_horarios->fetchAll(PDO::FETCH_ASSOC);
             $stmt_horarios->closeCursor();
 
@@ -212,12 +235,57 @@ class MatriculaController {
 
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?, ?)");
-            $stmt->execute([$id_curso, $id_profesor, $hora_inicio, $hora_fin, 0]); // 0 para no excluir ningún horario
+            $sql = "
+                SELECT
+                    h.id_horario,
+                    c.nombre AS curso_nombre,
+                    COALESCE(
+                        (SELECT pc.precio FROM precios_cursos pc WHERE pc.id_curso = h.id_curso AND h.fecha_inicio >= pc.fecha_inicio AND h.fecha_fin <= pc.fecha_fin LIMIT 1),
+                        0.00
+                    ) AS precio_actual,
+                    h.fecha_inicio,
+                    h.fecha_fin,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS profesor_nombre,
+                    CONCAT(pi.nombre, ' - Carril ', ca.numero_carril) as carril_nombre,
+                    th.nombre as tipo_horario_nombre,
+                    th.dias_semana,
+                    h.hora_inicio,
+                    h.hora_fin,
+                    (ca.capacidad_maxima - (
+                        SELECT COUNT(*) FROM matriculas m WHERE m.id_horario = h.id_horario AND m.estado IN ('activa', 'vigente')
+                    )) AS vacantes_disponibles
+                FROM horarios h
+                JOIN cursos c ON h.id_curso = c.id_curso
+                JOIN profesores p ON h.id_profesor = p.id_profesor
+                JOIN carriles ca ON h.id_carril = ca.id_carril
+                JOIN piscinas pi ON ca.id_piscina = pi.id_piscina
+                JOIN tipos_horario th ON h.id_tipo_horario = th.id_tipo_horario
+                WHERE h.id_curso = :id_curso
+            ";
+
+            $params = [':id_curso' => $id_curso];
+
+            if ($id_profesor > 0) {
+                $sql .= " AND h.id_profesor = :id_profesor";
+                $params[':id_profesor'] = $id_profesor;
+            }
+            if ($hora_inicio) {
+                $sql .= " AND h.hora_inicio >= :hora_inicio";
+                $params[':hora_inicio'] = $hora_inicio;
+            }
+            if ($hora_fin) {
+                $sql .= " AND h.hora_fin <= :hora_fin";
+                $params[':hora_fin'] = $hora_fin;
+            }
+
+            $sql .= " HAVING vacantes_disponibles > 0";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
             $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($horarios);
+
         } catch (PDOException $e) {
-            // En caso de error, devolver un array vacío y quizás registrar el error
             error_log($e->getMessage());
             echo json_encode([]);
         }
