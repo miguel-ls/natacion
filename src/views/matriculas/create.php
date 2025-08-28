@@ -125,7 +125,7 @@ $auth = new AuthController();
                 </div>
                  <div class="form-group">
                     <label for="precio_final">Precio Final (S/)</label>
-                    <input type="number" id="precio_final" name="precio_final" step="0.01" required readonly>
+                    <input type="number" id="precio_final" name="precio_final" step="0.01" required>
                 </div>
             </div>
             <div class="form-row">
