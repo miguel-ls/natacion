@@ -137,11 +137,11 @@ require_once __DIR__ . '/../partials/header.php';
                 <th>ID</th>
                 <th>Alumno</th>
                 <th>Curso</th>
+                <th>Profesor</th>
                 <th>Inicio Matrícula</th>
                 <th>Fin Matrícula</th>
-                <th>Inicio Curso</th>
-                <th>Fin Curso</th>
-                <th>Precio</th>
+                <th>Descuento</th>
+                <th>Precio Final</th>
                 <th>Estado</th>
                 <th>Acciones</th>
             </tr>
@@ -157,10 +157,10 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($matricula['id_matricula']); ?></td>
                         <td><?php echo htmlspecialchars($matricula['alumno_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($matricula['curso_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($matricula['profesor_nombre']); ?></td>
                         <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_inicio']))); ?></td>
                         <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_fin']))); ?></td>
-                        <td><?php echo $matricula['fecha_inicio_curso'] ? htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_inicio_curso']))) : 'N/A'; ?></td>
-                        <td><?php echo $matricula['fecha_fin_curso'] ? htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_fin_curso']))) : 'N/A'; ?></td>
+                        <td>S/ <?php echo htmlspecialchars(number_format($matricula['descuento'], 2)); ?></td>
                         <td>S/ <?php echo htmlspecialchars(number_format($matricula['precio_final'], 2)); ?></td>
                         <td>
                             <span class="status-<?php echo strtolower($matricula['estado']); ?>">
