@@ -450,5 +450,32 @@ class MatriculaController {
         header('Location: index.php?url=matriculas');
         exit;
     }
+
+    /**
+     * Obtiene el precio de un curso basado en la fecha de inicio (AJAX).
+     */
+    public function getPrecioByFecha() {
+        header('Content-Type: application/json');
+        $id_curso = $_GET['id_curso'] ?? null;
+        $fecha = $_GET['fecha'] ?? null;
+
+        if (!$id_curso || !$fecha) {
+            echo json_encode(['precio' => 0.00]);
+            exit;
+        }
+
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_precio_by_curso_and_fecha(?, ?)");
+            $stmt->execute([$id_curso, $fecha]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode($result);
+        } catch (PDOException $e) {
+            // En caso de error, devolver 0.00 y registrar el error
+            error_log($e->getMessage());
+            echo json_encode(['precio' => 0.00]);
+        }
+        exit;
+    }
 }
 ?>

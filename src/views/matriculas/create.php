@@ -312,7 +312,7 @@ function buscarHorarios(callback) { // Aceptar un callback
                     const div = document.createElement('div');
                     div.className = 'horario-item';
                     div.dataset.id = horario.id_horario;
-                    div.dataset.precio = horario.precio_actual;
+                    // Ya no se obtiene el precio aquí, se buscará dinámicamente
                     div.dataset.dias = horario.dias_semana;
                     div.dataset.fechaInicioCurso = horario.fecha_inicio; // Guardar la fecha de inicio del curso
                     div.dataset.fechaFinCurso = horario.fecha_fin;
@@ -330,9 +330,6 @@ function buscarHorarios(callback) { // Aceptar un callback
                         this.classList.add('selected');
                         document.getElementById('id_horario').value = this.dataset.id;
                         document.getElementById('dias_semana_hidden').value = this.dataset.dias;
-
-                        precioBaseCurso = parseFloat(this.dataset.precio) || 0;
-                        calcularPrecioFinal();
 
                         // Lógica para auto-seleccionar fechas
                         const fechaInicioInput = document.getElementById('fecha_inicio');
@@ -361,6 +358,8 @@ function buscarHorarios(callback) { // Aceptar un callback
                                 // Si el curso no ha empezado, la fecha de inicio es la del curso
                                 fechaInicioInput.value = cursoInicio;
                             }
+                            // Disparar el evento change para que se actualice el precio
+                            fechaInicioInput.dispatchEvent(new Event('change'));
                         }
                     });
                     container.appendChild(div);
@@ -376,6 +375,33 @@ function buscarHorarios(callback) { // Aceptar un callback
 document.getElementById('descuento').addEventListener('input', calcularPrecioFinal);
 
 document.getElementById('btn-filtrar-horarios').addEventListener('click', buscarHorarios);
+
+// --- Nueva Lógica de Precio Dinámico ---
+
+function actualizarPrecio() {
+    const cursoId = document.getElementById('id_curso').value;
+    const fechaInicio = document.getElementById('fecha_inicio').value;
+
+    if (!cursoId || !fechaInicio) {
+        precioBaseCurso = 0;
+        calcularPrecioFinal();
+        return;
+    }
+
+    fetch(`index.php?url=matriculas/getPrecioByFecha&id_curso=${cursoId}&fecha=${fechaInicio}`)
+        .then(response => response.json())
+        .then(data => {
+            precioBaseCurso = parseFloat(data.precio) || 0;
+            calcularPrecioFinal();
+        })
+        .catch(error => {
+            console.error('Error al obtener el precio:', error);
+            precioBaseCurso = 0;
+            calcularPrecioFinal();
+        });
+}
+
+document.getElementById('fecha_inicio').addEventListener('change', actualizarPrecio);
 
 // Form validation
 document.getElementById('form-matricula').addEventListener('submit', function(event) {
