@@ -18,7 +18,7 @@ require_once __DIR__ . '/../partials/header.php';
 .chart-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2.5rem; /* Aumentada la separación */
+    gap: 3.5rem; /* Aumentada más la separación */
 }
 .form-control { /* Estilo básico para los select */
     padding: 8px;
@@ -86,11 +86,15 @@ require_once __DIR__ . '/../partials/header.php';
     </div>
 </div>
 
-<!-- Incluir Chart.js desde CDN -->
+<!-- Incluir Chart.js y el plugin de datalabels desde CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Registrar el plugin globalmente
+    Chart.register(ChartDataLabels);
+
     // Obtener datos desde PHP
     const chartData = <?php echo json_encode($chart_data ?? []); ?>;
 
@@ -166,12 +170,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                     label += ': ';
                                 }
                                 if (context.parsed !== null) {
-                                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                    const percentage = total > 0 ? (context.raw / total * 100).toFixed(2) : 0;
-                                    label += `S/ ${context.raw} (${percentage}%)`;
+                                    label += `S/ ${context.raw}`;
                                 }
                                 return label;
                             }
+                        }
+                    },
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? (value / total * 100).toFixed(2) + '%' : '0%';
+                            return percentage;
+                        },
+                        color: '#fff',
+                        font: {
+                            weight: 'bold'
                         }
                     }
                 }
