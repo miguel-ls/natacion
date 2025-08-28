@@ -15,27 +15,13 @@ require_once __DIR__ . '/partials/header.php';
 
     <p>A continuación se muestran los horarios con vacantes disponibles. Seleccione uno para iniciar una matrícula rápida.</p>
 
-    <div class="schedule-grid">
-        <?php if (empty($schedules)): ?>
-            <p>No hay cursos con vacantes disponibles en este momento.</p>
-        <?php else: ?>
-            <?php foreach ($schedules as $schedule): ?>
-                <div class="schedule-card" data-id-horario="<?php echo $schedule['id_horario']; ?>">
-                    <div class="card-header">
-                        <h4><?php echo htmlspecialchars($schedule['curso_nombre']); ?></h4>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Profesor:</strong> <?php echo htmlspecialchars($schedule['profesor_nombre']); ?></p>
-                        <p><strong>Periodo:</strong> <?php echo ($schedule['fecha_inicio_curso'] && $schedule['fecha_fin_curso']) ? htmlspecialchars(date('d/m/Y', strtotime($schedule['fecha_inicio_curso']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($schedule['fecha_fin_curso']))) : 'No definido'; ?></p>
-                        <p><strong>Horario:</strong> <?php echo htmlspecialchars($schedule['tipo_horario_nombre']); ?> (<?php echo htmlspecialchars($schedule['hora_inicio'] . ' - ' . $schedule['hora_fin']); ?>)</p>
-                        <p><strong>Ubicación:</strong> Piscina <?php echo htmlspecialchars($schedule['piscina_nombre']); ?>, Carril <?php echo htmlspecialchars($schedule['numero_carril']); ?></p>
-                    </div>
-                    <div class="card-footer">
-                        <span class="vacantes">Vacantes: <?php echo htmlspecialchars($schedule['vacantes_disponibles']); ?></span>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+    <div class="dashboard-actions" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+        <button id="refresh-btn" class="btn btn-secondary">Actualizar Listado</button>
+        <span id="countdown-timer" style="font-style: italic;"></span>
+    </div>
+
+    <div id="schedules-container">
+        <?php require __DIR__ . '/dashboard/_schedules_list.php'; ?>
     </div>
 
     <div class="enrollment-action" style="margin-top: 2rem; text-align: center;">
@@ -103,32 +89,74 @@ require_once __DIR__ . '/partials/header.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const grid = document.querySelector('.schedule-grid');
+    const schedulesContainer = document.getElementById('schedules-container');
     const enrollButton = document.getElementById('generate-enrollment-btn');
+    const refreshButton = document.getElementById('refresh-btn');
+    const countdownTimer = document.getElementById('countdown-timer');
     let selectedHorarioId = null;
 
-    grid.addEventListener('click', function(event) {
+    // --- Lógica de selección ---
+    schedulesContainer.addEventListener('click', function(event) {
         const card = event.target.closest('.schedule-card');
         if (!card) return;
 
-        // Remove selection from all other cards
-        document.querySelectorAll('.schedule-card').forEach(c => {
-            c.classList.remove('selected');
-        });
-
-        // Add selection to the clicked card
+        document.querySelectorAll('.schedule-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedHorarioId = card.dataset.idHorario;
-
-        // Enable the button
         enrollButton.disabled = false;
     });
 
+    // --- Lógica de matrícula ---
     enrollButton.addEventListener('click', function() {
         if (selectedHorarioId) {
             window.location.href = `index.php?url=matriculas/create&id_horario=${selectedHorarioId}`;
         }
     });
+
+    // --- Lógica de actualización ---
+    const REFRESH_INTERVAL = 5; // en segundos
+    let countdown = REFRESH_INTERVAL;
+    let timerInterval;
+
+    function refreshSchedules() {
+        // Deshabilitar botón de matrícula y resetear selección
+        enrollButton.disabled = true;
+        selectedHorarioId = null;
+
+        countdownTimer.textContent = 'Actualizando...';
+        fetch('index.php?url=dashboard/getAvailableSchedules')
+            .then(response => response.text())
+            .then(html => {
+                schedulesContainer.innerHTML = html;
+                resetTimer();
+            })
+            .catch(error => {
+                console.error('Error al actualizar los horarios:', error);
+                countdownTimer.textContent = 'Error al actualizar.';
+            });
+    }
+
+    function updateCountdown() {
+        countdown--;
+        countdownTimer.textContent = `Actualizando en ${countdown}s...`;
+        if (countdown <= 0) {
+            refreshSchedules();
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        countdown = REFRESH_INTERVAL;
+        countdownTimer.textContent = `Actualizando en ${countdown}s...`;
+        timerInterval = setInterval(updateCountdown, 1000);
+    }
+
+    refreshButton.addEventListener('click', function() {
+        refreshSchedules();
+    });
+
+    // Iniciar el temporizador
+    resetTimer();
 });
 </script>
 
