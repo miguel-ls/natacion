@@ -112,19 +112,6 @@ class MatriculaController {
             $curso_id = $curso_id_result['id_curso'];
             $stmt_curso_id->closeCursor();
 
-            // Obtener el período (fecha_inicio y fecha_fin) del curso actual
-            $stmt_periodo = $db->prepare("SELECT fecha_inicio, fecha_fin FROM precios_cursos WHERE id_curso = ? AND CURDATE() BETWEEN fecha_inicio AND fecha_fin ORDER BY id_tipo_precio DESC LIMIT 1");
-            $stmt_periodo->execute([$curso_id]);
-            $periodo_curso = $stmt_periodo->fetch(PDO::FETCH_ASSOC);
-            $stmt_periodo->closeCursor();
-
-            // Añadir el período a los datos de la matrícula para que esté disponible en la vista
-            if ($periodo_curso) {
-                $matricula['fecha_inicio_curso'] = $periodo_curso['fecha_inicio'];
-                $matricula['fecha_fin_curso'] = $periodo_curso['fecha_fin'];
-            }
-
-
             // Obtener otros horarios disponibles para ese curso
             $stmt_horarios = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?)");
             $stmt_horarios->execute([$curso_id, 0, null, null]); // Se pasan valores por defecto para los filtros no usados aquí

@@ -24,7 +24,7 @@ $auth = new AuthController();
         <h4>Información Actual</h4>
         <p><strong>Alumno:</strong> <?php echo htmlspecialchars($matricula['alumno_nombre']); ?></p>
         <p><strong>Curso:</strong> <?php echo htmlspecialchars($matricula['curso_nombre']); ?></p>
-        <p><strong>Periodo del Curso:</strong> <?php echo isset($matricula['fecha_inicio_curso']) ? htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_inicio_curso']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_fin_curso']))) : 'No definido'; ?></p>
+        <p><strong>Periodo de Matrícula:</strong> <?php echo htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_inicio']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_fin']))); ?></p>
         <p><strong>Horario Actual:</strong> <?php echo htmlspecialchars($matricula['tipo_horario_nombre']); ?> de <?php echo htmlspecialchars(date('h:i A', strtotime($matricula['hora_inicio']))) . ' a ' . htmlspecialchars(date('h:i A', strtotime($matricula['hora_fin']))); ?> (Prof. <?php echo htmlspecialchars($matricula['profesor_nombre']); ?>)</p>
         <p><strong>Lugar:</strong> <?php echo htmlspecialchars($matricula['carril_nombre']); ?></p>
     </div>
