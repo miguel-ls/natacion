@@ -70,7 +70,7 @@ if (!defined('BASE_URL')) {
             <h1><a href="<?php echo BASE_URL; ?>index.php?url=dashboard">NataciónSys</a></h1>
             <div class="nav-links">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="<?php echo BASE_URL; ?>index.php?url=dashboard">Dashboard</a>
+                    <a href="<?php echo BASE_URL; ?>index.php?url=dashboard">Monitor</a>
 
                     <div class="dropdown">
                         <a href="#">Configuración &#9662;</a>

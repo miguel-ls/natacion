@@ -9,11 +9,8 @@ require_once __DIR__ . '/partials/header.php';
 ?>
 
 <div class="dashboard-container" style="padding: 2rem;">
-    <h2>Panel de Administración</h2>
-    <p>¡Bienvenido de nuevo, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</p>
-    <p>Desde aquí podrás gestionar todo el sistema de matrículas de natación.</p>
-
-    <p>A continuación se muestran los horarios con vacantes disponibles. Seleccione uno para iniciar una matrícula rápida.</p>
+    <h2>Monitor de Matriculas</h2>
+    <p>Seleccione un curso para iniciar una matricula rápida.</p>
 
     <div class="dashboard-actions" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
         <button id="refresh-btn" class="btn btn-secondary">Actualizar Listado</button>
