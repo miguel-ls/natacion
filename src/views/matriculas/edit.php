@@ -35,17 +35,6 @@ $auth = new AuthController();
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
         <input type="hidden" name="id_matricula" value="<?php echo htmlspecialchars($matricula['id_matricula']); ?>">
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="fecha_inicio">Nueva Fecha de Inicio</label>
-                <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($matricula['fecha_inicio']); ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="fecha_fin">Nueva Fecha de Fin</label>
-                <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($matricula['fecha_fin']); ?>" required>
-            </div>
-        </div>
-        <hr>
         <h4>Seleccione un Nuevo Horario (si desea cambiarlo)</h4>
         <input type="hidden" id="id_horario" name="id_horario" value="<?php echo htmlspecialchars($matricula['id_horario']); ?>" required>
 
@@ -54,7 +43,7 @@ $auth = new AuthController();
                 <p>No hay otros horarios con vacantes disponibles para este curso.</p>
             <?php else: ?>
                 <?php foreach ($horarios_disponibles as $horario): ?>
-                    <div class="horario-item" data-id="<?php echo $horario['id_horario']; ?>" data-fecha-fin="<?php echo htmlspecialchars($horario['fecha_fin']); ?>">
+                    <div class="horario-item" data-id="<?php echo $horario['id_horario']; ?>" data-fecha-inicio="<?php echo htmlspecialchars($horario['fecha_inicio']); ?>" data-fecha-fin="<?php echo htmlspecialchars($horario['fecha_fin']); ?>">
                         <strong>Periodo:</strong> <?php echo htmlspecialchars(date('d/m/Y', strtotime($horario['fecha_inicio']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($horario['fecha_fin']))); ?><br>
                         <strong>Profesor:</strong> <?php echo htmlspecialchars($horario['profesor_nombre']); ?><br>
                         <strong>Lugar:</strong> <?php echo htmlspecialchars($horario['carril_nombre']); ?><br>
@@ -66,6 +55,18 @@ $auth = new AuthController();
             <?php endif; ?>
         </div>
 
+        <hr>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="fecha_inicio">Nueva Fecha de Inicio</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($matricula['fecha_inicio']); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="fecha_fin">Nueva Fecha de Fin</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($matricula['fecha_fin']); ?>" required>
+            </div>
+        </div>
+
         <div class="form-actions">
             <a href="index.php?url=matriculas" class="btn btn-secondary">Cancelar</a>
             <button type="submit" class="btn btn-success">Confirmar Cambio</button>
@@ -75,12 +76,8 @@ $auth = new AuthController();
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const fechaFinCursoActual = '<?php echo $matricula['fecha_fin_curso'] ?? ''; ?>';
+    const fechaInicioInput = document.getElementById('fecha_inicio');
     const fechaFinInput = document.getElementById('fecha_fin');
-
-    if (fechaFinCursoActual) {
-        fechaFinInput.max = fechaFinCursoActual;
-    }
 
     document.querySelectorAll('.horario-item').forEach(item => {
         item.addEventListener('click', function() {
@@ -88,12 +85,26 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('selected');
             document.getElementById('id_horario').value = this.dataset.id;
 
-            // Actualizar la restricción de la fecha final
-            const fechaFinNuevoCurso = this.dataset.fechaFin;
-            if (fechaFinNuevoCurso) {
-                fechaFinInput.max = fechaFinNuevoCurso;
-                if (fechaFinInput.value > fechaFinNuevoCurso) {
-                    fechaFinInput.value = fechaFinNuevoCurso;
+            // Lógica para auto-seleccionar fechas
+            const horarioInicio = this.dataset.fechaInicio;
+            const horarioFin = this.dataset.fechaFin;
+
+            if (horarioInicio && horarioFin) {
+                // Establecer fecha de fin
+                fechaFinInput.value = horarioFin;
+
+                // Establecer fecha de inicio
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0); // Normalizar a medianoche
+                const fechaHorarioInicio = new Date(horarioInicio);
+                fechaHorarioInicio.setMinutes(fechaHorarioInicio.getMinutes() + fechaHorarioInicio.getTimezoneOffset());
+
+                if (hoy > fechaHorarioInicio) {
+                    // Si el horario ya empezó, la fecha de inicio es hoy
+                    fechaInicioInput.value = hoy.toISOString().split('T')[0];
+                } else {
+                    // Si el horario no ha empezado, la fecha de inicio es la del horario
+                    fechaInicioInput.value = horarioInicio;
                 }
             }
         });
