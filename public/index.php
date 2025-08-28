@@ -51,7 +51,12 @@ switch ($route) {
         break;
     case 'dashboard':
         $dashboardController = new DashboardController();
-        $dashboardController->index();
+        $action = $parts[1] ?? 'index';
+        if ($action === 'getAvailableSchedules') {
+            $dashboardController->getAvailableSchedules();
+        } else {
+            $dashboardController->index();
+        }
         break;
     case 'logout':
         $authController = new AuthController();
