@@ -5,18 +5,25 @@ require_once __DIR__ . '/../partials/header.php';
 <style>
 .chart-container {
     width: 100%;
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 2rem;
+    margin: 1.5rem auto;
+    padding: 1.5rem;
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+#ventasMensualesChartContainer {
+    max-width: 900px; /* El gráfico de barras puede ser más ancho */
 }
 .chart-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Reducido minmax */
+    gap: 1.5rem;
+}
+.form-control { /* Estilo básico para los select */
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
 }
 </style>
 
@@ -25,12 +32,41 @@ require_once __DIR__ . '/../partials/header.php';
         <h1>Inicio</h1>
     </div>
 
+    <!-- Filtros -->
+    <div class="filter-container" style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+        <form action="index.php" method="GET" style="display: flex; gap: 1rem; align-items: flex-end;">
+            <input type="hidden" name="url" value="inicio">
+            <div>
+                <label for="year" style="font-weight: bold;">Año:</label>
+                <select name="year" id="year" class="form-control">
+                    <?php foreach ($years as $year_option): ?>
+                        <option value="<?php echo $year_option['anio']; ?>" <?php echo ($year_option['anio'] == $selected_year) ? 'selected' : ''; ?>>
+                            <?php echo $year_option['anio']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label for="month" style="font-weight: bold;">Mes:</label>
+                <select name="month" id="month" class="form-control">
+                    <option value="0" <?php echo ($selected_month == 0) ? 'selected' : ''; ?>>Todos</option>
+                    <?php for ($i = 1; $i <= 12; $i++): ?>
+                        <option value="<?php echo $i; ?>" <?php echo ($i == $selected_month) ? 'selected' : ''; ?>>
+                            <?php echo DateTime::createFromFormat('!m', $i)->format('F'); ?>
+                        </option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </form>
+    </div>
+
     <?php if (isset($_SESSION['error_message'])): ?>
         <div class="error-message"><?php echo htmlspecialchars($_SESSION['error_message']); unset($_SESSION['error_message']); ?></div>
     <?php endif; ?>
 
-    <div class="chart-container">
-        <h3>Ventas Mensuales por Curso (Año Actual)</h3>
+    <div id="ventasMensualesChartContainer" class="chart-container">
+        <h3>Ventas Mensuales por Curso (<?php echo $selected_year; ?>)</h3>
         <canvas id="ventasMensualesChart"></canvas>
     </div>
 
