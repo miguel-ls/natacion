@@ -314,12 +314,13 @@ function buscarHorarios(callback) { // Aceptar un callback
                     div.dataset.id = horario.id_horario;
                     div.dataset.precio = horario.precio_actual;
                     div.dataset.dias = horario.dias_semana;
-                    div.dataset.fechaFinCurso = horario.fecha_fin; // Guardar la fecha fin. Asegurarse que el alias es fecha_fin
-                    const fechaInicio = formatDateDDMMYYYY(horario.fecha_inicio);
-                    const fechaFin = formatDateDDMMYYYY(horario.fecha_fin);
+                    div.dataset.fechaInicioCurso = horario.fecha_inicio; // Guardar la fecha de inicio del curso
+                    div.dataset.fechaFinCurso = horario.fecha_fin;
+                    const fechaInicioFormatted = formatDateDDMMYYYY(horario.fecha_inicio);
+                    const fechaFinFormatted = formatDateDDMMYYYY(horario.fecha_fin);
 
                     div.innerHTML = `<strong>Profesor:</strong> ${horario.profesor_nombre}<br>
-                                     <strong>Periodo:</strong> ${fechaInicio} - ${fechaFin}<br>
+                                     <strong>Periodo:</strong> ${fechaInicioFormatted} - ${fechaFinFormatted}<br>
                                      <strong>Lugar:</strong> ${horario.carril_nombre}<br>
                                      <strong>Días:</strong> ${horario.tipo_horario_nombre}<br>
                                      <strong>Horario:</strong> ${horario.hora_inicio} - ${horario.hora_fin}<br>
@@ -333,12 +334,33 @@ function buscarHorarios(callback) { // Aceptar un callback
                         precioBaseCurso = parseFloat(this.dataset.precio) || 0;
                         calcularPrecioFinal();
 
-                        // Restricción de fecha
-                        if (this.dataset.fechaFinCurso) {
-                            fechaFinInput.value = this.dataset.fechaFinCurso;
-                            fechaFinInput.readOnly = true;
-                        } else {
-                            fechaFinInput.readOnly = false;
+                        // Lógica para auto-seleccionar fechas
+                        const fechaInicioInput = document.getElementById('fecha_inicio');
+                        const fechaFinInput = document.getElementById('fecha_fin');
+                        const cursoInicio = this.dataset.fechaInicioCurso;
+                        const cursoFin = this.dataset.fechaFinCurso;
+
+                        if (cursoInicio && cursoFin) {
+                            // Establecer fecha de fin
+                            fechaFinInput.value = cursoFin;
+
+                            // Establecer fecha de inicio
+                            const hoy = new Date();
+                            hoy.setHours(0, 0, 0, 0); // Normalizar a medianoche
+                            const fechaCursoInicio = new Date(cursoInicio);
+
+                            // La fecha de la DB viene en YYYY-MM-DD, que new Date() interpreta como UTC.
+                            // Para evitar problemas de zona horaria, se ajusta.
+                            fechaCursoInicio.setMinutes(fechaCursoInicio.getMinutes() + fechaCursoInicio.getTimezoneOffset());
+
+                            if (hoy > fechaCursoInicio) {
+                                // Si el curso ya empezó, la fecha de inicio es hoy
+                                const hoyString = hoy.toISOString().split('T')[0];
+                                fechaInicioInput.value = hoyString;
+                            } else {
+                                // Si el curso no ha empezado, la fecha de inicio es la del curso
+                                fechaInicioInput.value = cursoInicio;
+                            }
                         }
                     });
                     container.appendChild(div);
