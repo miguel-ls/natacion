@@ -201,7 +201,7 @@ class MatriculaController {
     public function getHorariosByCurso() {
         header('Content-Type: application/json');
         $id_curso = $_GET['id_curso'] ?? 0;
-        $id_profesor = $_GET['id_profesor'] ?? 0;
+        $id_profesor = (int)($_GET['id_profesor'] ?? 0); // Casting a entero para robustez
         $hora_inicio = !empty($_GET['hora_inicio']) ? $_GET['hora_inicio'] : null;
         $hora_fin = !empty($_GET['hora_fin']) ? $_GET['hora_fin'] : null;
 
