@@ -1,4 +1,10 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once __DIR__ . '/../lib/PHPMailer/Exception.php';
+require_once __DIR__ . '/../lib/PHPMailer/PHPMailer.php';
+require_once __DIR__ . '/../lib/PHPMailer/SMTP.php';
 require_once __DIR__ . '/../core/Database.php';
 
 class AuthController {
@@ -76,13 +82,38 @@ class AuthController {
             $stmt = $db->prepare("CALL sp_update_user_2fa_code(?, ?)");
             $stmt->execute([$user['id_usuario'], $code]);
 
-            // Enviar correo (simulación por ahora)
-            // En un proyecto real, usar una librería como PHPMailer
-            $mailSent = mail($user['email'], "Su código de acceso", "Su código es: $code");
+            // Enviar correo con PHPMailer
+            $mail = new PHPMailer(true);
+            $mailSent = false;
+            try {
+                //Server settings
+                $mail->isSMTP();
+                $mail->Host       = MAIL_HOST;
+                $mail->SMTPAuth   = true;
+                $mail->Username   = MAIL_USER;
+                $mail->Password   = MAIL_PASS;
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $mail->Port       = MAIL_PORT;
 
-            if (true) { // Simular que el correo siempre se envía por ahora
+                //Recipients
+                $mail->setFrom(MAIL_USER, 'Sistema de Natacion');
+                $mail->addAddress($user['email']);
+
+                //Content
+                $mail->isHTML(true);
+                $mail->Subject = 'Su codigo de acceso';
+                $mail->Body    = "Su codigo de verificacion es: <b>$code</b>";
+                $mail->AltBody = "Su codigo de verificacion es: $code";
+
+                $mail->send();
+                $mailSent = true;
+            } catch (Exception $e) {
+                // Opcional: registrar el error para depuración
+                error_log("PHPMailer Error: {$mail->ErrorInfo}");
+            }
+
+            if ($mailSent) {
                 $_SESSION['2fa_user_id'] = $user['id_usuario'];
-                // Redirigir a la página de verificación de 2FA
                 header('Location: index.php?url=verify_2fa');
                 exit;
             } else {
