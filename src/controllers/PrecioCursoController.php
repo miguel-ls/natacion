@@ -22,8 +22,8 @@ class PrecioCursoController {
 
     public function create() {
         $db = Database::getInstance()->getConnection();
-        $stmt_cursos = $db->prepare("CALL sp_get_all_cursos()");
-        $stmt_cursos->execute();
+        $stmt_cursos = $db->prepare("CALL sp_get_all_cursos(?)");
+        $stmt_cursos->execute(['']);
         $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_cursos->closeCursor();
 
@@ -69,8 +69,8 @@ class PrecioCursoController {
         $stmt_item->closeCursor();
 
         if ($item) {
-            $stmt_cursos = $db->prepare("CALL sp_get_all_cursos()");
-            $stmt_cursos->execute();
+            $stmt_cursos = $db->prepare("CALL sp_get_all_cursos(?)");
+            $stmt_cursos->execute(['']);
             $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
             $stmt_cursos->closeCursor();
 
