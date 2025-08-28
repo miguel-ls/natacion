@@ -112,19 +112,11 @@ class MatriculaController {
             $curso_id = $curso_id_result['id_curso'];
             $stmt_curso_id->closeCursor();
 
-            // Obtener otros horarios disponibles para ese curso
-            $stmt_horarios = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?)");
-            $stmt_horarios->execute([$curso_id, 0, null, null]); // Se pasan valores por defecto para los filtros no usados aquí
+            // Obtener otros horarios disponibles para ese curso, excluyendo el actual
+            $stmt_horarios = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?, ?)");
+            $stmt_horarios->execute([$curso_id, 0, null, null, $matricula['id_horario']]);
             $horarios_disponibles = $stmt_horarios->fetchAll(PDO::FETCH_ASSOC);
             $stmt_horarios->closeCursor();
-
-            // Excluir el horario actual de la lista de horarios disponibles
-            if (isset($matricula['id_horario'])) {
-                $current_horario_id = $matricula['id_horario'];
-                $horarios_disponibles = array_filter($horarios_disponibles, function($horario) use ($current_horario_id) {
-                    return $horario['id_horario'] != $current_horario_id;
-                });
-            }
 
             require_once __DIR__ . '/../views/matriculas/edit.php';
 
@@ -220,8 +212,8 @@ class MatriculaController {
 
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?)");
-            $stmt->execute([$id_curso, $id_profesor, $hora_inicio, $hora_fin]);
+            $stmt = $db->prepare("CALL sp_get_horarios_disponibles_por_curso(?, ?, ?, ?, ?)");
+            $stmt->execute([$id_curso, $id_profesor, $hora_inicio, $hora_fin, 0]); // 0 para no excluir ningún horario
             $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($horarios);
         } catch (PDOException $e) {
