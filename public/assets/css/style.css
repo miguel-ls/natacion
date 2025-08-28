@@ -130,7 +130,12 @@ footer {
     opacity: 0.85;
 }
 
-.btn-primary, button[type="submit"] {
+.btn-primary {
+    background-color: #0056b3; /* Primary Blue */
+    color: #fff;
+}
+
+button[type="submit"] {
     background-color: #0056b3; /* Primary Blue */
 }
 

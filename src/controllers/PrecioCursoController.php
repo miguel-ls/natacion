@@ -27,8 +27,8 @@ class PrecioCursoController {
         $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_cursos->closeCursor();
 
-        $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_precio()");
-        $stmt_tipos->execute();
+        $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_precio(?)");
+        $stmt_tipos->execute(['']);
         $tipos_precio = $stmt_tipos->fetchAll(PDO::FETCH_ASSOC);
         $stmt_tipos->closeCursor();
 
@@ -74,8 +74,8 @@ class PrecioCursoController {
             $cursos = $stmt_cursos->fetchAll(PDO::FETCH_ASSOC);
             $stmt_cursos->closeCursor();
 
-            $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_precio()");
-            $stmt_tipos->execute();
+            $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_precio(?)");
+            $stmt_tipos->execute(['']);
             $tipos_precio = $stmt_tipos->fetchAll(PDO::FETCH_ASSOC);
             $stmt_tipos->closeCursor();
 
