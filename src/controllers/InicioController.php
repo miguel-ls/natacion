@@ -1,0 +1,50 @@
+<?php
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/AuthController.php';
+
+class InicioController {
+
+    private $auth;
+
+    public function __construct() {
+        $this->auth = new AuthController();
+        $this->auth->checkAuth();
+    }
+
+    public function index() {
+        $db = Database::getInstance()->getConnection();
+        $chart_data = [];
+
+        try {
+            // Datos para Gráfico 1: Ventas mensuales por curso
+            $stmt1 = $db->prepare("CALL sp_get_ventas_por_curso_mensual_anual()");
+            $stmt1->execute();
+            $chart_data['ventas_mensuales_por_curso'] = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+            $stmt1->closeCursor();
+
+            // Datos para Gráfico 2: Ventas totales por curso
+            $stmt2 = $db->prepare("CALL sp_get_ventas_por_curso_anual()");
+            $stmt2->execute();
+            $chart_data['ventas_por_curso'] = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+            $stmt2->closeCursor();
+
+            // Datos para Gráfico 3: Ventas por forma de pago
+            $stmt3 = $db->prepare("CALL sp_get_ventas_por_forma_pago_anual()");
+            $stmt3->execute();
+            $chart_data['ventas_por_forma_pago'] = $stmt3->fetchAll(PDO::FETCH_ASSOC);
+            $stmt3->closeCursor();
+
+            // Datos para Gráfico 4: Ventas por tipo de piscina
+            $stmt4 = $db->prepare("CALL sp_get_ventas_por_piscina_anual()");
+            $stmt4->execute();
+            $chart_data['ventas_por_piscina'] = $stmt4->fetchAll(PDO::FETCH_ASSOC);
+            $stmt4->closeCursor();
+
+        } catch (PDOException $e) {
+            $_SESSION['error_message'] = "Error al cargar los datos para los gráficos: " . $e->getMessage();
+        }
+
+        require_once __DIR__ . '/../views/inicio/index.php';
+    }
+}
+?>

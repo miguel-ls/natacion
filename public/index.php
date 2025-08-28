@@ -27,6 +27,7 @@ require_once '../src/controllers/ReporteController.php';
 require_once '../src/controllers/TipoPrecioController.php';
 require_once '../src/controllers/PrecioCursoController.php';
 require_once '../src/controllers/DashboardController.php';
+require_once '../src/controllers/InicioController.php';
 
 
 // Simple enrutador basado en el parámetro 'url'
@@ -307,9 +308,14 @@ switch ($route) {
         }
         break;
 
+    case 'inicio':
+        $inicioController = new InicioController();
+        $inicioController->index();
+        break;
+
     case 'home':
         if (isset($_SESSION['user_id'])) {
-            header('Location: index.php?url=dashboard');
+            header('Location: index.php?url=inicio'); // Redirigir a la nueva página de inicio
         } else {
             header('Location: index.php?url=login');
         }
