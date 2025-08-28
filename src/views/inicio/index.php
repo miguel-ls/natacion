@@ -17,7 +17,7 @@ require_once __DIR__ . '/../partials/header.php';
 }
 .chart-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); /* Reducido al 40% */
     gap: 3.5rem; /* Aumentada más la separación */
 }
 .form-control { /* Estilo básico para los select */
