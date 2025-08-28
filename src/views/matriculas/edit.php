@@ -35,7 +35,6 @@ $auth = new AuthController();
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
         <input type="hidden" name="id_matricula" value="<?php echo htmlspecialchars($matricula['id_matricula']); ?>">
 
-        <h4>Seleccione un Nuevo Horario (si desea cambiarlo)</h4>
         <input type="hidden" id="id_horario" name="id_horario" value="<?php echo htmlspecialchars($matricula['id_horario']); ?>" required>
 
         <div class="horarios-list">
