@@ -20,6 +20,17 @@ class InicioController {
 
         $chart_data = [];
         $years = [];
+        $months = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 5 => 'Mayo', 6 => 'Junio',
+            7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+
+        // Determinar el texto para los títulos de los gráficos
+        if ($selected_month == 0) {
+            $title_period_text = "Año " . $selected_year;
+        } else {
+            $title_period_text = $months[$selected_month] . " " . $selected_year;
+        }
 
         try {
             // Obtener los años disponibles para el filtro
