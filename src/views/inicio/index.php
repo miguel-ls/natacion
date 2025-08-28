@@ -13,12 +13,12 @@ require_once __DIR__ . '/../partials/header.php';
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 #ventasMensualesChartContainer {
-    max-width: 900px; /* El gráfico de barras puede ser más ancho */
+    max-width: 600px; /* Reducido al 50% (aprox) de 900px y centrado */
 }
 .chart-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Reducido minmax */
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem; /* Aumentada la separación */
 }
 .form-control { /* Estilo básico para los select */
     padding: 8px;
@@ -29,7 +29,7 @@ require_once __DIR__ . '/../partials/header.php';
 
 <div class="container">
     <div class="page-header">
-        <h1>Inicio</h1>
+        <h1>Panel de Control</h1>
     </div>
 
     <!-- Filtros -->
@@ -50,11 +50,11 @@ require_once __DIR__ . '/../partials/header.php';
                 <label for="month" style="font-weight: bold;">Mes:</label>
                 <select name="month" id="month" class="form-control">
                     <option value="0" <?php echo ($selected_month == 0) ? 'selected' : ''; ?>>Todos</option>
-                    <?php for ($i = 1; $i <= 12; $i++): ?>
-                        <option value="<?php echo $i; ?>" <?php echo ($i == $selected_month) ? 'selected' : ''; ?>>
-                            <?php echo DateTime::createFromFormat('!m', $i)->format('F'); ?>
+                    <?php foreach ($months as $num => $name): ?>
+                        <option value="<?php echo $num; ?>" <?php echo ($num == $selected_month) ? 'selected' : ''; ?>>
+                            <?php echo $name; ?>
                         </option>
-                    <?php endfor; ?>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Filtrar</button>
@@ -72,15 +72,15 @@ require_once __DIR__ . '/../partials/header.php';
 
     <div class="chart-grid">
         <div class="chart-container">
-            <h3>Ventas por Curso (Año Actual)</h3>
+            <h3>Ventas por Curso (<?php echo $title_period_text; ?>)</h3>
             <canvas id="ventasPorCursoChart"></canvas>
         </div>
         <div class="chart-container">
-            <h3>Ventas por Forma de Pago (Año Actual)</h3>
+            <h3>Ventas por Forma de Pago (<?php echo $title_period_text; ?>)</h3>
             <canvas id="ventasPorFormaPagoChart"></canvas>
         </div>
         <div class="chart-container">
-            <h3>Ventas por Tipo de Piscina (Año Actual)</h3>
+            <h3>Ventas por Tipo de Piscina (<?php echo $title_period_text; ?>)</h3>
             <canvas id="ventasPorPiscinaChart"></canvas>
         </div>
     </div>
