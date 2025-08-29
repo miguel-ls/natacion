@@ -215,6 +215,12 @@ class MatriculaController {
         $formas_pago = $stmt_formas_pago->fetchAll(PDO::FETCH_ASSOC);
         $stmt_formas_pago->closeCursor();
 
+        // Cargar tipos de documento para el formulario de nuevo alumno
+        $stmt_tipos_documento = $db->prepare("CALL sp_get_all_tipos_documento()");
+        $stmt_tipos_documento->execute();
+        $tipos_documento = $stmt_tipos_documento->fetchAll(PDO::FETCH_ASSOC);
+        $stmt_tipos_documento->closeCursor();
+
         require_once __DIR__ . '/../views/matriculas/create.php';
     }
 
@@ -337,10 +343,11 @@ class MatriculaController {
 
                 // Si no hay ID de alumno pero sí datos de nuevo alumno, crearlo primero
                 if (empty($id_alumno) && !empty($_POST['nuevo_alumno_nombres'])) {
-                    $stmt_nuevo_alumno = $db->prepare("CALL sp_create_alumno_simple(?, ?, ?, ?, ?)");
+                    $stmt_nuevo_alumno = $db->prepare("CALL sp_create_alumno_simple(?, ?, ?, ?, ?, ?)");
                     $stmt_nuevo_alumno->execute([
                         $_POST['nuevo_alumno_nombres'],
                         $_POST['nuevo_alumno_apellidos'],
+                        $_POST['nuevo_alumno_id_tipo_documento'],
                         $_POST['nuevo_alumno_documento'],
                         $_POST['nuevo_alumno_telefono'],
                         $_POST['nuevo_alumno_email']
