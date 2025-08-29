@@ -423,13 +423,17 @@ document.getElementById('form-matricula').addEventListener('submit', function(ev
 // DNI validation for new student
 const nuevoDniInput = document.querySelector('[name="nuevo_alumno_documento"]');
 const nuevoDniError = document.getElementById('nuevo-dni-error');
+const mainForm = document.getElementById('form-matricula');
 const submitButton = document.querySelector('#form-matricula button[type="submit"]');
+
+let isNuevoDniDuplicate = false;
 
 nuevoDniInput.addEventListener('blur', function() {
     const dni = this.value.trim();
     if (dni === '') {
         nuevoDniError.style.display = 'none';
         submitButton.disabled = false;
+        isNuevoDniDuplicate = false;
         return;
     }
 
@@ -440,15 +444,25 @@ nuevoDniInput.addEventListener('blur', function() {
                 nuevoDniError.textContent = 'Este documento ya está registrado.';
                 nuevoDniError.style.display = 'block';
                 submitButton.disabled = true;
+                isNuevoDniDuplicate = true;
             } else {
                 nuevoDniError.style.display = 'none';
                 submitButton.disabled = false;
+                isNuevoDniDuplicate = false;
             }
         })
         .catch(error => {
             console.error('Error al verificar el DNI:', error);
             submitButton.disabled = false;
+            isNuevoDniDuplicate = false;
         });
+});
+
+mainForm.addEventListener('submit', function(event) {
+    if (isNuevoDniDuplicate) {
+        event.preventDefault();
+        alert('No se puede registrar la matrícula porque el documento del nuevo alumno ya existe.');
+    }
 });
 </script>
 
