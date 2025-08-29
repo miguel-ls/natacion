@@ -317,8 +317,8 @@ class MatriculaController {
                 }
 
                 // Verificar duplicado
-                $stmt_check_dni = $db->prepare("CALL sp_check_alumno_by_dni(?, NULL)");
-                $stmt_check_dni->execute([$dni]);
+                $stmt_check_dni = $db->prepare("CALL sp_check_alumno_by_dni(?, ?)");
+                $stmt_check_dni->execute([$dni, null]);
                 $result = $stmt_check_dni->fetch(PDO::FETCH_ASSOC);
                 $stmt_check_dni->closeCursor();
 
