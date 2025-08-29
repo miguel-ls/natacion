@@ -134,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     form.addEventListener('submit', function(event) {
+        // Doble validación para prevenir el envío si el DNI es duplicado
         if (isDniDuplicate) {
             event.preventDefault();
             alert('No se puede guardar el alumno porque el documento de identidad ya existe.');
