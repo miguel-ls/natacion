@@ -34,6 +34,7 @@ $auth = new AuthController();
 .search-result-item:hover { background-color: #f0f0f0; }
 #nuevo-alumno-form { display: none; background-color: #f9f9f9; padding: 1rem; border-radius: 5px; margin-top: 1rem;}
 .schedule-filters { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-top: 1rem;}
+.error-text { color: red; font-size: 0.875em; margin-top: 0.25rem; }
 </style>
 
 <div class="form-container">
@@ -61,7 +62,11 @@ $auth = new AuthController();
                     <div class="form-group"><label>Apellidos:</label><input type="text" name="nuevo_alumno_apellidos"></div>
                 </div>
                  <div class="form-row">
-                    <div class="form-group"><label>Documento:</label><input type="text" name="nuevo_alumno_documento"></div>
+                    <div class="form-group">
+                        <label>Documento:</label>
+                        <input type="text" name="nuevo_alumno_documento">
+                        <div class="error-text" id="nuevo-dni-error" style="display: none;"></div>
+                    </div>
                     <div class="form-group"><label>Teléfono:</label><input type="text" name="nuevo_alumno_telefono"></div>
                 </div>
                  <div class="form-group"><label>Email:</label><input type="email" name="nuevo_alumno_email"></div>
@@ -413,6 +418,37 @@ document.getElementById('form-matricula').addEventListener('submit', function(ev
         alert('Por favor, seleccione un horario disponible.');
         event.preventDefault();
     }
+});
+
+// DNI validation for new student
+const nuevoDniInput = document.querySelector('[name="nuevo_alumno_documento"]');
+const nuevoDniError = document.getElementById('nuevo-dni-error');
+const submitButton = document.querySelector('#form-matricula button[type="submit"]');
+
+nuevoDniInput.addEventListener('blur', function() {
+    const dni = this.value.trim();
+    if (dni === '') {
+        nuevoDniError.style.display = 'none';
+        submitButton.disabled = false;
+        return;
+    }
+
+    fetch(`index.php?url=alumnos/checkDni&dni=${dni}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                nuevoDniError.textContent = 'Este documento ya está registrado.';
+                nuevoDniError.style.display = 'block';
+                submitButton.disabled = true;
+            } else {
+                nuevoDniError.style.display = 'none';
+                submitButton.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error al verificar el DNI:', error);
+            submitButton.disabled = false;
+        });
 });
 </script>
 

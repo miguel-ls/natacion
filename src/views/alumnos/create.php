@@ -15,6 +15,7 @@ $auth = new AuthController();
 .btn { padding: 10px 15px; border: none; border-radius: 4px; color: white; text-decoration: none; cursor: pointer; }
 .btn-success { background-color: #5cb85c; }
 .btn-secondary { background-color: #6c757d; }
+.error-text { color: red; font-size: 0.875em; margin-top: 0.25rem; }
 </style>
 
 <div class="form-container">
@@ -43,6 +44,7 @@ $auth = new AuthController();
             <div class="form-group">
                 <label for="documento_identidad">Documento de Identidad</label>
                 <input type="text" id="documento_identidad" name="documento_identidad">
+                <div id="dni-error" class="error-text" style="display: none;"></div>
             </div>
             <div class="form-group">
                 <label for="fecha_nacimiento">Fecha de Nacimiento</label>
@@ -91,3 +93,38 @@ $auth = new AuthController();
 <?php
 require_once __DIR__ . '/../partials/footer.php';
 ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dniInput = document.getElementById('documento_identidad');
+    const dniError = document.getElementById('dni-error');
+    const submitButton = document.querySelector('button[type="submit"]');
+
+    dniInput.addEventListener('blur', function() {
+        const dni = this.value.trim();
+        if (dni === '') {
+            dniError.style.display = 'none';
+            submitButton.disabled = false;
+            return;
+        }
+
+        fetch(`index.php?url=alumnos/checkDni&dni=${dni}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    dniError.textContent = 'Este documento de identidad ya está registrado.';
+                    dniError.style.display = 'block';
+                    submitButton.disabled = true;
+                } else {
+                    dniError.style.display = 'none';
+                    submitButton.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar el DNI:', error);
+                // En caso de error de red, permitir el envío para que la validación del backend actúe
+                submitButton.disabled = false;
+            });
+    });
+});
+</script>
