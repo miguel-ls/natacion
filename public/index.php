@@ -13,6 +13,7 @@ require_once '../src/controllers/AuthController.php';
 require_once '../src/controllers/AlumnoController.php';
 require_once '../src/controllers/ProfesorController.php';
 require_once '../src/controllers/CursoController.php';
+require_once '../src/controllers/TipoDocumentoController.php';
 require_once '../src/controllers/TipoPiscinaController.php';
 require_once '../src/controllers/PiscinaController.php';
 require_once '../src/controllers/CarrilController.php';
@@ -78,6 +79,21 @@ switch ($route) {
             case 'search': $alumnoController->search(); break;
             case 'checkDni': $alumnoController->checkDni(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Alumnos</h1>"; break;
+        }
+        break;
+
+    // Rutas de Tipos de Documento
+    case 'tipos_documento':
+        $tipoDocumentoController = new TipoDocumentoController();
+        $action = $parts[1] ?? 'index';
+        switch ($action) {
+            case 'index': $tipoDocumentoController->index(); break;
+            case 'create': $tipoDocumentoController->create(); break;
+            case 'store': $tipoDocumentoController->store(); break;
+            case 'edit': $tipoDocumentoController->edit(); break;
+            case 'update': $tipoDocumentoController->update(); break;
+            case 'delete': $tipoDocumentoController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Tipos de Documento</h1>"; break;
         }
         break;
 
