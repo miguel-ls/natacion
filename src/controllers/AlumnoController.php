@@ -136,6 +136,43 @@ class AlumnoController {
     }
 
     /**
+     * Muestra los detalles de un alumno y sus matrículas.
+     */
+    public function show() {
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            header('Location: index.php?url=alumnos');
+            exit;
+        }
+
+        $db = Database::getInstance()->getConnection();
+        try {
+            // Obtener detalles del alumno
+            $stmt_alumno = $db->prepare("CALL sp_get_alumno_by_id(?)");
+            $stmt_alumno->execute([$id]);
+            $alumno = $stmt_alumno->fetch(PDO::FETCH_ASSOC);
+            $stmt_alumno->closeCursor();
+
+            if (!$alumno) {
+                http_response_code(404);
+                echo "Alumno no encontrado.";
+                exit;
+            }
+
+            // Obtener matrículas del alumno
+            $stmt_matriculas = $db->prepare("CALL sp_get_matriculas_by_alumn_id(?)");
+            $stmt_matriculas->execute([$id]);
+            $matriculas = $stmt_matriculas->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_matriculas->closeCursor();
+
+            require_once __DIR__ . '/../views/alumnos/show.php';
+
+        } catch (PDOException $e) {
+            echo "Error al cargar los detalles del alumno: " . $e->getMessage();
+        }
+    }
+
+    /**
      * Elimina un alumno.
      */
     public function delete() {
