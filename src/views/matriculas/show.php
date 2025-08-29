@@ -65,6 +65,18 @@ function get_spanish_day_name($date_str) {
         <div class="detail-item">
             <strong>Estado de Matrícula:</strong> <?php echo htmlspecialchars(ucfirst($matricula['estado'])); ?>
         </div>
+        <div class="detail-item">
+            <strong>Forma de Pago:</strong> <?php echo htmlspecialchars($matricula['forma_pago_nombre'] ?? 'No especificado'); ?>
+        </div>
+        <div class="detail-item">
+            <strong>Precio Base:</strong> S/ <?php echo htmlspecialchars(number_format($matricula['precio_base'] ?? 0, 2)); ?>
+        </div>
+        <div class="detail-item">
+            <strong>Descuento:</strong> S/ <?php echo htmlspecialchars(number_format($matricula['descuento'] ?? 0, 2)); ?>
+        </div>
+        <div class="detail-item">
+            <strong>Importe Final:</strong> S/ <?php echo htmlspecialchars(number_format($matricula['precio_final'] ?? 0, 2)); ?>
+        </div>
     </div>
 
     <div class="dias-clase-container">
