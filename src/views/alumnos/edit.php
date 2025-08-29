@@ -44,7 +44,8 @@ $auth = new AuthController();
         <div class="form-row">
             <div class="form-group">
                 <label for="documento_identidad">Documento de Identidad</label>
-                <input type="text" id="documento_identidad" name="documento_identidad" value="<?php echo htmlspecialchars($alumno['documento_identidad']); ?>">
+                <input type="text" id="documento_identidad" name="documento_identidad" value="<?php echo htmlspecialchars($alumno['documento_identidad']); ?>" maxlength="8" pattern="[0-9]{8}" title="El DNI debe contener 8 dígitos numéricos.">
+                <div id="dni-error" class="error-text" style="display: none;"></div>
             </div>
             <div class="form-group">
                 <label for="fecha_nacimiento">Fecha de Nacimiento</label>
@@ -93,3 +94,88 @@ $auth = new AuthController();
 <?php
 require_once __DIR__ . '/../partials/footer.php';
 ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const dniInput = document.getElementById('documento_identidad');
+    const dniError = document.getElementById('dni-error');
+    const submitButton = document.querySelector('button[type="submit"]');
+    const studentId = document.querySelector('input[name="id_alumno"]').value;
+    const originalDni = "<?php echo htmlspecialchars($alumno['documento_identidad']); ?>";
+
+    let isDniDuplicate = false;
+    let isDniInvalid = false;
+
+    function validateDniFormat() {
+        const dni = dniInput.value.trim();
+        if (dni === '') {
+            dniError.style.display = 'none';
+            isDniInvalid = false;
+            updateSubmitButtonState();
+            return;
+        }
+
+        if (!/^[0-9]{8}$/.test(dni)) {
+            dniError.textContent = 'El DNI debe contener 8 dígitos numéricos.';
+            dniError.style.display = 'block';
+            isDniInvalid = true;
+        } else {
+            dniError.style.display = 'none';
+            isDniInvalid = false;
+        }
+        updateSubmitButtonState();
+    }
+
+    function checkDniDuplication() {
+        const dni = dniInput.value.trim();
+        if (isDniInvalid || dni === '' || dni === originalDni) {
+            isDniDuplicate = false;
+            updateSubmitButtonState();
+            return;
+        }
+
+        fetch(`index.php?url=alumnos/checkDni&dni=${dni}&id=${studentId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    dniError.textContent = 'Este documento de identidad ya está registrado.';
+                    dniError.style.display = 'block';
+                    isDniDuplicate = true;
+                } else {
+                    if (!isDniInvalid) {
+                        dniError.style.display = 'none';
+                    }
+                    isDniDuplicate = false;
+                }
+                updateSubmitButtonState();
+            })
+            .catch(error => {
+                console.error('Error al verificar el DNI:', error);
+                isDniDuplicate = false;
+                updateSubmitButtonState();
+            });
+    }
+
+    function updateSubmitButtonState() {
+        submitButton.disabled = isDniDuplicate || isDniInvalid;
+    }
+
+    dniInput.addEventListener('input', validateDniFormat);
+    dniInput.addEventListener('blur', checkDniDuplication);
+
+    form.addEventListener('submit', function(event) {
+        validateDniFormat();
+        // No llamamos a checkDniDuplication en submit para evitar el delay del fetch,
+        // la validación del blur ya debería haber seteado el estado.
+
+        if (isDniInvalid) {
+            event.preventDefault();
+            alert('Por favor, corrija los errores en el formulario antes de guardar.\nEl DNI debe tener 8 dígitos numéricos.');
+        } else if (isDniDuplicate) {
+            event.preventDefault();
+            alert('No se puede actualizar el alumno porque el documento de identidad ya está en uso por otro alumno.');
+        }
+    });
+});
+</script>

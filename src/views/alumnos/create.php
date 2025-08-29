@@ -2,6 +2,10 @@
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 $auth = new AuthController();
+
+// Repoblar datos del formulario si existen en la sesión
+$form_data = $_SESSION['form_data'] ?? [];
+unset($_SESSION['form_data']);
 ?>
 
 <style>
@@ -33,42 +37,42 @@ $auth = new AuthController();
         <div class="form-row">
             <div class="form-group">
                 <label for="nombres">Nombres</label>
-                <input type="text" id="nombres" name="nombres" required>
+                <input type="text" id="nombres" name="nombres" value="<?php echo htmlspecialchars($form_data['nombres'] ?? ''); ?>" required>
             </div>
             <div class="form-group">
                 <label for="apellidos">Apellidos</label>
-                <input type="text" id="apellidos" name="apellidos" required>
+                <input type="text" id="apellidos" name="apellidos" value="<?php echo htmlspecialchars($form_data['apellidos'] ?? ''); ?>" required>
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label for="documento_identidad">Documento de Identidad</label>
-                <input type="text" id="documento_identidad" name="documento_identidad">
+                <input type="text" id="documento_identidad" name="documento_identidad" value="<?php echo htmlspecialchars($form_data['documento_identidad'] ?? ''); ?>" maxlength="8" pattern="[0-9]{8}" title="El DNI debe contener 8 dígitos numéricos.">
                 <div id="dni-error" class="error-text" style="display: none;"></div>
             </div>
             <div class="form-group">
                 <label for="fecha_nacimiento">Fecha de Nacimiento</label>
-                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?php echo htmlspecialchars($form_data['fecha_nacimiento'] ?? ''); ?>">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label for="grupo_sanguineo">Grupo Sanguíneo</label>
-                <input type="text" id="grupo_sanguineo" name="grupo_sanguineo">
+                <input type="text" id="grupo_sanguineo" name="grupo_sanguineo" value="<?php echo htmlspecialchars($form_data['grupo_sanguineo'] ?? ''); ?>">
             </div>
              <div class="form-group">
                 <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" name="telefono">
+                <input type="tel" id="telefono" name="telefono" value="<?php echo htmlspecialchars($form_data['telefono'] ?? ''); ?>">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label for="email">Correo Electrónico</label>
-                <input type="email" id="email" name="email">
+                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($form_data['email'] ?? ''); ?>">
             </div>
              <div class="form-group">
                 <label for="direccion">Dirección</label>
-                <input type="text" id="direccion" name="direccion">
+                <input type="text" id="direccion" name="direccion" value="<?php echo htmlspecialchars($form_data['direccion'] ?? ''); ?>">
             </div>
         </div>
         <hr>
@@ -76,11 +80,11 @@ $auth = new AuthController();
         <div class="form-row">
             <div class="form-group">
                 <label for="nombre_padre_tutor">Nombre del Padre o Tutor</label>
-                <input type="text" id="nombre_padre_tutor" name="nombre_padre_tutor">
+                <input type="text" id="nombre_padre_tutor" name="nombre_padre_tutor" value="<?php echo htmlspecialchars($form_data['nombre_padre_tutor'] ?? ''); ?>">
             </div>
             <div class="form-group">
                 <label for="telefono_emergencia">Teléfono de Emergencia</label>
-                <input type="tel" id="telefono_emergencia" name="telefono_emergencia">
+                <input type="tel" id="telefono_emergencia" name="telefono_emergencia" value="<?php echo htmlspecialchars($form_data['telefono_emergencia'] ?? ''); ?>">
             </div>
         </div>
         <div class="form-actions">
@@ -102,13 +106,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.querySelector('button[type="submit"]');
 
     let isDniDuplicate = false;
+    let isDniInvalid = false;
 
-    dniInput.addEventListener('blur', function() {
-        const dni = this.value.trim();
+    function validateDniFormat() {
+        const dni = dniInput.value.trim();
+        // Permite que el campo esté vacío, la validación de 'required' se maneja en el HTML si es necesario
         if (dni === '') {
             dniError.style.display = 'none';
-            submitButton.disabled = false;
+            isDniInvalid = false;
+            updateSubmitButtonState();
+            return;
+        }
+
+        // Validar que solo contiene números y tiene 8 dígitos
+        if (!/^[0-9]{8}$/.test(dni)) {
+            dniError.textContent = 'El DNI debe contener 8 dígitos numéricos.';
+            dniError.style.display = 'block';
+            isDniInvalid = true;
+        } else {
+            dniError.style.display = 'none';
+            isDniInvalid = false;
+        }
+        updateSubmitButtonState();
+    }
+
+    function checkDniDuplication() {
+        const dni = dniInput.value.trim();
+        if (isDniInvalid || dni === '') {
             isDniDuplicate = false;
+            updateSubmitButtonState();
             return;
         }
 
@@ -118,24 +144,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.exists) {
                     dniError.textContent = 'Este documento de identidad ya está registrado.';
                     dniError.style.display = 'block';
-                    submitButton.disabled = true;
                     isDniDuplicate = true;
                 } else {
-                    dniError.style.display = 'none';
-                    submitButton.disabled = false;
+                    // Si no hay duplicado, el mensaje de error (si existe) debe ser por formato
+                    if (!isDniInvalid) {
+                        dniError.style.display = 'none';
+                    }
                     isDniDuplicate = false;
                 }
+                updateSubmitButtonState();
             })
             .catch(error => {
                 console.error('Error al verificar el DNI:', error);
-                submitButton.disabled = false;
                 isDniDuplicate = false;
+                updateSubmitButtonState();
             });
-    });
+    }
+
+    function updateSubmitButtonState() {
+        submitButton.disabled = isDniDuplicate || isDniInvalid;
+    }
+
+    // Validar formato mientras se escribe
+    dniInput.addEventListener('input', validateDniFormat);
+
+    // Validar duplicados al salir del campo
+    dniInput.addEventListener('blur', checkDniDuplication);
 
     form.addEventListener('submit', function(event) {
-        // Doble validación para prevenir el envío si el DNI es duplicado
-        if (isDniDuplicate) {
+        // Re-validar todo al intentar enviar
+        validateDniFormat();
+        checkDniDuplication(); // Esto es asíncrono, pero la validación síncrona de abajo puede detener el envío
+
+        if (isDniInvalid) {
+            event.preventDefault();
+            alert('Por favor, corrija los errores en el formulario antes de guardar.\nEl DNI debe tener 8 dígitos numéricos.');
+        } else if (isDniDuplicate) {
             event.preventDefault();
             alert('No se puede guardar el alumno porque el documento de identidad ya existe.');
         }
