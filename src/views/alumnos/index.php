@@ -12,6 +12,7 @@ require_once __DIR__ . '/../partials/header.php';
 .btn-primary { background-color: #337ab7; }
 .btn-warning { background-color: #f0ad4e; }
 .btn-danger { background-color: #d9534f; }
+.btn-info { background-color: #5bc0de; }
 .action-links a { margin-right: 5px; }
 .page-header { display: flex; justify-content: space-between; align-items: center; }
 </style>
@@ -66,6 +67,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($alumno['email']); ?></td>
                         <td><?php echo htmlspecialchars($alumno['telefono']); ?></td>
                         <td class="action-links">
+                            <a href="index.php?url=alumnos/show&id=<?php echo $alumno['id_alumno']; ?>" class="btn btn-info">Ver</a>
                             <a href="index.php?url=alumnos/edit&id=<?php echo $alumno['id_alumno']; ?>" class="btn btn-warning">Editar</a>
                             <a href="index.php?url=alumnos/delete&id=<?php echo $alumno['id_alumno']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este alumno?');">Eliminar</a>
                         </td>
