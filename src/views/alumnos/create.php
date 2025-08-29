@@ -23,7 +23,7 @@ unset($_SESSION['form_data']);
 </style>
 
 <div class="form-container">
-    <h2>Añadir Nuevo Alumno</h2>
+    <h2>Añadir Nuevo Cliente</h2>
 
     <?php
     if (isset($_SESSION['error_message'])) {
@@ -101,7 +101,7 @@ unset($_SESSION['form_data']);
         </div>
         <div class="form-actions">
             <a href="index.php?url=alumnos" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-success">Guardar Alumno</button>
+            <button type="submit" class="btn btn-success">Guardar Cliente</button>
         </div>
     </form>
 </div>
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(`Por favor, corrija los errores. El número de documento debe tener ${longitud} caracteres.`);
         } else if (isDocumentoDuplicate) {
             event.preventDefault();
-            alert('No se puede guardar el alumno porque el número de documento ya existe.');
+            alert('No se puede guardar el cliente porque el número de documento ya existe.');
         }
     });
 });
