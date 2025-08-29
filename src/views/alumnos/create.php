@@ -46,10 +46,22 @@ unset($_SESSION['form_data']);
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label for="documento_identidad">Documento de Identidad</label>
-                <input type="text" id="documento_identidad" name="documento_identidad" value="<?php echo htmlspecialchars($form_data['documento_identidad'] ?? ''); ?>" maxlength="8" pattern="[0-9]{8}" title="El DNI debe contener 8 dígitos numéricos.">
+                <label for="id_tipo_documento">Tipo de Documento</label>
+                <select id="id_tipo_documento" name="id_tipo_documento" required>
+                    <?php foreach ($tipos_documento as $tipo): ?>
+                        <option value="<?php echo htmlspecialchars($tipo['id']); ?>" data-longitud="<?php echo htmlspecialchars($tipo['longitud']); ?>" <?php echo (isset($form_data['id_tipo_documento']) && $form_data['id_tipo_documento'] == $tipo['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($tipo['descripcion']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="documento_identidad">Número de Documento</label>
+                <input type="text" id="documento_identidad" name="documento_identidad" value="<?php echo htmlspecialchars($form_data['documento_identidad'] ?? ''); ?>" required>
                 <div id="dni-error" class="error-text" style="display: none;"></div>
             </div>
+        </div>
+        <div class="form-row">
             <div class="form-group">
                 <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                 <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?php echo htmlspecialchars($form_data['fecha_nacimiento'] ?? ''); ?>">
@@ -101,87 +113,102 @@ require_once __DIR__ . '/../partials/footer.php';
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
-    const dniInput = document.getElementById('documento_identidad');
-    const dniError = document.getElementById('dni-error');
+    const tipoDocumentoSelect = document.getElementById('id_tipo_documento');
+    const documentoInput = document.getElementById('documento_identidad');
+    const documentoError = document.getElementById('dni-error');
     const submitButton = document.querySelector('button[type="submit"]');
 
-    let isDniDuplicate = false;
-    let isDniInvalid = false;
+    let isDocumentoDuplicate = false;
+    let isDocumentoInvalid = false;
 
-    function validateDniFormat() {
-        const dni = dniInput.value.trim();
-        // Permite que el campo esté vacío, la validación de 'required' se maneja en el HTML si es necesario
-        if (dni === '') {
-            dniError.style.display = 'none';
-            isDniInvalid = false;
+    function updateDocumentoValidation() {
+        const selectedOption = tipoDocumentoSelect.options[tipoDocumentoSelect.selectedIndex];
+        const longitud = selectedOption.getAttribute('data-longitud');
+
+        documentoInput.maxLength = longitud;
+        documentoInput.pattern = `^[0-9]{${longitud}}$`; // Asumiendo que todos son numéricos por ahora
+        documentoInput.title = `El documento debe contener ${longitud} dígitos.`;
+
+        // Disparar la validación del campo de documento inmediatamente
+        validateDocumentoFormat();
+    }
+
+    function validateDocumentoFormat() {
+        const documento = documentoInput.value.trim();
+        const longitud = documentoInput.maxLength;
+
+        if (documento === '') {
+            documentoError.style.display = 'none';
+            isDocumentoInvalid = false;
             updateSubmitButtonState();
             return;
         }
 
-        // Validar que solo contiene números y tiene 8 dígitos
-        if (!/^[0-9]{8}$/.test(dni)) {
-            dniError.textContent = 'El DNI debe contener 8 dígitos numéricos.';
-            dniError.style.display = 'block';
-            isDniInvalid = true;
+        const regex = new RegExp(`^[a-zA-Z0-9]{${longitud}}$`);
+        if (documento.length !== parseInt(longitud)) {
+            documentoError.textContent = `El número de documento debe tener exactamente ${longitud} caracteres.`;
+            documentoError.style.display = 'block';
+            isDocumentoInvalid = true;
         } else {
-            dniError.style.display = 'none';
-            isDniInvalid = false;
+            documentoError.style.display = 'none';
+            isDocumentoInvalid = false;
         }
         updateSubmitButtonState();
     }
 
-    function checkDniDuplication() {
-        const dni = dniInput.value.trim();
-        if (isDniInvalid || dni === '') {
-            isDniDuplicate = false;
+    function checkDocumentoDuplication() {
+        const documento = documentoInput.value.trim();
+        if (isDocumentoInvalid || documento === '') {
+            isDocumentoDuplicate = false;
             updateSubmitButtonState();
             return;
         }
 
-        fetch(`index.php?url=alumnos/checkDni&dni=${dni}`)
+        // El endpoint no cambia, la unicidad se sigue verificando en la misma columna
+        fetch(`index.php?url=alumnos/checkDni&dni=${documento}`)
             .then(response => response.json())
             .then(data => {
                 if (data.exists) {
-                    dniError.textContent = 'Este documento de identidad ya está registrado.';
-                    dniError.style.display = 'block';
-                    isDniDuplicate = true;
+                    documentoError.textContent = 'Este número de documento ya está registrado.';
+                    documentoError.style.display = 'block';
+                    isDocumentoDuplicate = true;
                 } else {
-                    // Si no hay duplicado, el mensaje de error (si existe) debe ser por formato
-                    if (!isDniInvalid) {
-                        dniError.style.display = 'none';
+                    if (!isDocumentoInvalid) {
+                        documentoError.style.display = 'none';
                     }
-                    isDniDuplicate = false;
+                    isDocumentoDuplicate = false;
                 }
                 updateSubmitButtonState();
             })
             .catch(error => {
-                console.error('Error al verificar el DNI:', error);
-                isDniDuplicate = false;
+                console.error('Error al verificar el documento:', error);
+                isDocumentoDuplicate = false;
                 updateSubmitButtonState();
             });
     }
 
     function updateSubmitButtonState() {
-        submitButton.disabled = isDniDuplicate || isDniInvalid;
+        submitButton.disabled = isDocumentoDuplicate || isDocumentoInvalid;
     }
 
-    // Validar formato mientras se escribe
-    dniInput.addEventListener('input', validateDniFormat);
+    // Event listeners
+    tipoDocumentoSelect.addEventListener('change', updateDocumentoValidation);
+    documentoInput.addEventListener('input', validateDocumentoFormat);
+    documentoInput.addEventListener('blur', checkDocumentoDuplication);
 
-    // Validar duplicados al salir del campo
-    dniInput.addEventListener('blur', checkDniDuplication);
+    // Initial validation setup on page load
+    updateDocumentoValidation();
 
     form.addEventListener('submit', function(event) {
-        // Re-validar todo al intentar enviar
-        validateDniFormat();
-        checkDniDuplication(); // Esto es asíncrono, pero la validación síncrona de abajo puede detener el envío
+        validateDocumentoFormat();
 
-        if (isDniInvalid) {
+        if (isDocumentoInvalid) {
             event.preventDefault();
-            alert('Por favor, corrija los errores en el formulario antes de guardar.\nEl DNI debe tener 8 dígitos numéricos.');
-        } else if (isDniDuplicate) {
+            const longitud = documentoInput.maxLength;
+            alert(`Por favor, corrija los errores. El número de documento debe tener ${longitud} caracteres.`);
+        } else if (isDocumentoDuplicate) {
             event.preventDefault();
-            alert('No se puede guardar el alumno porque el documento de identidad ya existe.');
+            alert('No se puede guardar el alumno porque el número de documento ya existe.');
         }
     });
 });

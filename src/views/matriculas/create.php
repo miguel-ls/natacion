@@ -67,13 +67,25 @@ unset($_SESSION['form_data']);
                 </div>
                  <div class="form-row">
                     <div class="form-group">
-                        <label>Documento:</label>
-                        <input type="text" name="nuevo_alumno_documento" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_documento'] ?? ''); ?>">
+                        <label>Tipo de Documento:</label>
+                        <select name="nuevo_alumno_id_tipo_documento" id="nuevo_alumno_id_tipo_documento" required>
+                            <?php foreach ($tipos_documento as $tipo): ?>
+                                <option value="<?php echo htmlspecialchars($tipo['id']); ?>" data-longitud="<?php echo htmlspecialchars($tipo['longitud']); ?>" <?php echo (isset($form_data['nuevo_alumno_id_tipo_documento']) && $form_data['nuevo_alumno_id_tipo_documento'] == $tipo['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($tipo['descripcion']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Documento:</label>
+                        <input type="text" name="nuevo_alumno_documento" id="nuevo_alumno_documento" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_documento'] ?? ''); ?>" required>
                         <div class="error-text" id="nuevo-dni-error" style="display: none;"></div>
                     </div>
-                    <div class="form-group"><label>Teléfono:</label><input type="text" name="nuevo_alumno_telefono" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_telefono'] ?? ''); ?>"></div>
                 </div>
-                 <div class="form-group"><label>Email:</label><input type="email" name="nuevo_alumno_email" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_email'] ?? ''); ?>"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Teléfono:</label><input type="text" name="nuevo_alumno_telefono" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_telefono'] ?? ''); ?>"></div>
+                    <div class="form-group"><label>Email:</label><input type="email" name="nuevo_alumno_email" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_email'] ?? ''); ?>"></div>
+                </div>
             </div>
         </div>
 
@@ -429,60 +441,70 @@ document.getElementById('form-matricula').addEventListener('submit', function(ev
 });
 
 // DNI validation for new student
-const nuevoDniInput = document.querySelector('[name="nuevo_alumno_documento"]');
-const nuevoDniError = document.getElementById('nuevo-dni-error');
+const nuevoTipoDocumentoSelect = document.getElementById('nuevo_alumno_id_tipo_documento');
+const nuevoDocumentoInput = document.getElementById('nuevo_alumno_documento');
+const nuevoDocumentoError = document.getElementById('nuevo-dni-error');
 const mainForm = document.getElementById('form-matricula');
 const submitButton = document.querySelector('#form-matricula button[type="submit"]');
 
-let isNuevoDniDuplicate = false;
-let isNuevoDniInvalid = false;
+let isNuevoDocumentoDuplicate = false;
+let isNuevoDocumentoInvalid = false;
 
-function validateNuevoDniFormat() {
-    const dni = nuevoDniInput.value.trim();
-    if (dni === '') {
-        nuevoDniError.style.display = 'none';
-        isNuevoDniInvalid = false;
+function updateNuevoDocumentoValidation() {
+    const selectedOption = nuevoTipoDocumentoSelect.options[nuevoTipoDocumentoSelect.selectedIndex];
+    const longitud = selectedOption.getAttribute('data-longitud');
+    nuevoDocumentoInput.maxLength = longitud;
+    validateNuevoDocumentoFormat();
+}
+
+function validateNuevoDocumentoFormat() {
+    const documento = nuevoDocumentoInput.value.trim();
+    const longitud = nuevoDocumentoInput.maxLength;
+
+    if (documento === '') {
+        nuevoDocumentoError.style.display = 'none';
+        isNuevoDocumentoInvalid = false;
         updateSubmitButtonState();
         return;
     }
 
-    if (!/^[0-9]{8}$/.test(dni)) {
-        nuevoDniError.textContent = 'El DNI debe contener 8 dígitos numéricos.';
-        nuevoDniError.style.display = 'block';
-        isNuevoDniInvalid = true;
+    if (documento.length !== parseInt(longitud)) {
+        nuevoDocumentoError.textContent = `El número de documento debe tener ${longitud} caracteres.`;
+        nuevoDocumentoError.style.display = 'block';
+        isNuevoDocumentoInvalid = true;
     } else {
-        nuevoDniError.style.display = 'none';
-        isNuevoDniInvalid = false;
+        nuevoDocumentoError.style.display = 'none';
+        isNuevoDocumentoInvalid = false;
     }
     updateSubmitButtonState();
 }
 
-function checkNuevoDniDuplication() {
-    const dni = nuevoDniInput.value.trim();
-    if (isNuevoDniInvalid || dni === '') {
-        isNuevoDniDuplicate = false;
+function checkNuevoDocumentoDuplication() {
+    const documento = nuevoDocumentoInput.value.trim();
+    if (isNuevoDocumentoInvalid || documento === '') {
+        isNuevoDocumentoDuplicate = false;
         updateSubmitButtonState();
         return;
     }
 
-    fetch(`index.php?url=alumnos/checkDni&dni=${dni}`)
+    fetch(`index.php?url=alumnos/checkDni&dni=${documento}`)
         .then(response => response.json())
         .then(data => {
             if (data.exists) {
-                nuevoDniError.textContent = 'Este documento ya está registrado.';
-                nuevoDniError.style.display = 'block';
-                isNuevoDniDuplicate = true;
+                nuevoDocumentoError.textContent = 'Este número de documento ya está registrado.';
+                nuevoDocumentoError.style.display = 'block';
+                isNuevoDocumentoDuplicate = true;
             } else {
-                if (!isNuevoDniInvalid) {
-                    nuevoDniError.style.display = 'none';
+                if (!isNuevoDocumentoInvalid) {
+                    nuevoDocumentoError.style.display = 'none';
                 }
-                isNuevoDniDuplicate = false;
+                isNuevoDocumentoDuplicate = false;
             }
             updateSubmitButtonState();
         })
         .catch(error => {
-            console.error('Error al verificar el DNI:', error);
-            isNuevoDniDuplicate = false;
+            console.error('Error al verificar el documento:', error);
+            isNuevoDocumentoDuplicate = false;
             updateSubmitButtonState();
         });
 }
@@ -491,49 +513,41 @@ function updateSubmitButtonState() {
     const isAlumnoSelected = !!document.getElementById('id_alumno').value;
     const isNuevoAlumnoFormVisible = document.getElementById('nuevo-alumno-form').style.display === 'block';
 
-    // Si hay un alumno existente seleccionado, la validación del DNI del nuevo alumno no debe bloquear el submit.
-    if (isAlumnoSelected) {
+    if (isAlumnoSelected || !isNuevoAlumnoFormVisible) {
         submitButton.disabled = false;
         return;
     }
 
-    // Si el formulario de nuevo alumno no es visible, tampoco debe bloquear.
-    if (!isNuevoAlumnoFormVisible) {
-        submitButton.disabled = false;
-        return;
-    }
-
-    submitButton.disabled = isNuevoDniDuplicate || isNuevoDniInvalid;
+    submitButton.disabled = isNuevoDocumentoDuplicate || isNuevoDocumentoInvalid;
 }
 
+// Event listeners
+nuevoTipoDocumentoSelect.addEventListener('change', updateNuevoDocumentoValidation);
+nuevoDocumentoInput.addEventListener('input', validateNuevoDocumentoFormat);
+nuevoDocumentoInput.addEventListener('blur', checkNuevoDocumentoDuplication);
 
-// Event listeners for DNI validation
-nuevoDniInput.addEventListener('input', validateNuevoDniFormat);
-nuevoDniInput.addEventListener('blur', checkNuevoDniDuplication);
-
+// Initial validation
+updateNuevoDocumentoValidation();
 
 mainForm.addEventListener('submit', function(event) {
     const isAlumnoSelected = !!document.getElementById('id_alumno').value;
     const isNuevoAlumnoFormVisible = document.getElementById('nuevo-alumno-form').style.display === 'block';
 
-    // Solo validar DNI del nuevo alumno si no hay un alumno existente seleccionado Y el form de nuevo alumno está visible
     if (!isAlumnoSelected && isNuevoAlumnoFormVisible) {
-        validateNuevoDniFormat(); // Re-validar formato
-
-        if (isNuevoDniInvalid) {
+        validateNuevoDocumentoFormat();
+        if (isNuevoDocumentoInvalid) {
             event.preventDefault();
-            alert('Por favor, corrija los errores en el formulario antes de guardar.\nEl DNI del nuevo alumno debe tener 8 dígitos numéricos.');
-            return; // Detener aquí
+            alert(`Por favor, corrija los errores. El número de documento del nuevo alumno debe tener ${nuevoDocumentoInput.maxLength} caracteres.`);
+            return;
         }
-        if (isNuevoDniDuplicate) {
+        if (isNuevoDocumentoDuplicate) {
             event.preventDefault();
-            alert('No se puede registrar la matrícula porque el documento del nuevo alumno ya existe.');
-            return; // Detener aquí
+            alert('No se puede registrar la matrícula porque el número de documento del nuevo alumno ya existe.');
+            return;
         }
     }
 
-
-    if (!document.getElementById('id_alumno').value && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
+    if (!isAlumnoSelected && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
         alert('Por favor, seleccione un alumno existente o registre uno nuevo.');
         event.preventDefault();
     }

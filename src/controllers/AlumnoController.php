@@ -35,6 +35,16 @@ class AlumnoController {
      * Muestra el formulario para crear un nuevo alumno.
      */
     public function create() {
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_all_tipos_documento()");
+            $stmt->execute();
+            $tipos_documento = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Manejar el error, quizás con un array vacío
+            $tipos_documento = [];
+            $_SESSION['error_message'] = "Error al cargar los tipos de documento: " . $e->getMessage();
+        }
         require_once __DIR__ . '/../views/alumnos/create.php';
     }
 
@@ -61,10 +71,11 @@ class AlumnoController {
 
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_create_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_create_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $_POST['nombres'],
                     $_POST['apellidos'],
+                    $_POST['id_tipo_documento'],
                     $dni,
                     $_POST['fecha_nacimiento'],
                     $_POST['grupo_sanguineo'],
@@ -99,9 +110,17 @@ class AlumnoController {
 
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_alumno_by_id(?)");
-            $stmt->execute([$id]);
-            $alumno = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Obtener tipos de documento
+            $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_documento()");
+            $stmt_tipos->execute();
+            $tipos_documento = $stmt_tipos->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_tipos->closeCursor();
+
+            // Obtener datos del alumno
+            $stmt_alumno = $db->prepare("CALL sp_get_alumno_by_id(?)");
+            $stmt_alumno->execute([$id]);
+            $alumno = $stmt_alumno->fetch(PDO::FETCH_ASSOC);
+            $stmt_alumno->closeCursor();
 
             if ($alumno) {
                 require_once __DIR__ . '/../views/alumnos/edit.php';
@@ -110,7 +129,7 @@ class AlumnoController {
                 echo "Alumno no encontrado.";
             }
         } catch (PDOException $e) {
-            echo "Error al buscar el alumno: " . $e->getMessage();
+            echo "Error al buscar el alumno o los tipos de documento: " . $e->getMessage();
         }
     }
 
@@ -135,11 +154,12 @@ class AlumnoController {
 
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_update_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_update_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $id,
                     $_POST['nombres'],
                     $_POST['apellidos'],
+                    $_POST['id_tipo_documento'],
                     $dni,
                     $_POST['fecha_nacimiento'],
                     $_POST['grupo_sanguineo'],
