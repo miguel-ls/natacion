@@ -69,7 +69,7 @@ require_once __DIR__ . '/../partials/header.php';
     </div>
 
     <div style="margin-bottom: 1rem; text-align: right;">
-        <button id="btn-exportar" class="btn btn-success">Exportar a Excel</button>
+        <button id="btn-exportar" class="btn btn-success">Exportar / Imprimir</button>
     </div>
 
     <table class="report-table">
@@ -131,7 +131,7 @@ require_once __DIR__ . '/../partials/header.php';
 document.getElementById('btn-exportar').addEventListener('click', function() {
     const form = document.querySelector('.filter-form');
     const params = new URLSearchParams(new FormData(form)).toString();
-    window.location.href = 'index.php?url=reportes/exportarVentas&' + params;
+    window.open('index.php?url=reportes/ventasPreview&' + params, '_blank');
 });
 </script>
 
