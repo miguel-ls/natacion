@@ -18,7 +18,7 @@ $auth = new AuthController();
 </style>
 
 <div class="form-container">
-    <h2>Editar Alumno</h2>
+    <h2>Editar Cliente</h2>
 
     <?php
     if (isset($_SESSION['error_message'])) {
@@ -98,7 +98,7 @@ $auth = new AuthController();
         </div>
         <div class="form-actions">
             <a href="index.php?url=alumnos" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-success">Actualizar Alumno</button>
+            <button type="submit" class="btn btn-success">Actualizar Cliente</button>
         </div>
     </form>
 </div>

@@ -86,7 +86,7 @@ if (!defined('BASE_URL')) {
                             <a href="<?php echo BASE_URL; ?>index.php?url=cursos">Cursos</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=precios_cursos">Lista de Precios</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=profesores">Profesores</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Alumnos</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Clientes</a>
                         </div>
                     </div>
 
@@ -96,7 +96,7 @@ if (!defined('BASE_URL')) {
                             <a href="<?php echo BASE_URL; ?>index.php?url=matriculas">Matriculas</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=horarios">Programar horarios</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=asistencias_profesor">Asistencia Profesores</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=asistencias_alumnos">Asistencia Alumno</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=asistencias_alumnos">Asistencia Clientes</a>
                         </div>
                     </div>
 

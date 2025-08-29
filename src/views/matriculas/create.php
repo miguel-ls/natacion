@@ -48,19 +48,19 @@ unset($_SESSION['form_data']);
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
 
         <div class="form-section">
-            <h4>1. Seleccionar o Registrar Alumno</h4>
+            <h4>1. Seleccionar o Registrar Cliente</h4>
             <div class="form-group search-container">
-                <label for="alumno_search">Buscar Alumno Existente</label>
+                <label for="alumno_search">Buscar Cliente Existente</label>
                 <input type="text" id="alumno_search" class="form-control" placeholder="Escriba nombre, apellido o documento..." value="<?php echo htmlspecialchars($form_data['alumno_search'] ?? ''); ?>" autocomplete="off">
                 <input type="hidden" id="id_alumno" name="id_alumno" value="<?php echo htmlspecialchars($form_data['id_alumno'] ?? ''); ?>">
                 <div id="alumno-search-results" class="search-results"></div>
-                <small>Si el alumno no existe, regístrelo a continuación.</small>
+                <small>Si el cliente no existe, regístrelo a continuación.</small>
             </div>
 
-            <button type="button" id="btn-show-nuevo-alumno" class="btn btn-secondary">Registrar Nuevo Alumno</button>
+            <button type="button" id="btn-show-nuevo-alumno" class="btn btn-secondary">Registrar Nuevo Cliente</button>
 
             <div id="nuevo-alumno-form" style="<?php echo !empty($form_data['nuevo_alumno_nombres']) ? 'display:block;' : 'display:none;'; ?>">
-                <h5>Datos del Nuevo Alumno (Esenciales)</h5>
+                <h5>Datos del Nuevo Cliente (Esenciales)</h5>
                 <div class="form-row">
                     <div class="form-group"><label>Nombres:</label><input type="text" name="nuevo_alumno_nombres" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_nombres'] ?? ''); ?>"></div>
                     <div class="form-group"><label>Apellidos:</label><input type="text" name="nuevo_alumno_apellidos" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_apellidos'] ?? ''); ?>"></div>
@@ -548,7 +548,7 @@ mainForm.addEventListener('submit', function(event) {
     }
 
     if (!isAlumnoSelected && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
-        alert('Por favor, seleccione un alumno existente o registre uno nuevo.');
+        alert('Por favor, seleccione un cliente existente o registre uno nuevo.');
         event.preventDefault();
     }
     if (!document.getElementById('id_horario').value) {

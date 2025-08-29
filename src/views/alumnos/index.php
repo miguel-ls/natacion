@@ -19,15 +19,15 @@ require_once __DIR__ . '/../partials/header.php';
 
 <div class="container">
     <div class="page-header">
-        <h1>Gestión de Alumnos</h1>
-        <a href="index.php?url=alumnos/create" class="btn btn-primary">Añadir Nuevo Alumno</a>
+        <h1>Gestión de Clientes</h1>
+        <a href="index.php?url=alumnos/create" class="btn btn-primary">Añadir Nuevo Cliente</a>
     </div>
 
     <!-- Formulario de Búsqueda -->
     <div class="filter-container" style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
         <form action="index.php" method="GET">
             <input type="hidden" name="url" value="alumnos">
-            <label for="search">Buscar Alumno:</label>
+            <label for="search">Buscar Cliente:</label>
             <input type="text" name="search" id="search" value="<?php echo htmlspecialchars($search_term); ?>" placeholder="Nombre, apellido o documento...">
             <button type="submit" class="btn btn-primary">Buscar</button>
         </form>

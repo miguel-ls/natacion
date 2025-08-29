@@ -24,7 +24,7 @@ require_once __DIR__ . '/../partials/header.php';
     <a href="index.php?url=alumnos" class="btn btn-primary" style="margin-bottom: 1rem;">Volver a la Lista</a>
 
     <div class="details-card">
-        <h2>Detalles del Alumno</h2>
+        <h2>Detalles del Cliente</h2>
         <div class="details-grid">
             <div class="detail-item"><strong>ID:</strong> <?php echo htmlspecialchars($alumno['id_alumno']); ?></div>
             <div class="detail-item"><strong>Nombres:</strong> <?php echo htmlspecialchars($alumno['nombres']); ?></div>
@@ -58,7 +58,7 @@ require_once __DIR__ . '/../partials/header.php';
         <tbody>
             <?php if (empty($matriculas)): ?>
                 <tr>
-                    <td colspan="9">Este alumno no tiene matrículas registradas.</td>
+                    <td colspan="9">Este cliente no tiene matrículas registradas.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($matriculas as $matricula): ?>
