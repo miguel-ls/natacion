@@ -94,6 +94,43 @@ class ReporteController {
     }
 
     /**
+     * Muestra una vista previa del reporte de ventas para impresión.
+     */
+    public function ventasPreview() {
+        $this->auth->checkAuth();
+        $db = Database::getInstance()->getConnection();
+
+        // Captura de filtros del GET
+        $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
+        $fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+        $id_alumno = (int)($_GET['id_alumno'] ?? 0);
+        $id_curso = (int)($_GET['id_curso'] ?? 0);
+        $id_forma_pago = (int)($_GET['id_forma_pago'] ?? 0);
+
+        // Obtener los datos del reporte con los filtros aplicados
+        try {
+            $stmt_reporte = $db->prepare("CALL sp_reporte_ventas(?, ?, ?, ?, ?)");
+            $stmt_reporte->execute([$fecha_inicio, $fecha_fin, $id_alumno, $id_curso, $id_forma_pago]);
+            $reporte_data = $stmt_reporte->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_reporte->closeCursor();
+        } catch (PDOException $e) {
+            $_SESSION['error_message'] = "Error al generar el reporte: " . $e->getMessage();
+            $reporte_data = [];
+        }
+
+        // Pasar los filtros a la vista para que los botones de exportación los usen
+        $filters = http_build_query([
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
+            'id_alumno' => $id_alumno,
+            'id_curso' => $id_curso,
+            'id_forma_pago' => $id_forma_pago
+        ]);
+
+        require_once __DIR__ . '/../views/reportes/ventas_preview.php';
+    }
+
+    /**
      * Exporta el reporte de ventas a un archivo CSV.
      */
     public function exportarVentas() {
