@@ -6,7 +6,7 @@ require_once __DIR__ . '/../partials/header.php';
 
 <div class="container">
     <div class="page-header">
-        <h1>Marcar Asistencia de Alumno</h1>
+        <h1>Marcar Asistencia del Cliente</h1>
     </div>
 
     <?php if (isset($_SESSION['error_message'])): ?>
@@ -15,7 +15,7 @@ require_once __DIR__ . '/../partials/header.php';
 
     <?php if ($matricula): ?>
     <div class="attendance-info">
-        <p><strong>Alumno:</strong> <?php echo htmlspecialchars($matricula['alumno_nombres'] . ' ' . $matricula['alumno_apellidos']); ?></p>
+        <p><strong>Cliente:</strong> <?php echo htmlspecialchars($matricula['alumno_nombres'] . ' ' . $matricula['alumno_apellidos']); ?></p>
         <p><strong>Curso:</strong> <?php echo htmlspecialchars($matricula['curso_nombre']); ?></p>
         <p><strong>Periodo:</strong> <?php echo date('d/m/Y', strtotime($matricula['fecha_inicio'])) . ' - ' . date('d/m/Y', strtotime($matricula['fecha_fin'])); ?></p>
     </div>
