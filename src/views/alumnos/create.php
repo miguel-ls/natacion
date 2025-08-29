@@ -96,15 +96,19 @@ require_once __DIR__ . '/../partials/footer.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
     const dniInput = document.getElementById('documento_identidad');
     const dniError = document.getElementById('dni-error');
     const submitButton = document.querySelector('button[type="submit"]');
+
+    let isDniDuplicate = false;
 
     dniInput.addEventListener('blur', function() {
         const dni = this.value.trim();
         if (dni === '') {
             dniError.style.display = 'none';
             submitButton.disabled = false;
+            isDniDuplicate = false;
             return;
         }
 
@@ -115,16 +119,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     dniError.textContent = 'Este documento de identidad ya está registrado.';
                     dniError.style.display = 'block';
                     submitButton.disabled = true;
+                    isDniDuplicate = true;
                 } else {
                     dniError.style.display = 'none';
                     submitButton.disabled = false;
+                    isDniDuplicate = false;
                 }
             })
             .catch(error => {
                 console.error('Error al verificar el DNI:', error);
-                // En caso de error de red, permitir el envío para que la validación del backend actúe
                 submitButton.disabled = false;
+                isDniDuplicate = false;
             });
+    });
+
+    form.addEventListener('submit', function(event) {
+        if (isDniDuplicate) {
+            event.preventDefault();
+            alert('No se puede guardar el alumno porque el documento de identidad ya existe.');
+        }
     });
 });
 </script>
