@@ -36,6 +36,7 @@ function get_spanish_day_name($date_str) {
 .status-recuperada { color: purple; }
 .status-programada { color: blue; }
 .btn-back { display: inline-block; margin-top: 2rem; background-color: #6c757d; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; }
+.btn-secondary { background-color: #6c757d; }
 .action-select { padding: 5px; border-radius: 4px; }
 .recuperacion-form { margin-top: 1.5rem; padding: 1rem; border: 1px dashed #ccc; }
 </style>
@@ -129,6 +130,7 @@ function get_spanish_day_name($date_str) {
     </div>
 
     <a href="index.php?url=matriculas/edit&id=<?php echo $matricula['id_matricula']; ?>" class="btn btn-warning">Editar Matrícula</a>
+    <a href="index.php?url=alumnos/show&id=<?php echo $matricula['id_alumno']; ?>" class="btn btn-secondary">Volver a Alumno</a>
     <a href="index.php?url=matriculas" class="btn-back">Volver al Listado</a>
 </div>
 
