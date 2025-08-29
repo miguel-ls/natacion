@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!canvas || !rawData || rawData.length === 0) return;
 
         const labels = rawData.map(d => d[labelField]);
-        const data = rawData.map(d => d[dataField]);
+        const data = rawData.map(d => parseFloat(d[dataField]) || 0);
 
         new Chart(canvas, {
             type: 'pie',
