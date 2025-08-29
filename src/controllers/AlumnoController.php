@@ -38,19 +38,34 @@ class AlumnoController {
         require_once __DIR__ . '/../views/alumnos/create.php';
     }
 
+    private function validateDni($dni) {
+        if (empty($dni)) return true; // Permite DNI vacío, se puede hacer requerido en el frontend/BD
+        return preg_match('/^[0-9]{8}$/', $dni);
+    }
+
     /**
      * Almacena un nuevo alumno en la base de datos.
      */
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->auth->verifyCsrfToken();
+
+            $dni = $_POST['documento_identidad'];
+            if (!$this->validateDni($dni)) {
+                $_SESSION['error_message'] = "El Documento de Identidad debe tener 8 dígitos numéricos.";
+                // Guardar los datos del post en la sesión para repoblar el formulario
+                $_SESSION['form_data'] = $_POST;
+                header('Location: index.php?url=alumnos/create');
+                exit;
+            }
+
             $db = Database::getInstance()->getConnection();
             try {
                 $stmt = $db->prepare("CALL sp_create_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $_POST['nombres'],
                     $_POST['apellidos'],
-                    $_POST['documento_identidad'],
+                    $dni,
                     $_POST['fecha_nacimiento'],
                     $_POST['grupo_sanguineo'],
                     $_POST['direccion'],
@@ -59,11 +74,13 @@ class AlumnoController {
                     $_POST['nombre_padre_tutor'],
                     $_POST['telefono_emergencia']
                 ]);
+                unset($_SESSION['form_data']); // Limpiar datos del formulario en éxito
                 header('Location: index.php?url=alumnos');
                 exit;
             } catch (PDOException $e) {
                 // Manejar error, quizás con un mensaje en la sesión
                 $_SESSION['error_message'] = "Error al crear el alumno: " . $e->getMessage();
+                $_SESSION['form_data'] = $_POST;
                 header('Location: index.php?url=alumnos/create');
                 exit;
             }
@@ -109,6 +126,13 @@ class AlumnoController {
                 exit;
             }
 
+            $dni = $_POST['documento_identidad'];
+            if (!$this->validateDni($dni)) {
+                $_SESSION['error_message'] = "El Documento de Identidad debe tener 8 dígitos numéricos.";
+                header('Location: index.php?url=alumnos/edit&id=' . $id);
+                exit;
+            }
+
             $db = Database::getInstance()->getConnection();
             try {
                 $stmt = $db->prepare("CALL sp_update_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -116,7 +140,7 @@ class AlumnoController {
                     $id,
                     $_POST['nombres'],
                     $_POST['apellidos'],
-                    $_POST['documento_identidad'],
+                    $dni,
                     $_POST['fecha_nacimiento'],
                     $_POST['grupo_sanguineo'],
                     $_POST['direccion'],
@@ -216,6 +240,7 @@ class AlumnoController {
     public function checkDni() {
         header('Content-Type: application/json');
         $dni = $_GET['dni'] ?? '';
+        $id = $_GET['id'] ?? null; // ID del alumno que se está editando
 
         if (empty($dni)) {
             echo json_encode(['exists' => false]);
@@ -224,8 +249,8 @@ class AlumnoController {
 
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_check_alumno_by_dni(?)");
-            $stmt->execute([$dni]);
+            $stmt = $db->prepare("CALL sp_check_alumno_by_dni(?, ?)");
+            $stmt->execute([$dni, $id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $stmt->closeCursor();
 
@@ -234,7 +259,7 @@ class AlumnoController {
             // En caso de error, asumimos que no existe para no bloquear al usuario,
             // pero registramos el error para depuración.
             error_log("Error en checkDni: " . $e->getMessage());
-            echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
+            echo json_encode(['exists' => false, 'error' => 'Error al verificar DNI.']);
         }
         exit;
     }
