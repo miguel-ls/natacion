@@ -6,7 +6,7 @@ require_once __DIR__ . '/../partials/header.php';
 
 <div class="container">
     <div class="page-header">
-        <h1>Control de Asistencia de Alumnos</h1>
+        <h1>Control de Asistencia de Clientes</h1>
     </div>
 
     <?php if (isset($_SESSION['error_message'])): ?>
@@ -18,7 +18,7 @@ require_once __DIR__ . '/../partials/header.php';
         <input type="hidden" name="url" value="asistencias_alumnos">
 
         <div class="form-group">
-            <label for="id_alumno">Alumno:</label>
+            <label for="id_alumno">Cliente:</label>
             <select name="id_alumno" id="id_alumno" class="form-control">
                 <option value="0">Todos</option>
                 <?php foreach ($alumnos as $alumno): ?>
