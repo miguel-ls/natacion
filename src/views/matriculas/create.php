@@ -2,6 +2,10 @@
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 $auth = new AuthController();
+
+// Repoblar datos del formulario si existen en la sesión
+$form_data = $_SESSION['form_data'] ?? [];
+unset($_SESSION['form_data']);
 ?>
 
 <style>
@@ -47,29 +51,29 @@ $auth = new AuthController();
             <h4>1. Seleccionar o Registrar Alumno</h4>
             <div class="form-group search-container">
                 <label for="alumno_search">Buscar Alumno Existente</label>
-                <input type="text" id="alumno_search" class="form-control" placeholder="Escriba nombre, apellido o documento..." autocomplete="off">
-                <input type="hidden" id="id_alumno" name="id_alumno">
+                <input type="text" id="alumno_search" class="form-control" placeholder="Escriba nombre, apellido o documento..." value="<?php echo htmlspecialchars($form_data['alumno_search'] ?? ''); ?>" autocomplete="off">
+                <input type="hidden" id="id_alumno" name="id_alumno" value="<?php echo htmlspecialchars($form_data['id_alumno'] ?? ''); ?>">
                 <div id="alumno-search-results" class="search-results"></div>
                 <small>Si el alumno no existe, regístrelo a continuación.</small>
             </div>
 
             <button type="button" id="btn-show-nuevo-alumno" class="btn btn-secondary">Registrar Nuevo Alumno</button>
 
-            <div id="nuevo-alumno-form">
+            <div id="nuevo-alumno-form" style="<?php echo !empty($form_data['nuevo_alumno_nombres']) ? 'display:block;' : 'display:none;'; ?>">
                 <h5>Datos del Nuevo Alumno (Esenciales)</h5>
                 <div class="form-row">
-                    <div class="form-group"><label>Nombres:</label><input type="text" name="nuevo_alumno_nombres"></div>
-                    <div class="form-group"><label>Apellidos:</label><input type="text" name="nuevo_alumno_apellidos"></div>
+                    <div class="form-group"><label>Nombres:</label><input type="text" name="nuevo_alumno_nombres" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_nombres'] ?? ''); ?>"></div>
+                    <div class="form-group"><label>Apellidos:</label><input type="text" name="nuevo_alumno_apellidos" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_apellidos'] ?? ''); ?>"></div>
                 </div>
                  <div class="form-row">
                     <div class="form-group">
                         <label>Documento:</label>
-                        <input type="text" name="nuevo_alumno_documento">
+                        <input type="text" name="nuevo_alumno_documento" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_documento'] ?? ''); ?>">
                         <div class="error-text" id="nuevo-dni-error" style="display: none;"></div>
                     </div>
-                    <div class="form-group"><label>Teléfono:</label><input type="text" name="nuevo_alumno_telefono"></div>
+                    <div class="form-group"><label>Teléfono:</label><input type="text" name="nuevo_alumno_telefono" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_telefono'] ?? ''); ?>"></div>
                 </div>
-                 <div class="form-group"><label>Email:</label><input type="email" name="nuevo_alumno_email"></div>
+                 <div class="form-group"><label>Email:</label><input type="email" name="nuevo_alumno_email" value="<?php echo htmlspecialchars($form_data['nuevo_alumno_email'] ?? ''); ?>"></div>
             </div>
         </div>
 
@@ -77,8 +81,8 @@ $auth = new AuthController();
             <h4>2. Seleccionar Curso y Horario</h4>
             <div class="form-group search-container">
                 <label for="curso_search">Buscar Curso</label>
-                <input type="text" id="curso_search" class="form-control" placeholder="Escriba el nombre del curso..." autocomplete="off" required>
-                <input type="hidden" id="id_curso" name="id_curso" required>
+                <input type="text" id="curso_search" class="form-control" placeholder="Escriba el nombre del curso..." value="<?php echo htmlspecialchars($form_data['curso_search'] ?? ''); ?>" autocomplete="off" required>
+                <input type="hidden" id="id_curso" name="id_curso" value="<?php echo htmlspecialchars($form_data['id_curso'] ?? ''); ?>" required>
                 <div id="curso-search-results" class="search-results"></div>
             </div>
 
@@ -88,17 +92,19 @@ $auth = new AuthController();
                     <select id="filtro_profesor">
                         <option value="0">Todos</option>
                         <?php foreach ($profesores as $profesor): ?>
-                            <option value="<?php echo htmlspecialchars($profesor['id_profesor']); ?>"><?php echo htmlspecialchars($profesor['nombres'] . ' ' . $profesor['apellidos']); ?></option>
+                            <option value="<?php echo htmlspecialchars($profesor['id_profesor']); ?>" <?php echo (isset($form_data['filtro_profesor']) && $form_data['filtro_profesor'] == $profesor['id_profesor']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($profesor['nombres'] . ' ' . $profesor['apellidos']); ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="filtro_hora_inicio">Desde las:</label>
-                    <input type="time" id="filtro_hora_inicio">
+                    <input type="time" id="filtro_hora_inicio" value="<?php echo htmlspecialchars($form_data['filtro_hora_inicio'] ?? ''); ?>">
                 </div>
                 <div class="form-group">
                     <label for="filtro_hora_fin">Hasta las:</label>
-                    <input type="time" id="filtro_hora_fin">
+                    <input type="time" id="filtro_hora_fin" value="<?php echo htmlspecialchars($form_data['filtro_hora_fin'] ?? ''); ?>">
                 </div>
                 <button type="button" id="btn-filtrar-horarios" class="btn btn-primary">Filtrar Horarios</button>
             </div>
@@ -106,9 +112,9 @@ $auth = new AuthController();
             <div id="horarios-disponibles-container">
                 <p>Por favor, seleccione un curso.</p>
             </div>
-            <input type="hidden" id="id_horario" name="id_horario" required>
-            <input type="hidden" id="dias_semana_hidden" name="dias_semana_hidden">
-            <input type="hidden" id="precio_base" name="precio_base">
+            <input type="hidden" id="id_horario" name="id_horario" value="<?php echo htmlspecialchars($form_data['id_horario'] ?? ''); ?>" required>
+            <input type="hidden" id="dias_semana_hidden" name="dias_semana_hidden" value="<?php echo htmlspecialchars($form_data['dias_semana_hidden'] ?? ''); ?>">
+            <input type="hidden" id="precio_base" name="precio_base" value="<?php echo htmlspecialchars($form_data['precio_base'] ?? ''); ?>">
         </div>
 
         <div class="form-section">
@@ -116,21 +122,21 @@ $auth = new AuthController();
             <div class="form-row">
                 <div class="form-group">
                     <label for="fecha_inicio">Fecha de Inicio</label>
-                    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" value="<?php echo htmlspecialchars($form_data['fecha_inicio'] ?? ''); ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="fecha_fin">Fecha de Fin</label>
-                    <input type="date" id="fecha_fin" name="fecha_fin" required>
+                    <input type="date" id="fecha_fin" name="fecha_fin" value="<?php echo htmlspecialchars($form_data['fecha_fin'] ?? ''); ?>" required>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="descuento">Descuento (S/)</label>
-                    <input type="number" id="descuento" name="descuento" step="0.01" value="0">
+                    <input type="number" id="descuento" name="descuento" step="0.01" value="<?php echo htmlspecialchars($form_data['descuento'] ?? '0'); ?>">
                 </div>
                  <div class="form-group">
                     <label for="precio_final">Precio Final (S/)</label>
-                    <input type="number" id="precio_final" name="precio_final" step="0.01" required>
+                    <input type="number" id="precio_final" name="precio_final" step="0.01" value="<?php echo htmlspecialchars($form_data['precio_final'] ?? ''); ?>" required>
                 </div>
             </div>
             <div class="form-row">
@@ -139,14 +145,16 @@ $auth = new AuthController();
                     <select id="id_forma_pago" name="id_forma_pago" required>
                         <option value="">Seleccione una forma de pago</option>
                          <?php foreach ($formas_pago as $forma): ?>
-                            <option value="<?php echo htmlspecialchars($forma['id_forma_pago']); ?>"><?php echo htmlspecialchars($forma['nombre']); ?></option>
+                            <option value="<?php echo htmlspecialchars($forma['id_forma_pago']); ?>" <?php echo (isset($form_data['id_forma_pago']) && $form_data['id_forma_pago'] == $forma['id_forma_pago']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($forma['nombre']); ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
             </div>
              <div class="form-group">
                 <label for="observaciones">Observaciones</label>
-                <textarea id="observaciones" name="observaciones" rows="3"></textarea>
+                <textarea id="observaciones" name="observaciones" rows="3"><?php echo htmlspecialchars($form_data['observaciones'] ?? ''); ?></textarea>
             </div>
         </div>
 
@@ -427,13 +435,33 @@ const mainForm = document.getElementById('form-matricula');
 const submitButton = document.querySelector('#form-matricula button[type="submit"]');
 
 let isNuevoDniDuplicate = false;
+let isNuevoDniInvalid = false;
 
-nuevoDniInput.addEventListener('blur', function() {
-    const dni = this.value.trim();
+function validateNuevoDniFormat() {
+    const dni = nuevoDniInput.value.trim();
     if (dni === '') {
         nuevoDniError.style.display = 'none';
-        submitButton.disabled = false;
+        isNuevoDniInvalid = false;
+        updateSubmitButtonState();
+        return;
+    }
+
+    if (!/^[0-9]{8}$/.test(dni)) {
+        nuevoDniError.textContent = 'El DNI debe contener 8 dígitos numéricos.';
+        nuevoDniError.style.display = 'block';
+        isNuevoDniInvalid = true;
+    } else {
+        nuevoDniError.style.display = 'none';
+        isNuevoDniInvalid = false;
+    }
+    updateSubmitButtonState();
+}
+
+function checkNuevoDniDuplication() {
+    const dni = nuevoDniInput.value.trim();
+    if (isNuevoDniInvalid || dni === '') {
         isNuevoDniDuplicate = false;
+        updateSubmitButtonState();
         return;
     }
 
@@ -443,25 +471,75 @@ nuevoDniInput.addEventListener('blur', function() {
             if (data.exists) {
                 nuevoDniError.textContent = 'Este documento ya está registrado.';
                 nuevoDniError.style.display = 'block';
-                submitButton.disabled = true;
                 isNuevoDniDuplicate = true;
             } else {
-                nuevoDniError.style.display = 'none';
-                submitButton.disabled = false;
+                if (!isNuevoDniInvalid) {
+                    nuevoDniError.style.display = 'none';
+                }
                 isNuevoDniDuplicate = false;
             }
+            updateSubmitButtonState();
         })
         .catch(error => {
             console.error('Error al verificar el DNI:', error);
-            submitButton.disabled = false;
             isNuevoDniDuplicate = false;
+            updateSubmitButtonState();
         });
-});
+}
+
+function updateSubmitButtonState() {
+    const isAlumnoSelected = !!document.getElementById('id_alumno').value;
+    const isNuevoAlumnoFormVisible = document.getElementById('nuevo-alumno-form').style.display === 'block';
+
+    // Si hay un alumno existente seleccionado, la validación del DNI del nuevo alumno no debe bloquear el submit.
+    if (isAlumnoSelected) {
+        submitButton.disabled = false;
+        return;
+    }
+
+    // Si el formulario de nuevo alumno no es visible, tampoco debe bloquear.
+    if (!isNuevoAlumnoFormVisible) {
+        submitButton.disabled = false;
+        return;
+    }
+
+    submitButton.disabled = isNuevoDniDuplicate || isNuevoDniInvalid;
+}
+
+
+// Event listeners for DNI validation
+nuevoDniInput.addEventListener('input', validateNuevoDniFormat);
+nuevoDniInput.addEventListener('blur', checkNuevoDniDuplication);
+
 
 mainForm.addEventListener('submit', function(event) {
-    if (isNuevoDniDuplicate) {
+    const isAlumnoSelected = !!document.getElementById('id_alumno').value;
+    const isNuevoAlumnoFormVisible = document.getElementById('nuevo-alumno-form').style.display === 'block';
+
+    // Solo validar DNI del nuevo alumno si no hay un alumno existente seleccionado Y el form de nuevo alumno está visible
+    if (!isAlumnoSelected && isNuevoAlumnoFormVisible) {
+        validateNuevoDniFormat(); // Re-validar formato
+
+        if (isNuevoDniInvalid) {
+            event.preventDefault();
+            alert('Por favor, corrija los errores en el formulario antes de guardar.\nEl DNI del nuevo alumno debe tener 8 dígitos numéricos.');
+            return; // Detener aquí
+        }
+        if (isNuevoDniDuplicate) {
+            event.preventDefault();
+            alert('No se puede registrar la matrícula porque el documento del nuevo alumno ya existe.');
+            return; // Detener aquí
+        }
+    }
+
+
+    if (!document.getElementById('id_alumno').value && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
+        alert('Por favor, seleccione un alumno existente o registre uno nuevo.');
         event.preventDefault();
-        alert('No se puede registrar la matrícula porque el documento del nuevo alumno ya existe.');
+    }
+    if (!document.getElementById('id_horario').value) {
+        alert('Por favor, seleccione un horario disponible.');
+        event.preventDefault();
     }
 });
 </script>
