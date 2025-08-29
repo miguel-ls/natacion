@@ -292,6 +292,11 @@ class MatriculaController {
         exit;
     }
 
+    private function validateDni($dni) {
+        if (empty($dni)) return true; // Permite DNI vacío
+        return preg_match('/^[0-9]{8}$/', $dni);
+    }
+
     /**
      * Almacena la nueva matrícula y genera los días de clase.
      */
@@ -299,6 +304,32 @@ class MatriculaController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->auth->verifyCsrfToken();
             $db = Database::getInstance()->getConnection();
+
+            // Validar DNI de nuevo alumno si se proporciona
+            if (empty($_POST['id_alumno']) && !empty($_POST['nuevo_alumno_nombres'])) {
+                $dni = $_POST['nuevo_alumno_documento'];
+
+                if (!$this->validateDni($dni)) {
+                    $_SESSION['error_message'] = "El Documento de Identidad del nuevo alumno debe tener 8 dígitos numéricos.";
+                    $_SESSION['form_data'] = $_POST;
+                    header('Location: index.php?url=matriculas/create');
+                    exit;
+                }
+
+                // Verificar duplicado
+                $stmt_check_dni = $db->prepare("CALL sp_check_alumno_by_dni(?, NULL)");
+                $stmt_check_dni->execute([$dni]);
+                $result = $stmt_check_dni->fetch(PDO::FETCH_ASSOC);
+                $stmt_check_dni->closeCursor();
+
+                if ($result['count'] > 0) {
+                    $_SESSION['error_message'] = "El Documento de Identidad del nuevo alumno ya está registrado.";
+                    $_SESSION['form_data'] = $_POST;
+                    header('Location: index.php?url=matriculas/create');
+                    exit;
+                }
+            }
+
             $db->beginTransaction();
 
             try {
