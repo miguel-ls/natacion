@@ -76,7 +76,7 @@ switch ($route) {
             case 'update': $alumnoController->update(); break;
             case 'delete': $alumnoController->delete(); break;
             case 'search': $alumnoController->search(); break;
-            case 'show': $alumnoController->show(); break;
+            case 'checkDni': $alumnoController->checkDni(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Alumnos</h1>"; break;
         }
         break;

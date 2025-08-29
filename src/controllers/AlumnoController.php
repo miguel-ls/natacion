@@ -209,5 +209,34 @@ class AlumnoController {
         }
         exit;
     }
+
+    /**
+     * Verifica si un DNI ya existe (para AJAX).
+     */
+    public function checkDni() {
+        header('Content-Type: application/json');
+        $dni = $_GET['dni'] ?? '';
+
+        if (empty($dni)) {
+            echo json_encode(['exists' => false]);
+            exit;
+        }
+
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_check_alumno_by_dni(?)");
+            $stmt->execute([$dni]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+
+            echo json_encode(['exists' => ($result['count'] > 0)]);
+        } catch (PDOException $e) {
+            // En caso de error, asumimos que no existe para no bloquear al usuario,
+            // pero registramos el error para depuración.
+            error_log("Error en checkDni: " . $e->getMessage());
+            echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
+        }
+        exit;
+    }
 }
 ?>
