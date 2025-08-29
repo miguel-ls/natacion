@@ -78,6 +78,7 @@ require_once __DIR__ . '/../partials/header.php';
                 <th>Fecha Matrícula</th>
                 <th>Alumno</th>
                 <th>Curso</th>
+                <th>Forma de Pago</th>
                 <th>Fecha Inicio</th>
                 <th>Fecha Fin</th>
                 <th>Precio Original</th>
@@ -93,7 +94,7 @@ require_once __DIR__ . '/../partials/header.php';
             if (empty($reporte_data)):
             ?>
                 <tr>
-                    <td colspan="8">No se encontraron resultados para los filtros seleccionados.</td>
+                    <td colspan="9">No se encontraron resultados para los filtros seleccionados.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($reporte_data as $row):
@@ -105,6 +106,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($row['fecha_matricula']))); ?></td>
                         <td><?php echo htmlspecialchars($row['alumno_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($row['curso_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($row['forma_pago_nombre'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($row['fecha_inicio']))); ?></td>
                         <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($row['fecha_fin']))); ?></td>
                         <td>S/ <?php echo htmlspecialchars(number_format($row['precio_base'], 2)); ?></td>
@@ -116,7 +118,7 @@ require_once __DIR__ . '/../partials/header.php';
         </tbody>
         <tfoot>
             <tr class="total-row">
-                <td colspan="5" style="text-align: right;"><strong>Totales:</strong></td>
+                <td colspan="6" style="text-align: right;"><strong>Totales:</strong></td>
                 <td><strong>S/ <?php echo htmlspecialchars(number_format($total_base, 2)); ?></strong></td>
                 <td><strong>S/ <?php echo htmlspecialchars(number_format($total_descuentos, 2)); ?></strong></td>
                 <td><strong>S/ <?php echo htmlspecialchars(number_format($total_ventas, 2)); ?></strong></td>
