@@ -63,7 +63,7 @@ $auth = new AuthController();
                     <option value="">Seleccione una sub area</option>
                     <?php foreach ($carriles as $carril): ?>
                         <option value="<?php echo htmlspecialchars($carril['id_carril']); ?>" <?php echo (isset($form_data['id_carril']) && $form_data['id_carril'] == $carril['id_carril']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($carril['piscina_nombre'] . ' - Sub Area ' . $carril['numero_carril']); ?>
+                            <?php echo htmlspecialchars($carril['display_nombre']); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
