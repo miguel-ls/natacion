@@ -18,12 +18,15 @@ class MatriculaController {
         $db = Database::getInstance()->getConnection();
 
         // Valores por defecto para los filtros
+        $fecha_desde = !empty($_GET['fecha_inicio_desde']) ? $_GET['fecha_inicio_desde'] : null;
+        $fecha_hasta = !empty($_GET['fecha_inicio_hasta']) ? $_GET['fecha_inicio_hasta'] : null;
+
         $filters = [
             'id_alumno' => $_GET['id_alumno'] ?? 0,
             'id_curso' => $_GET['id_curso'] ?? 0,
             'id_tipo_curso' => $_GET['id_tipo_curso'] ?? 0,
-            'fecha_inicio_desde' => $_GET['fecha_inicio_desde'] ?? null,
-            'fecha_inicio_hasta' => $_GET['fecha_inicio_hasta'] ?? null,
+            'fecha_inicio_desde' => $fecha_desde,
+            'fecha_inicio_hasta' => $fecha_hasta,
             'estado' => $_GET['estado'] ?? 'Todos',
             'alumno_nombre' => '', // Nuevo
             'curso_nombre' => ''  // Nuevo
