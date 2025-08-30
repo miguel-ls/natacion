@@ -16,8 +16,33 @@ class MatriculaMultipleController {
      */
     public function index() {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("CALL sp_get_all_matricula_grupos()");
-        $stmt->execute();
+
+        // Filtros
+        $filters = [
+            'id_alumno' => $_GET['id_alumno'] ?? 0,
+            'fecha_desde' => !empty($_GET['fecha_desde']) ? $_GET['fecha_desde'] : null,
+            'fecha_hasta' => !empty($_GET['fecha_hasta']) ? $_GET['fecha_hasta'] : null,
+            'alumno_nombre' => ''
+        ];
+
+        // Cargar nombre del alumno si se ha filtrado por uno
+        if ($filters['id_alumno'] != 0) {
+            $stmt_alumno = $db->prepare("CALL sp_get_alumno_by_id(?)");
+            $stmt_alumno->execute([$filters['id_alumno']]);
+            $alumno_data = $stmt_alumno->fetch(PDO::FETCH_ASSOC);
+            if ($alumno_data) {
+                $filters['alumno_nombre'] = $alumno_data['nombres'] . ' ' . $alumno_data['apellidos'];
+            }
+            $stmt_alumno->closeCursor();
+        }
+
+        // Cargar los grupos de matrícula con filtros
+        $stmt = $db->prepare("CALL sp_get_all_matricula_grupos(?, ?, ?)");
+        $stmt->execute([
+            $filters['id_alumno'],
+            $filters['fecha_desde'],
+            $filters['fecha_hasta']
+        ]);
         $grupos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $stmt->closeCursor();
 
