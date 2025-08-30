@@ -3,8 +3,8 @@ require_once __DIR__ . '/../partials/header.php';
 ?>
 
 <div class="container">
-    <h2>Gestión de Tipos de Profesor</h2>
-    <p>Aquí puede gestionar los tipos de profesor.</p>
+    <h2>Gestión de Tipos de Curso</h2>
+    <p>Aquí puede gestionar los tipos de curso.</p>
     <a href="index.php?url=tipos_profesor/create" class="btn btn-success mb-3">Añadir Nuevo Tipo</a>
 
     <?php
@@ -25,7 +25,7 @@ require_once __DIR__ . '/../partials/header.php';
         <tbody>
             <?php if (empty($items)): ?>
                 <tr>
-                    <td colspan="3" class="text-center">No se encontraron tipos de profesor.</td>
+                    <td colspan="3" class="text-center">No se encontraron tipos de curso.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($items as $item): ?>
@@ -34,7 +34,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($item['descripcion']); ?></td>
                         <td>
                             <a href="index.php?url=tipos_profesor/edit&id=<?php echo $item['id']; ?>" class="btn btn-primary btn-sm">Editar</a>
-                            <a href="index.php?url=tipos_profesor/delete&id=<?php echo $item['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de que desea eliminar este tipo de profesor?');">Eliminar</a>
+                            <a href="index.php?url=tipos_profesor/delete&id=<?php echo $item['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de que desea eliminar este tipo de curso?');">Eliminar</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

@@ -47,7 +47,7 @@ require_once __DIR__ . '/../partials/header.php';
                 <th>ID</th>
                 <th>Nombres</th>
                 <th>Apellidos</th>
-                <th>Tipo de Profesor</th>
+                <th>Tipo de Curso</th>
                 <th>Email</th>
                 <th>Teléfono</th>
                 <th>Estado</th>
