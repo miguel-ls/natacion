@@ -12,7 +12,7 @@ CREATE PROCEDURE `sp_find_free_lanes`(
 BEGIN
     SELECT
         ca.id_carril,
-        ca.descripcion AS sub_area_nombre,
+        CONCAT(ca.descripcion, ' ', ca.numero_carril) AS sub_area_nombre,
         pi.nombre AS area_nombre
     FROM
         carriles ca
