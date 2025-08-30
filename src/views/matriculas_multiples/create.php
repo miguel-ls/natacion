@@ -107,7 +107,29 @@ $auth = new AuthController();
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="filtro_fecha_inicio">Fecha Inicial</label>
+                    <label for="filtro_id_curso">Curso</label>
+                    <select id="filtro_id_curso" name="id_curso" required>
+                        <option value="">Seleccione un curso...</option>
+                        <?php foreach ($cursos as $curso): ?>
+                            <option value="<?php echo htmlspecialchars($curso['id_curso']); ?>">
+                                <?php echo htmlspecialchars($curso['nombre']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filtro_id_profesor">Profesor</label>
+                    <select id="filtro_id_profesor" name="id_profesor" required>
+                        <option value="">Seleccione un profesor...</option>
+                        <?php foreach ($profesores as $profesor): ?>
+                            <option value="<?php echo htmlspecialchars($profesor['id_profesor']); ?>">
+                                <?php echo htmlspecialchars($profesor['nombres'] . ' ' . $profesor['apellidos']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filtro_fecha_inicio">Fecha de Reserva</label>
                     <input type="date" id="filtro_fecha_inicio" name="filtro_fecha_inicio">
                 </div>
                 <div class="form-group">
@@ -184,25 +206,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Lógica para el botón de filtrar
     document.getElementById('btn-filtrar-areas').addEventListener('click', function() {
         const id_tipo_area = document.getElementById('filtro_tipo_area').value;
-        const fecha_inicio = document.getElementById('filtro_fecha_inicio').value;
-        const fecha_fin = document.getElementById('filtro_fecha_fin').value;
-        const hora_inicio = document.getElementById('filtro_hora_inicio').value;
-        const hora_fin = document.getElementById('filtro_hora_fin').value;
+        const filtro_fecha_inicio = document.getElementById('filtro_fecha_inicio').value;
+        const filtro_fecha_fin = document.getElementById('filtro_fecha_fin').value;
+        const filtro_hora_inicio = document.getElementById('filtro_hora_inicio').value;
+        const filtro_hora_fin = document.getElementById('filtro_hora_fin').value;
         const container = document.getElementById('available-areas-container');
 
-        if (!fecha_inicio || !fecha_fin || !hora_inicio || !hora_fin) {
+        if (!filtro_fecha_inicio || !filtro_fecha_fin || !filtro_hora_inicio || !filtro_hora_fin) {
             alert('Por favor, complete todos los filtros de fecha y hora.');
             return;
         }
 
-        container.innerHTML = '<p>Buscando horarios disponibles...</p>';
+        container.innerHTML = '<p>Buscando carriles libres...</p>';
 
         const queryParams = new URLSearchParams({
             id_tipo_area,
-            fecha_inicio,
-            fecha_fin,
-            hora_inicio,
-            hora_fin
+            filtro_fecha_inicio,
+            filtro_fecha_fin,
+            filtro_hora_inicio,
+            filtro_hora_fin
         });
 
         fetch(`index.php?url=matricula_multiple/getAvailableAreas&${queryParams}`)
@@ -214,22 +236,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 if (data.length === 0) {
-                    container.innerHTML = '<p>No se encontraron áreas disponibles con los criterios seleccionados.</p>';
+                    container.innerHTML = '<p>No se encontraron áreas/carriles libres con los criterios seleccionados.</p>';
                     return;
                 }
 
-                data.forEach(area => {
+                data.forEach(lane => {
                     const card = document.createElement('div');
                     card.className = 'area-card';
-                    card.dataset.scheduleId = area.id_horario;
+                    card.dataset.laneId = lane.id_carril; // Usar data-lane-id
                     card.innerHTML = `
-                        <strong>Curso:</strong> ${area.curso_nombre}<br>
-                        <strong>Área:</strong> ${area.area_nombre} - ${area.sub_area_nombre}<br>
-                        <strong>Profesor:</strong> ${area.profesor_nombre}<br>
-                        <strong>Horario:</strong> ${area.hora_inicio} - ${area.hora_fin}<br>
-                        <strong>Días:</strong> ${area.tipo_horario_nombre}<br>
-                        <strong>Periodo del Horario:</strong> ${area.horario_fecha_inicio} al ${area.horario_fecha_fin}<br>
-                        <strong>Vacantes:</strong> ${area.vacantes_disponibles}
+                        <strong>Área:</strong> ${lane.area_nombre}<br>
+                        <strong>Sub-Área/Carril:</strong> ${lane.sub_area_nombre}<br>
+                        <span style="color: green; font-weight: bold;">¡Disponible!</span>
                     `;
                     container.appendChild(card);
                 });
@@ -249,18 +267,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const card = e.target.closest('.area-card');
         if (!card) return;
 
-        const scheduleId = card.dataset.scheduleId;
-        if (!scheduleId) return;
+        const laneId = card.dataset.laneId; // Cambiado a laneId
+        if (!laneId) return;
 
         if (card.classList.contains('selected')) {
             card.classList.remove('selected');
-            selectedIds = selectedIds.filter(id => id !== scheduleId);
+            selectedIds = selectedIds.filter(id => id !== laneId);
         } else {
             card.classList.add('selected');
-            selectedIds.push(scheduleId);
+            selectedIds.push(laneId);
         }
 
-        selectedSchedulesInput.value = JSON.stringify(selectedIds);
+        selectedSchedulesInput.value = JSON.stringify(selectedIds); // Ahora contiene IDs de carril
     });
 
     // Validación del formulario
