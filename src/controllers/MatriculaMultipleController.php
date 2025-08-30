@@ -12,9 +12,22 @@ class MatriculaMultipleController {
     }
 
     /**
-     * Muestra la página principal de Matrícula Múltiple.
+     * Muestra la lista de grupos de matrículas múltiples.
      */
     public function index() {
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("CALL sp_get_all_matricula_grupos()");
+        $stmt->execute();
+        $grupos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+
+        require_once __DIR__ . '/../views/matriculas_multiples/index.php';
+    }
+
+    /**
+     * Muestra el formulario para crear una nueva matrícula múltiple.
+     */
+    public function create() {
         $db = Database::getInstance()->getConnection();
 
         // Cargar tipos de área para el filtro
@@ -29,9 +42,9 @@ class MatriculaMultipleController {
         $tipos_documento = $stmt_tipos_documento->fetchAll(PDO::FETCH_ASSOC);
         $stmt_tipos_documento->closeCursor();
 
-
-        require_once __DIR__ . '/../views/matriculas_multiples/index.php';
+        require_once __DIR__ . '/../views/matriculas_multiples/create.php';
     }
+
 
     /**
      * Manejador AJAX para obtener áreas/sub-áreas disponibles según filtros.
@@ -114,18 +127,23 @@ class MatriculaMultipleController {
                  throw new Exception("No se ha seleccionado ningún horario.");
             }
 
-            // Llamar al nuevo stored procedure
-            $stmt = $db->prepare("CALL sp_create_matricula_multiple(?, ?, ?)");
+            // 1. Crear el grupo de matrícula
+            $stmt_grupo = $db->prepare("INSERT INTO matricula_grupos (id_alumno) VALUES (?)");
+            $stmt_grupo->execute([$id_alumno]);
+            $id_grupo_matricula = $db->lastInsertId();
+
+            // 2. Llamar al stored procedure que crea las matrículas individuales
+            $stmt = $db->prepare("CALL sp_create_matricula_multiple(?, ?, ?, ?)");
             $stmt->execute([
                 $id_alumno,
                 $_SESSION['user_id'],
-                $selected_schedules_json
+                $selected_schedules_json,
+                $id_grupo_matricula
             ]);
 
             $db->commit();
-            // Idealmente, redirigir a una página de éxito o a la ficha del cliente.
-            // Por ahora, redirigimos a la lista de matrículas.
-            header('Location: index.php?url=matriculas');
+            // Redirigir a la lista de grupos de matrícula
+            header('Location: index.php?url=matricula_multiple');
             exit;
 
         } catch (Exception $e) {
@@ -133,9 +151,32 @@ class MatriculaMultipleController {
             // Guardar el error y los datos del formulario en la sesión para repoblar
             $_SESSION['error_message'] = "Error al crear la matrícula múltiple: " . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
+            header('Location: index.php?url=matricula_multiple/create');
+            exit;
+        }
+    }
+
+    /**
+     * Muestra los detalles de un grupo de matrícula.
+     */
+    public function show() {
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
             header('Location: index.php?url=matricula_multiple');
             exit;
         }
+
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("CALL sp_get_matricula_grupo_details(?)");
+        $stmt->execute([$id]);
+
+        $grupo = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->nextRowset(); // Moverse al siguiente conjunto de resultados
+        $matriculas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt->closeCursor();
+
+        require_once __DIR__ . '/../views/matriculas_multiples/show.php';
     }
 }
 ?>
