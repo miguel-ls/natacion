@@ -52,7 +52,7 @@ BEGIN
 END$$
 
 -- Recrear `sp_get_all_carriles` con el nuevo campo
-CREATE PROCEDURE `sp_get_all_carriles`()
+CREATE PROCEDURE `sp_get_all_carriles`(IN p_search_term VARCHAR(255))
 BEGIN
     SELECT
         c.id_carril,
@@ -63,6 +63,10 @@ BEGIN
         c.capacidad_maxima
     FROM carriles c
     JOIN piscinas p ON c.id_piscina = p.id_piscina
+    WHERE p_search_term = ''
+       OR p.nombre LIKE CONCAT('%', p_search_term, '%')
+       OR c.numero_carril LIKE CONCAT('%', p_search_term, '%')
+       OR c.descripcion LIKE CONCAT('%', p_search_term, '%')
     ORDER BY p.nombre, c.numero_carril;
 END$$
 
