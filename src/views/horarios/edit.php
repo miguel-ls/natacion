@@ -58,11 +58,11 @@ $auth = new AuthController();
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label for="id_carril">Piscina y Carril</label>
+                <label for="id_carril">Area y Sub Area</label>
                 <select id="id_carril" name="id_carril" required>
                     <?php foreach ($carriles as $carril): ?>
                         <option value="<?php echo htmlspecialchars($carril['id_carril']); ?>" <?php echo ($form_data['id_carril'] == $carril['id_carril']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($carril['piscina_nombre'] . ' - Carril ' . $carril['numero_carril']); ?>
+                            <?php echo htmlspecialchars($carril['piscina_nombre'] . ' - Sub Area ' . $carril['numero_carril']); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
