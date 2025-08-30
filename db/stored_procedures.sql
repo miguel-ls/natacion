@@ -162,13 +162,23 @@ END$$
 -- Obtener todos los profesores
 CREATE PROCEDURE `sp_get_all_profesores`(IN p_search_term VARCHAR(255))
 BEGIN
-    SELECT id_profesor, nombres, apellidos, documento_identidad, telefono, email, direccion, fecha_contratacion, estado
-    FROM profesores
+    SELECT
+        p.id_profesor,
+        p.nombres,
+        p.apellidos,
+        tp.descripcion as tipo_profesor_nombre,
+        p.documento_identidad,
+        p.telefono,
+        p.email,
+        p.direccion,
+        p.fecha_contratacion,
+        p.estado
+    FROM profesores p
+    LEFT JOIN tipos_profesor tp ON p.id_tipo_profesor = tp.id
     WHERE p_search_term = ''
-       OR nombres LIKE CONCAT('%', p_search_term, '%')
-       OR apellidos LIKE CONCAT('%', p_search_term, '%')
-       OR documento_identidad LIKE CONCAT('%', p_search_term, '%')
-       OR email LIKE CONCAT('%', p_search_term, '%');
+       OR p.nombres LIKE CONCAT('%', p_search_term, '%')
+       OR p.apellidos LIKE CONCAT('%', p_search_term, '%')
+       OR p.documento_identidad LIKE CONCAT('%', p_search_term, '%');
 END$$
 
 -- Obtener un profesor por ID

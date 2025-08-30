@@ -36,8 +36,9 @@ $auth = new AuthController();
 
 /* Estilos para los filtros y resultados */
 .filters-container { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-top: 1rem;}
-#available-areas-container { margin-top: 1.5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
-.area-card { border: 1px solid #ccc; padding: 1rem; border-radius: 4px; cursor: pointer; }
+.results-grid { margin-top: 1.5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+.area-card, .profesor-card { border: 1px solid #ccc; padding: 1rem; border-radius: 4px; }
+.area-card { cursor: pointer; }
 .area-card:hover { background-color: #f5f5f5; }
 .area-card.selected { border-color: #28a745; background-color: #eafaf1; }
 </style>
@@ -147,10 +148,27 @@ $auth = new AuthController();
                 <button type="button" id="btn-filtrar-areas" class="btn btn-primary">Filtrar</button>
             </div>
 
-            <div id="available-areas-container">
+            <!-- SECCIÓN 3: AREAS DISPONIBLES -->
+            <h3>3. Areas Disponibles</h3>
+            <div id="available-areas-container" class="results-grid">
                 <p>Use los filtros para buscar áreas y horarios disponibles.</p>
             </div>
-             <input type="hidden" id="selected_schedules" name="selected_schedules" required>
+            <input type="hidden" id="selected_schedules" name="selected_schedules" required>
+
+            <!-- SECCIÓN 4: PROFESORES DISPONIBLES -->
+            <h3>4. Profesores Disponibles</h3>
+            <div id="available-profesores-container" class="results-grid">
+                <?php if (isset($profesores) && !empty($profesores)): ?>
+                    <?php foreach ($profesores as $profesor): ?>
+                        <div class="profesor-card">
+                            <strong><?php echo htmlspecialchars($profesor['nombres'] . ' ' . $profesor['apellidos']); ?></strong><br>
+                            <small>Tipo: <?php echo htmlspecialchars($profesor['tipo_profesor_nombre'] ?? 'No asignado'); ?></small>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p>No hay profesores disponibles.</p>
+                <?php endif; ?>
+            </div>
         </div>
 
         <div class="form-actions">
@@ -243,10 +261,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.forEach(lane => {
                     const card = document.createElement('div');
                     card.className = 'area-card';
-                    card.dataset.laneId = lane.id_carril; // Usar data-lane-id
+                    card.dataset.laneId = lane.id_carril;
                     card.innerHTML = `
                         <strong>Área:</strong> ${lane.area_nombre}<br>
-                        <strong>Sub-Área/Carril:</strong> ${lane.sub_area_nombre}<br>
+                        <strong>Sub Área:</strong> ${lane.sub_area_nombre}<br>
                         <span style="color: green; font-weight: bold;">¡Disponible!</span>
                     `;
                     container.appendChild(card);
@@ -267,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const card = e.target.closest('.area-card');
         if (!card) return;
 
-        const laneId = card.dataset.laneId; // Cambiado a laneId
+        const laneId = card.dataset.laneId;
         if (!laneId) return;
 
         if (card.classList.contains('selected')) {
@@ -278,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedIds.push(laneId);
         }
 
-        selectedSchedulesInput.value = JSON.stringify(selectedIds); // Ahora contiene IDs de carril
+        selectedSchedulesInput.value = JSON.stringify(selectedIds);
     });
 
     // Validación del formulario
