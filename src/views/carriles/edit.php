@@ -42,6 +42,10 @@ $auth = new AuthController();
             </select>
         </div>
         <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <input type="text" id="descripcion" name="descripcion" value="<?php echo htmlspecialchars($carril['descripcion']); ?>" maxlength="100">
+        </div>
+        <div class="form-group">
             <label for="numero_carril">Número de Sub Area</label>
             <input type="number" id="numero_carril" name="numero_carril" value="<?php echo htmlspecialchars($carril['numero_carril']); ?>" required>
         </div>
