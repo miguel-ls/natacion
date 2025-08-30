@@ -100,7 +100,7 @@ $auth = new AuthController();
                     <select id="filtro_tipo_area" name="filtro_tipo_area">
                          <option value="0">Todos</option>
                         <?php foreach ($tipos_area as $tipo): ?>
-                            <option value="<?php echo htmlspecialchars($tipo['id']); ?>">
+                            <option value="<?php echo htmlspecialchars($tipo['id_tipo_piscina']); ?>">
                                 <?php echo htmlspecialchars($tipo['nombre']); ?>
                             </option>
                         <?php endforeach; ?>
