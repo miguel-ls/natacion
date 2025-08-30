@@ -23,8 +23,8 @@ class CarrilController {
     public function create() {
         $db = Database::getInstance()->getConnection();
         // Fetch pools for the dropdown
-        $stmt = $db->prepare("CALL sp_get_all_piscinas()");
-        $stmt->execute();
+        $stmt = $db->prepare("CALL sp_get_all_piscinas(?)");
+        $stmt->execute(['']);
         $piscinas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         require_once __DIR__ . '/../views/carriles/create.php';
     }
@@ -56,8 +56,8 @@ class CarrilController {
 
         if ($carril) {
             // Fetch all pools for the dropdown
-            $stmt_piscinas = $db->prepare("CALL sp_get_all_piscinas()");
-            $stmt_piscinas->execute();
+            $stmt_piscinas = $db->prepare("CALL sp_get_all_piscinas(?)");
+            $stmt_piscinas->execute(['']);
             $piscinas = $stmt_piscinas->fetchAll(PDO::FETCH_ASSOC);
             require_once __DIR__ . '/../views/carriles/edit.php';
         } else {
