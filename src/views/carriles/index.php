@@ -18,15 +18,15 @@ require_once __DIR__ . '/../partials/header.php';
 
 <div class="container">
     <div class="page-header">
-        <h1>Gestión de Carriles por Piscina</h1>
-        <a href="index.php?url=carriles/create" class="btn btn-primary">Añadir Nuevo Carril</a>
+        <h1>Gestión de Sub Areas</h1>
+        <a href="index.php?url=carriles/create" class="btn btn-primary">Añadir Nueva Sub Area</a>
     </div>
 
     <!-- Formulario de Búsqueda -->
     <div class="filter-container" style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
         <form action="index.php" method="GET">
             <input type="hidden" name="url" value="carriles">
-            <label for="search">Buscar por Piscina o N° Carril:</label>
+            <label for="search">Buscar por Area o N° Sub Area:</label>
             <input type="text" name="search" id="search" value="<?php echo htmlspecialchars($search_term); ?>">
             <button type="submit" class="btn btn-primary">Buscar</button>
         </form>
@@ -43,8 +43,8 @@ require_once __DIR__ . '/../partials/header.php';
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Piscina</th>
-                <th>Número de Carril</th>
+                <th>Area</th>
+                <th>Número de Sub Area</th>
                 <th>Capacidad Máxima</th>
                 <th>Acciones</th>
             </tr>
@@ -52,7 +52,7 @@ require_once __DIR__ . '/../partials/header.php';
         <tbody>
             <?php if (empty($carriles)): ?>
                 <tr>
-                    <td colspan="5">No hay carriles registrados.</td>
+                    <td colspan="5">No hay sub areas registradas.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($carriles as $carril): ?>
@@ -63,7 +63,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($carril['capacidad_maxima']); ?></td>
                         <td class="action-links">
                             <a href="index.php?url=carriles/edit&id=<?php echo $carril['id_carril']; ?>" class="btn btn-warning">Editar</a>
-                            <a href="index.php?url=carriles/delete&id=<?php echo $carril['id_carril']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este carril?');">Eliminar</a>
+                            <a href="index.php?url=carriles/delete&id=<?php echo $carril['id_carril']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar esta sub area?');">Eliminar</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

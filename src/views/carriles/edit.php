@@ -17,7 +17,7 @@ $auth = new AuthController();
 </style>
 
 <div class="form-container">
-    <h2>Editar Carril</h2>
+    <h2>Editar Sub Area</h2>
 
     <?php
     if (isset($_SESSION['error_message'])) {
@@ -31,9 +31,9 @@ $auth = new AuthController();
         <input type="hidden" name="id_carril" value="<?php echo htmlspecialchars($carril['id_carril']); ?>">
 
         <div class="form-group">
-            <label for="id_piscina">Piscina</label>
+            <label for="id_piscina">Area</label>
             <select id="id_piscina" name="id_piscina" required>
-                <option value="">Seleccione una piscina</option>
+                <option value="">Seleccione un area</option>
                 <?php foreach ($piscinas as $piscina): ?>
                     <option value="<?php echo htmlspecialchars($piscina['id_piscina']); ?>" <?php echo ($carril['id_piscina'] == $piscina['id_piscina']) ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($piscina['nombre']); ?>
@@ -42,16 +42,16 @@ $auth = new AuthController();
             </select>
         </div>
         <div class="form-group">
-            <label for="numero_carril">Número de Carril</label>
+            <label for="numero_carril">Número de Sub Area</label>
             <input type="number" id="numero_carril" name="numero_carril" value="<?php echo htmlspecialchars($carril['numero_carril']); ?>" required>
         </div>
         <div class="form-group">
-            <label for="capacidad_maxima">Capacidad Máxima de Alumnos</label>
+            <label for="capacidad_maxima">Capacidad Máxima de Clientes</label>
             <input type="number" id="capacidad_maxima" name="capacidad_maxima" value="<?php echo htmlspecialchars($carril['capacidad_maxima']); ?>" required>
         </div>
         <div class="form-actions">
             <a href="index.php?url=carriles" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-success">Actualizar Carril</button>
+            <button type="submit" class="btn btn-success">Actualizar Sub Area</button>
         </div>
     </form>
 </div>

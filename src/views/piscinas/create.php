@@ -17,7 +17,7 @@ $auth = new AuthController();
 </style>
 
 <div class="form-container">
-    <h2>Añadir Nueva Piscina</h2>
+    <h2>Añadir Nueva Area</h2>
 
     <?php
     if (isset($_SESSION['error_message'])) {
@@ -29,11 +29,11 @@ $auth = new AuthController();
     <form action="index.php?url=piscinas/store" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
         <div class="form-group">
-            <label for="nombre">Nombre de la Piscina</label>
+            <label for="nombre">Nombre del Area</label>
             <input type="text" id="nombre" name="nombre" required>
         </div>
         <div class="form-group">
-            <label for="id_tipo_piscina">Tipo de Piscina</label>
+            <label for="id_tipo_piscina">Tipo de Area</label>
             <select id="id_tipo_piscina" name="id_tipo_piscina" required>
                 <option value="">Seleccione un tipo</option>
                 <?php foreach ($tipos_piscina as $tipo): ?>
@@ -45,7 +45,7 @@ $auth = new AuthController();
         </div>
         <div class="form-actions">
             <a href="index.php?url=piscinas" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-success">Guardar Piscina</button>
+            <button type="submit" class="btn btn-success">Guardar Area</button>
         </div>
     </form>
 </div>

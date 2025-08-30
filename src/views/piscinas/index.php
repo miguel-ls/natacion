@@ -18,8 +18,8 @@ require_once __DIR__ . '/../partials/header.php';
 
 <div class="container">
     <div class="page-header">
-        <h1>Gestión de Piscinas</h1>
-        <a href="index.php?url=piscinas/create" class="btn btn-primary">Añadir Nueva Piscina</a>
+        <h1>Gestión de Areas</h1>
+        <a href="index.php?url=piscinas/create" class="btn btn-primary">Añadir Nueva Area</a>
     </div>
 
     <!-- Formulario de Búsqueda -->
@@ -44,14 +44,14 @@ require_once __DIR__ . '/../partials/header.php';
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
-                <th>Tipo de Piscina</th>
+                <th>Tipo de Area</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($piscinas)): ?>
                 <tr>
-                    <td colspan="4">No hay piscinas registradas.</td>
+                    <td colspan="4">No hay areas registradas.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($piscinas as $piscina): ?>
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($piscina['tipo_piscina_nombre']); ?></td>
                         <td class="action-links">
                             <a href="index.php?url=piscinas/edit&id=<?php echo $piscina['id_piscina']; ?>" class="btn btn-warning">Editar</a>
-                            <a href="index.php?url=piscinas/delete&id=<?php echo $piscina['id_piscina']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar esta piscina?');">Eliminar</a>
+                            <a href="index.php?url=piscinas/delete&id=<?php echo $piscina['id_piscina']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar esta area?');">Eliminar</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
