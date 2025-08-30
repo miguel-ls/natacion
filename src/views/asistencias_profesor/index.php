@@ -79,7 +79,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($h['curso_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($h['tipo_horario_nombre'] . ' (' . date('g:i A', strtotime($h['hora_inicio'])) . ' - ' . date('g:i A', strtotime($h['hora_fin'])) . ')'); ?></td>
                         <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($h['fecha_inicio']))) . ' - ' . htmlspecialchars(date('d/m/Y', strtotime($h['fecha_fin']))); ?></td>
-                        <td><span class="badge badge-<?php echo strtolower(str_replace(' ', '-', $h['estado_calculado'])); ?>"><?php echo htmlspecialchars($h['estado_calculado']); ?></span></td>
+                        <td><span class="badge badge-<?php echo strtolower(str_replace(' ', '-', $h['estado_calculado'])); ?>" style="color: black;"><?php echo htmlspecialchars($h['estado_calculado']); ?></span></td>
                         <td>
                             <a href="index.php?url=asistencias_profesor/show&id=<?php echo $h['id_horario']; ?>" class="btn btn-info btn-sm">Marcar Asistencia</a>
                         </td>
