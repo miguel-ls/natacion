@@ -63,6 +63,10 @@ $auth = new AuthController();
                 <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                 <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?php echo htmlspecialchars($alumno['fecha_nacimiento']); ?>">
             </div>
+            <div class="form-group">
+                <label for="codigo_erp">Código ERP</label>
+                <input type="text" id="codigo_erp" name="codigo_erp" value="<?php echo htmlspecialchars($alumno['codigo_erp']); ?>" maxlength="10">
+            </div>
         </div>
         <div class="form-row">
             <div class="form-group">

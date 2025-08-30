@@ -71,13 +71,14 @@ class AlumnoController {
 
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_create_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_create_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $_POST['nombres'],
                     $_POST['apellidos'],
                     $_POST['id_tipo_documento'],
                     $dni,
                     $_POST['fecha_nacimiento'],
+                    $_POST['codigo_erp'],
                     $_POST['grupo_sanguineo'],
                     $_POST['direccion'],
                     $_POST['telefono'],
@@ -154,7 +155,7 @@ class AlumnoController {
 
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_update_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_update_alumno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $id,
                     $_POST['nombres'],
@@ -162,6 +163,7 @@ class AlumnoController {
                     $_POST['id_tipo_documento'],
                     $dni,
                     $_POST['fecha_nacimiento'],
+                    $_POST['codigo_erp'],
                     $_POST['grupo_sanguineo'],
                     $_POST['direccion'],
                     $_POST['telefono'],
