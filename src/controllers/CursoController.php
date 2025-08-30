@@ -25,6 +25,15 @@ class CursoController {
     }
 
     public function create() {
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_all_tipos_profesor()");
+            $stmt->execute();
+            $tipos_curso = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $tipos_curso = [];
+            $_SESSION['error_message'] = "Error al cargar los tipos de curso: " . $e->getMessage();
+        }
         require_once __DIR__ . '/../views/cursos/create.php';
     }
 
@@ -33,9 +42,10 @@ class CursoController {
             $this->auth->verifyCsrfToken();
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_create_curso(?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_create_curso(?, ?, ?, ?)");
                 $stmt->execute([
                     $_POST['nombre'],
+                    $_POST['id_tipo_profesor'],
                     $_POST['descripcion'],
                     $_POST['codigo_erp']
                 ]);
@@ -58,9 +68,18 @@ class CursoController {
 
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_curso_by_id(?)");
-            $stmt->execute([$id]);
-            $curso = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Fetch course types
+            $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_profesor()");
+            $stmt_tipos->execute();
+            $tipos_curso = $stmt_tipos->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_tipos->closeCursor();
+
+            // Fetch course data
+            $stmt_curso = $db->prepare("CALL sp_get_curso_by_id(?)");
+            $stmt_curso->execute([$id]);
+            $curso = $stmt_curso->fetch(PDO::FETCH_ASSOC);
+            $stmt_curso->closeCursor();
+
             if ($curso) {
                 require_once __DIR__ . '/../views/cursos/edit.php';
             } else {
@@ -83,10 +102,11 @@ class CursoController {
 
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_update_curso(?, ?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_update_curso(?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $id,
                     $_POST['nombre'],
+                    $_POST['id_tipo_profesor'],
                     $_POST['descripcion'],
                     $_POST['codigo_erp']
                 ]);

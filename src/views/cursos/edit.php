@@ -35,6 +35,17 @@ $auth = new AuthController();
             <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($curso['nombre']); ?>" required>
         </div>
         <div class="form-group">
+            <label for="id_tipo_profesor">Tipo de Curso</label>
+            <select id="id_tipo_profesor" name="id_tipo_profesor" required>
+                <option value="">Seleccione un tipo</option>
+                <?php foreach ($tipos_curso as $tipo): ?>
+                    <option value="<?php echo htmlspecialchars($tipo['id']); ?>" <?php echo ($curso['id_tipo_profesor'] == $tipo['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($tipo['descripcion']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="descripcion">Descripción</label>
             <textarea id="descripcion" name="descripcion" rows="4"><?php echo htmlspecialchars($curso['descripcion']); ?></textarea>
         </div>
