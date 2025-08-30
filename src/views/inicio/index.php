@@ -83,6 +83,10 @@ require_once __DIR__ . '/../partials/header.php';
             <h3>Ventas por Tipo de Piscina (<?php echo $title_period_text; ?>)</h3>
             <canvas id="ventasPorPiscinaChart"></canvas>
         </div>
+        <div class="chart-container">
+            <h3>Ventas por Tipo de Curso (<?php echo $title_period_text; ?>)</h3>
+            <canvas id="ventasPorTipoCursoChart"></canvas>
+        </div>
     </div>
 </div>
 
@@ -200,6 +204,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Gráfico 4: Ventas por Tipo de Piscina (Circular) ---
     createPieChart('ventasPorPiscinaChart', chartData.ventas_por_piscina, 'tipo_piscina', 'total_ventas');
+
+    // --- Gráfico 5: Ventas por Tipo de Curso (Circular) ---
+    createPieChart('ventasPorTipoCursoChart', chartData.ventas_por_tipo_curso, 'tipo_curso', 'total_ventas');
 });
 </script>
 

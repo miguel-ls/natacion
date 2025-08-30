@@ -345,7 +345,12 @@ switch ($route) {
 
     case 'inicio':
         $inicioController = new InicioController();
-        $inicioController->index();
+        $action = $parts[1] ?? 'index';
+        if ($action === 'getVentasByTipoCurso') {
+            $inicioController->getVentasByTipoCurso();
+        } else {
+            $inicioController->index();
+        }
         break;
 
     case 'home':

@@ -63,11 +63,35 @@ class InicioController {
             $chart_data['ventas_por_piscina'] = $stmt4->fetchAll(PDO::FETCH_ASSOC);
             $stmt4->closeCursor();
 
+            // Datos para Gráfico 5: Ventas por tipo de curso
+            $stmt5 = $db->prepare("CALL sp_get_ventas_by_tipo_curso(?, ?)");
+            $stmt5->execute([$selected_year, $selected_month]);
+            $chart_data['ventas_por_tipo_curso'] = $stmt5->fetchAll(PDO::FETCH_ASSOC);
+            $stmt5->closeCursor();
+
         } catch (PDOException $e) {
             $_SESSION['error_message'] = "Error al cargar los datos para los gráficos: " . $e->getMessage();
         }
 
         require_once __DIR__ . '/../views/inicio/index.php';
+    }
+
+    public function getVentasByTipoCurso() {
+        header('Content-Type: application/json');
+        $year = (int)($_GET['year'] ?? date('Y'));
+        $month = (int)($_GET['month'] ?? 0);
+
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_ventas_by_tipo_curso(?, ?)");
+            $stmt->execute([$year, $month]);
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($data);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error en la base de datos: ' . $e->getMessage()]);
+        }
+        exit;
     }
 }
 ?>
