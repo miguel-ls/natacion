@@ -373,7 +373,7 @@ class MatriculaController {
                 }
 
                 // 1. Crear la matrícula (Lógica corregida)
-                $stmt_matricula = $db->prepare("CALL sp_create_matricula(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt_matricula = $db->prepare("CALL sp_create_matricula(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt_matricula->execute([
                     $id_alumno,
                     $_POST['id_horario'],
@@ -383,7 +383,8 @@ class MatriculaController {
                     $_POST['precio_base'], // Se envía el precio base
                     $_POST['descuento'],
                     $_POST['id_forma_pago'],
-                    $_POST['observaciones']
+                    $_POST['observaciones'],
+                    null // id_grupo_matricula es null para matrículas individuales
                 ]);
                 $result = $stmt_matricula->fetch(PDO::FETCH_ASSOC);
                 $new_matricula_id = $result['nueva_matricula_id'];
