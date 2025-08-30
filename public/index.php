@@ -14,6 +14,7 @@ require_once '../src/controllers/AlumnoController.php';
 require_once '../src/controllers/ProfesorController.php';
 require_once '../src/controllers/CursoController.php';
 require_once '../src/controllers/TipoDocumentoController.php';
+require_once '../src/controllers/TipoProfesorController.php';
 require_once '../src/controllers/TipoPiscinaController.php';
 require_once '../src/controllers/PiscinaController.php';
 require_once '../src/controllers/CarrilController.php';
@@ -95,6 +96,21 @@ switch ($route) {
             case 'update': $tipoDocumentoController->update(); break;
             case 'delete': $tipoDocumentoController->delete(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Tipos de Documento</h1>"; break;
+        }
+        break;
+
+    // Rutas de Tipos de Profesor
+    case 'tipos_profesor':
+        $tipoProfesorController = new TipoProfesorController();
+        $action = $parts[1] ?? 'index';
+        switch ($action) {
+            case 'index': $tipoProfesorController->index(); break;
+            case 'create': $tipoProfesorController->create(); break;
+            case 'store': $tipoProfesorController->store(); break;
+            case 'edit': $tipoProfesorController->edit(); break;
+            case 'update': $tipoProfesorController->update(); break;
+            case 'delete': $tipoProfesorController->delete(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Tipos de Profesor</h1>"; break;
         }
         break;
 

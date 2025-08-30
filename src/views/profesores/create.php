@@ -38,6 +38,17 @@ $auth = new AuthController();
                 <label for="apellidos">Apellidos</label>
                 <input type="text" id="apellidos" name="apellidos" required>
             </div>
+            <div class="form-group">
+                <label for="id_tipo_profesor">Tipo de Profesor</label>
+                <select id="id_tipo_profesor" name="id_tipo_profesor" required>
+                    <option value="">Seleccione un tipo</option>
+                    <?php foreach ($tipos_profesor as $tipo): ?>
+                        <option value="<?php echo htmlspecialchars($tipo['id']); ?>">
+                            <?php echo htmlspecialchars($tipo['descripcion']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
         <div class="form-row">
             <div class="form-group">

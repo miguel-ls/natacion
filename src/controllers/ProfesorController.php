@@ -31,6 +31,15 @@ class ProfesorController {
      * Muestra el formulario para crear un nuevo profesor.
      */
     public function create() {
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_all_tipos_profesor()");
+            $stmt->execute();
+            $tipos_profesor = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $tipos_profesor = [];
+            $_SESSION['error_message'] = "Error al cargar los tipos de profesor: " . $e->getMessage();
+        }
         require_once __DIR__ . '/../views/profesores/create.php';
     }
 
@@ -42,10 +51,11 @@ class ProfesorController {
             $this->auth->verifyCsrfToken();
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_create_profesor(?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_create_profesor(?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $_POST['nombres'],
                     $_POST['apellidos'],
+                    $_POST['id_tipo_profesor'],
                     $_POST['documento_identidad'],
                     $_POST['telefono'],
                     $_POST['email'],
@@ -74,9 +84,18 @@ class ProfesorController {
 
         $db = Database::getInstance()->getConnection();
         try {
-            $stmt = $db->prepare("CALL sp_get_profesor_by_id(?)");
-            $stmt->execute([$id]);
-            $profesor = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Fetch professor types
+            $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_profesor()");
+            $stmt_tipos->execute();
+            $tipos_profesor = $stmt_tipos->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_tipos->closeCursor();
+
+            // Fetch professor data
+            $stmt_profesor = $db->prepare("CALL sp_get_profesor_by_id(?)");
+            $stmt_profesor->execute([$id]);
+            $profesor = $stmt_profesor->fetch(PDO::FETCH_ASSOC);
+            $stmt_profesor->closeCursor();
+
             if ($profesor) {
                 require_once __DIR__ . '/../views/profesores/edit.php';
             } else {
@@ -102,11 +121,12 @@ class ProfesorController {
 
             $db = Database::getInstance()->getConnection();
             try {
-                $stmt = $db->prepare("CALL sp_update_profesor(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("CALL sp_update_profesor(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $id,
                     $_POST['nombres'],
                     $_POST['apellidos'],
+                    $_POST['id_tipo_profesor'],
                     $_POST['documento_identidad'],
                     $_POST['telefono'],
                     $_POST['email'],
