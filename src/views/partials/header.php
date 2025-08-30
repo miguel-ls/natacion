@@ -77,6 +77,7 @@ if (!defined('BASE_URL')) {
                         <a href="#">Configuración &#9662;</a>
                         <div class="dropdown-content">
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_documento">Tipo de Documento</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=profesores">Profesores</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_piscina">Tipos de piscina</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=piscinas">Piscina</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=carriles">Carriles</a>
@@ -85,14 +86,13 @@ if (!defined('BASE_URL')) {
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_horario">Tipo de horario</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=cursos">Cursos</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=precios_cursos">Lista de Precios</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=profesores">Profesores</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Clientes</a>
                         </div>
                     </div>
 
                     <div class="dropdown">
                         <a href="#">Operaciones &#9662;</a>
                         <div class="dropdown-content">
+                            <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Clientes</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=matriculas">Matriculas</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=horarios">Programar horarios</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=asistencias_profesor">Asistencia Profesores</a>
