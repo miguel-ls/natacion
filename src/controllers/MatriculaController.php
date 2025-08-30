@@ -347,9 +347,9 @@ class MatriculaController {
                 }
             }
 
-            // $db->beginTransaction();
+            $db->beginTransaction();
 
-            // try {
+            try {
                 $id_alumno = $_POST['id_alumno'];
 
                 // Si no hay ID de alumno pero sí datos de nuevo alumno, crearlo primero
@@ -403,17 +403,17 @@ class MatriculaController {
                 ]);
                 $stmt_dias->closeCursor();
 
-                // $db->commit();
+                $db->commit();
                 // Redirigir a una página de éxito o al detalle de la matrícula
                 header('Location: index.php?url=matriculas');
                 exit;
 
-            // } catch (Exception $e) {
-            //     $db->rollBack();
-            //     $_SESSION['error_message'] = "Error al crear la matrícula: " . $e->getMessage();
-            //     header('Location: index.php?url=matriculas/create');
-            //     exit;
-            // }
+            } catch (Exception $e) {
+                $db->rollBack();
+                $_SESSION['error_message'] = "Error al crear la matrícula: " . $e->getMessage();
+                header('Location: index.php?url=matriculas/create');
+                exit;
+            }
         }
     }
 
