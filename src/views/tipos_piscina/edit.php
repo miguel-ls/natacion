@@ -17,7 +17,7 @@ $auth = new AuthController();
 </style>
 
 <div class="form-container">
-    <h2>Editar Tipo de Piscina</h2>
+    <h2>Editar Tipo de Area</h2>
 
     <?php
     if (isset($_SESSION['error_message'])) {

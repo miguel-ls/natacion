@@ -18,7 +18,7 @@ require_once __DIR__ . '/../partials/header.php';
 
 <div class="container">
     <div class="page-header">
-        <h1>Gestión de Tipos de Piscina</h1>
+        <h1>Gestión de Tipos de Area</h1>
         <a href="index.php?url=tipos_piscina/create" class="btn btn-primary">Añadir Nuevo Tipo</a>
     </div>
 
@@ -51,7 +51,7 @@ require_once __DIR__ . '/../partials/header.php';
         <tbody>
             <?php if (empty($items)): ?>
                 <tr>
-                    <td colspan="4">No hay tipos de piscina registrados.</td>
+                    <td colspan="4">No hay tipos de area registrados.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($items as $item): ?>
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($item['descripcion']); ?></td>
                         <td class="action-links">
                             <a href="index.php?url=tipos_piscina/edit&id=<?php echo $item['id_tipo_piscina']; ?>" class="btn btn-warning">Editar</a>
-                            <a href="index.php?url=tipos_piscina/delete&id=<?php echo $item['id_tipo_piscina']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este tipo de piscina?');">Eliminar</a>
+                            <a href="index.php?url=tipos_piscina/delete&id=<?php echo $item['id_tipo_piscina']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este tipo de area?');">Eliminar</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

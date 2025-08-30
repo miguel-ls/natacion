@@ -17,7 +17,7 @@ $auth = new AuthController();
 </style>
 
 <div class="form-container">
-    <h2>Editar Piscina</h2>
+    <h2>Editar Area</h2>
 
     <?php
     if (isset($_SESSION['error_message'])) {
@@ -31,11 +31,11 @@ $auth = new AuthController();
         <input type="hidden" name="id_piscina" value="<?php echo htmlspecialchars($piscina['id_piscina']); ?>">
 
         <div class="form-group">
-            <label for="nombre">Nombre de la Piscina</label>
+            <label for="nombre">Nombre del Area</label>
             <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($piscina['nombre']); ?>" required>
         </div>
         <div class="form-group">
-            <label for="id_tipo_piscina">Tipo de Piscina</label>
+            <label for="id_tipo_piscina">Tipo de Area</label>
             <select id="id_tipo_piscina" name="id_tipo_piscina" required>
                 <option value="">Seleccione un tipo</option>
                 <?php foreach ($tipos_piscina as $tipo): ?>
@@ -47,7 +47,7 @@ $auth = new AuthController();
         </div>
         <div class="form-actions">
             <a href="index.php?url=piscinas" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-success">Actualizar Piscina</button>
+            <button type="submit" class="btn btn-success">Actualizar Area</button>
         </div>
     </form>
 </div>
