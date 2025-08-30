@@ -45,13 +45,14 @@ require_once __DIR__ . '/../partials/header.php';
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
+                <th>Codigo ERP</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($cursos)): ?>
                 <tr>
-                    <td colspan="4">No hay cursos registrados.</td>
+                    <td colspan="5">No hay cursos registrados.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($cursos as $curso): ?>
@@ -59,6 +60,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($curso['id_curso']); ?></td>
                         <td><?php echo htmlspecialchars($curso['nombre']); ?></td>
                         <td><?php echo htmlspecialchars($curso['descripcion']); ?></td>
+                        <td><?php echo htmlspecialchars($curso['codigo_erp']); ?></td>
                         <td class="action-links">
                             <a href="index.php?url=cursos/edit&id=<?php echo $curso['id_curso']; ?>" class="btn btn-warning">Editar</a>
                             <a href="index.php?url=cursos/delete&id=<?php echo $curso['id_curso']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este curso?');">Eliminar</a>
