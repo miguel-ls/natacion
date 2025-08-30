@@ -81,7 +81,7 @@ if (!defined('BASE_URL')) {
                             <a href="<?php echo BASE_URL; ?>index.php?url=formas_pago">Forma de pago</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_documento">Tipo de Documento</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_piscina">Tipo de Area</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_precio">Tipos de pago</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_precio">Tipo de Precio</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_horario">Tipo de horario</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=precios_cursos">Lista de Precios</a>
                         </div>
