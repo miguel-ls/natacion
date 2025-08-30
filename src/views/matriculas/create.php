@@ -44,6 +44,13 @@ unset($_SESSION['form_data']);
 <div class="form-container">
     <h2>Nueva Matrícula</h2>
 
+    <?php
+    if (isset($_SESSION['error_message'])) {
+        echo '<div style="padding: 1rem; margin-bottom: 1rem; border: 1px solid red; color: red; background-color: #fdd;">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
+        unset($_SESSION['error_message']);
+    }
+    ?>
+
     <form id="form-matricula" action="index.php?url=matriculas/store" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
 
