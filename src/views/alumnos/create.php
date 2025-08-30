@@ -66,6 +66,10 @@ unset($_SESSION['form_data']);
                 <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                 <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?php echo htmlspecialchars($form_data['fecha_nacimiento'] ?? ''); ?>">
             </div>
+            <div class="form-group">
+                <label for="codigo_erp">Código ERP</label>
+                <input type="text" id="codigo_erp" name="codigo_erp" value="<?php echo htmlspecialchars($form_data['codigo_erp'] ?? ''); ?>" maxlength="10">
+            </div>
         </div>
         <div class="form-row">
             <div class="form-group">

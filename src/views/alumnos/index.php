@@ -49,13 +49,14 @@ require_once __DIR__ . '/../partials/header.php';
                 <th>Documento</th>
                 <th>Email</th>
                 <th>Teléfono</th>
+                <th>Codigo ERP</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($alumnos)): ?>
                 <tr>
-                    <td colspan="7">No hay alumnos registrados.</td>
+                    <td colspan="8">No hay alumnos registrados.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($alumnos as $alumno): ?>
@@ -66,6 +67,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($alumno['documento_identidad']); ?></td>
                         <td><?php echo htmlspecialchars($alumno['email']); ?></td>
                         <td><?php echo htmlspecialchars($alumno['telefono']); ?></td>
+                        <td><?php echo htmlspecialchars($alumno['codigo_erp']); ?></td>
                         <td class="action-links">
                             <a href="index.php?url=alumnos/show&id=<?php echo $alumno['id_alumno']; ?>" class="btn btn-info">Ver</a>
                             <a href="index.php?url=alumnos/edit&id=<?php echo $alumno['id_alumno']; ?>" class="btn btn-warning">Editar</a>
