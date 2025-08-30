@@ -90,7 +90,7 @@ if (!defined('BASE_URL')) {
                     <div class="dropdown">
                         <a href="#">Operaciones &#9662;</a>
                         <div class="dropdown-content">
-                            <a href="<?php echo BASE_URL; ?>index.php?url=dashboard">Monitor de Matriculas</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=dashboard">Monitor</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Clientes</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=profesores">Profesores</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=matriculas">Matriculas</a>
