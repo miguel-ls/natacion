@@ -44,6 +44,7 @@ require_once __DIR__ . '/../partials/header.php';
             <tr>
                 <th>ID</th>
                 <th>Area</th>
+                <th>Descripción</th>
                 <th>Número de Sub Area</th>
                 <th>Capacidad Máxima</th>
                 <th>Acciones</th>
@@ -52,13 +53,14 @@ require_once __DIR__ . '/../partials/header.php';
         <tbody>
             <?php if (empty($carriles)): ?>
                 <tr>
-                    <td colspan="5">No hay sub areas registradas.</td>
+                    <td colspan="6">No hay sub areas registradas.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($carriles as $carril): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($carril['id_carril']); ?></td>
                         <td><?php echo htmlspecialchars($carril['piscina_nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($carril['descripcion']); ?></td>
                         <td><?php echo htmlspecialchars($carril['numero_carril']); ?></td>
                         <td><?php echo htmlspecialchars($carril['capacidad_maxima']); ?></td>
                         <td class="action-links">

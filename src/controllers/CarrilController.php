@@ -33,9 +33,10 @@ class CarrilController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->auth->verifyCsrfToken();
             $db = Database::getInstance()->getConnection();
-            $stmt = $db->prepare("CALL sp_create_carril(?, ?, ?)");
+            $stmt = $db->prepare("CALL sp_create_carril(?, ?, ?, ?)");
             $stmt->execute([
                 $_POST['id_piscina'],
+                $_POST['descripcion'],
                 $_POST['numero_carril'],
                 $_POST['capacidad_maxima']
             ]);
@@ -71,10 +72,11 @@ class CarrilController {
             $this->auth->verifyCsrfToken();
             $id = $_POST['id_carril'];
             $db = Database::getInstance()->getConnection();
-            $stmt = $db->prepare("CALL sp_update_carril(?, ?, ?, ?)");
+            $stmt = $db->prepare("CALL sp_update_carril(?, ?, ?, ?, ?)");
             $stmt->execute([
                 $id,
                 $_POST['id_piscina'],
+                $_POST['descripcion'],
                 $_POST['numero_carril'],
                 $_POST['capacidad_maxima']
             ]);
