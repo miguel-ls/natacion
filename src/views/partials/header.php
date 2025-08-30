@@ -76,14 +76,14 @@ if (!defined('BASE_URL')) {
                     <div class="dropdown">
                         <a href="#">Configuración &#9662;</a>
                         <div class="dropdown-content">
-                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_documento">Tipo de Documento</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_piscina">Tipos de piscina</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=cursos">Cursos</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=piscinas">Piscina</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=carriles">Carriles</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_precio">Tipos de pago</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=formas_pago">Forma de pago</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_documento">Tipo de Documento</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_piscina">Tipos de piscina</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_precio">Tipos de pago</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_horario">Tipo de horario</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=cursos">Cursos</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=precios_cursos">Lista de Precios</a>
                         </div>
                     </div>
