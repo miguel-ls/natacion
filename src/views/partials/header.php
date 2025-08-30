@@ -122,7 +122,10 @@ if (!defined('BASE_URL')) {
             </div>
             <div class="nav-user">
                  <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="<?php echo BASE_URL; ?>index.php?url=logout">Cerrar Sesión</a>
+                    <div style="text-align: right;">
+                        <a href="<?php echo BASE_URL; ?>index.php?url=logout" style="font-weight: bold;">Cerrar Sesión</a>
+                        <span style="color: white; font-size: 0.9em;"><?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                    </div>
                  <?php else: ?>
                     <a href="<?php echo BASE_URL; ?>index.php?url=login">Iniciar Sesión</a>
                 <?php endif; ?>
