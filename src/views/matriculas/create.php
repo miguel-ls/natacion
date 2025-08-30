@@ -228,10 +228,36 @@ const searchInput = document.getElementById('alumno_search');
 const searchResults = document.getElementById('alumno-search-results');
 const hiddenInputId = document.getElementById('id_alumno');
 const nuevoAlumnoForm = document.getElementById('nuevo-alumno-form');
+const nuevoAlumnoInputs = document.querySelectorAll('#nuevo-alumno-form input, #nuevo-alumno-form select');
+
+// Función para habilitar/deshabilitar el formulario de nuevo alumno
+function toggleNuevoAlumnoForm(enabled) {
+    if (enabled) {
+        nuevoAlumnoForm.style.display = 'block';
+        nuevoAlumnoInputs.forEach(input => {
+            input.disabled = false;
+            // Solo añadir 'required' a los campos que realmente lo son
+            if (input.name === 'nuevo_alumno_documento' || input.name === 'nuevo_alumno_id_tipo_documento') {
+                input.required = true;
+            }
+        });
+    } else {
+        nuevoAlumnoForm.style.display = 'none';
+        nuevoAlumnoInputs.forEach(input => {
+            input.disabled = true;
+            input.required = false;
+            input.value = ''; // Limpiar valores
+        });
+    }
+}
+
+// Deshabilitar el formulario de nuevo alumno al cargar la página
+toggleNuevoAlumnoForm(false);
 
 searchInput.addEventListener('keyup', function() {
     const term = this.value;
     hiddenInputId.value = '';
+    toggleNuevoAlumnoForm(false); // Deshabilitar al empezar a buscar
     if (term.length < 2) {
         searchResults.innerHTML = '';
         return;
@@ -249,8 +275,7 @@ searchInput.addEventListener('keyup', function() {
                     searchInput.value = this.textContent;
                     hiddenInputId.value = this.dataset.id;
                     searchResults.innerHTML = '';
-                    nuevoAlumnoForm.style.display = 'none';
-                    document.querySelectorAll('#nuevo-alumno-form input').forEach(input => input.value = '');
+                    toggleNuevoAlumnoForm(false); // Deshabilitar al seleccionar uno existente
                 });
                 searchResults.appendChild(item);
             });
@@ -258,10 +283,10 @@ searchInput.addEventListener('keyup', function() {
 });
 
 document.getElementById('btn-show-nuevo-alumno').addEventListener('click', function() {
-    nuevoAlumnoForm.style.display = 'block';
     searchInput.value = '';
     hiddenInputId.value = '';
     searchResults.innerHTML = '';
+    toggleNuevoAlumnoForm(true); // Habilitar al hacer clic en registrar nuevo
 });
 
 // Lógica para búsqueda de cursos
