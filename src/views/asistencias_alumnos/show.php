@@ -42,7 +42,7 @@ require_once __DIR__ . '/../partials/header.php';
                     elseif ($dia['estado'] === 'recuperada') $estado_class = 'success';
                     elseif ($dia['estado'] === 'programada') $estado_class = 'light';
                     ?>
-                    <span class="badge badge-<?php echo $estado_class; ?>">
+                    <span class="badge badge-<?php echo $estado_class; ?>" style="color: black;">
                         <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $dia['estado']))); ?>
                     </span>
                 </td>
