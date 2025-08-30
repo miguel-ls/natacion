@@ -46,6 +46,17 @@ require_once __DIR__ . '/../partials/header.php';
                     <input type="hidden" id="id_curso" name="id_curso" value="<?php echo htmlspecialchars($filters['id_curso'] ?? '0'); ?>">
                     <div id="curso-search-results" class="search-results"></div>
                 </div>
+                <div class="filter-group">
+                    <label for="id_tipo_curso">Tipo de Curso:</label>
+                    <select name="id_tipo_curso" id="id_tipo_curso">
+                        <option value="0">Todos</option>
+                        <?php foreach ($tipos_curso as $tipo): ?>
+                            <option value="<?php echo $tipo['id']; ?>" <?php echo (isset($filters['id_tipo_curso']) && $filters['id_tipo_curso'] == $tipo['id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($tipo['descripcion']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
             <div class="filter-row">
                 <div class="filter-group">

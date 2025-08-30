@@ -21,6 +21,7 @@ class MatriculaController {
         $filters = [
             'id_alumno' => $_GET['id_alumno'] ?? 0,
             'id_curso' => $_GET['id_curso'] ?? 0,
+            'id_tipo_curso' => $_GET['id_tipo_curso'] ?? 0,
             'fecha_inicio_desde' => $_GET['fecha_inicio_desde'] ?? null,
             'fecha_inicio_hasta' => $_GET['fecha_inicio_hasta'] ?? null,
             'estado' => $_GET['estado'] ?? 'Todos',
@@ -29,6 +30,12 @@ class MatriculaController {
         ];
 
         try {
+            // Cargar tipos de curso para el filtro
+            $stmt_tipos_curso = $db->prepare("CALL sp_get_all_tipos_profesor()");
+            $stmt_tipos_curso->execute();
+            $tipos_curso = $stmt_tipos_curso->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_tipos_curso->closeCursor();
+
             // Cargar nombres para filtros si los IDs están presentes
             if ($filters['id_alumno'] != 0) {
                 $stmt_alumno = $db->prepare("CALL sp_get_alumno_by_id(?)");
@@ -62,10 +69,11 @@ class MatriculaController {
             $stmt_cursos->closeCursor();
 
             // Cargar matrículas filtradas
-            $stmt = $db->prepare("CALL sp_get_matriculas_filtradas(?, ?, ?, ?, ?)");
+            $stmt = $db->prepare("CALL sp_get_matriculas_filtradas(?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $filters['id_alumno'],
                 $filters['id_curso'],
+                $filters['id_tipo_curso'],
                 $filters['fecha_inicio_desde'],
                 $filters['fecha_inicio_hasta'],
                 $filters['estado']
