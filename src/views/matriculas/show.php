@@ -59,7 +59,7 @@ function get_spanish_day_name($date_str) {
             <strong>Horario:</strong> <?php echo htmlspecialchars($matricula['tipo_horario_nombre']); ?> de <?php echo htmlspecialchars(date('h:i A', strtotime($matricula['hora_inicio']))) . ' a ' . htmlspecialchars(date('h:i A', strtotime($matricula['hora_fin']))); ?>
         </div>
         <div class="detail-item">
-            <strong>Lugar:</strong> <?php echo htmlspecialchars($matricula['carril_nombre']); ?>
+            <strong>Area y Sub Area:</strong> <?php echo htmlspecialchars($matricula['carril_nombre']); ?>
         </div>
         <div class="detail-item">
             <strong>Periodo:</strong> <?php echo htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_inicio']))); ?> - <?php echo htmlspecialchars(date('d/m/Y', strtotime($matricula['fecha_fin']))); ?>
