@@ -18,8 +18,8 @@ class MatriculaMultipleController {
         $db = Database::getInstance()->getConnection();
 
         // Cargar tipos de área para el filtro
-        $stmt_tipos_area = $db->prepare("CALL sp_get_all_tipos_piscina()");
-        $stmt_tipos_area->execute();
+        $stmt_tipos_area = $db->prepare("CALL sp_get_all_tipos_piscina(?)");
+        $stmt_tipos_area->execute(['']);
         $tipos_area = $stmt_tipos_area->fetchAll(PDO::FETCH_ASSOC);
         $stmt_tipos_area->closeCursor();
 
