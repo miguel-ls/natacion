@@ -192,5 +192,25 @@ class ProfesorController {
         }
         exit;
     }
+
+    /**
+     * Obtiene profesores filtrados por tipo para una llamada AJAX.
+     */
+    public function getByTipo() {
+        header('Content-Type: application/json');
+        $id_tipo = $_GET['id_tipo'] ?? 0;
+
+        $db = Database::getInstance()->getConnection();
+        try {
+            $stmt = $db->prepare("CALL sp_get_profesores_by_tipo(?)");
+            $stmt->execute([$id_tipo]);
+            $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($profesores);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error en la base de datos: ' . $e->getMessage()]);
+        }
+        exit;
+    }
 }
 ?>

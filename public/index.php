@@ -156,6 +156,7 @@ switch ($route) {
             case 'update': $profesorController->update(); break;
             case 'delete': $profesorController->delete(); break;
             case 'search': $profesorController->search(); break;
+            case 'getByTipo': $profesorController->getByTipo(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Profesores</h1>"; break;
         }
         break;

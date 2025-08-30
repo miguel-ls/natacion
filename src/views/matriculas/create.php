@@ -279,16 +279,40 @@ cursoSearchInput.addEventListener('keyup', function() {
                 item.className = 'search-result-item';
                 item.textContent = curso.nombre;
                 item.dataset.id = curso.id_curso;
+                item.dataset.tipoId = curso.id_tipo_profesor; // Guardar el id del tipo
                 item.addEventListener('click', function() {
                     cursoSearchInput.value = this.textContent;
                     cursoHiddenInputId.value = this.dataset.id;
                     cursoSearchResults.innerHTML = '';
-                    buscarHorarios();
+
+                    // Filtrar profesores y luego buscar horarios
+                    filtrarProfesoresPorTipo(this.dataset.tipoId, buscarHorarios);
                 });
                 cursoSearchResults.appendChild(item);
             });
         });
 });
+
+function filtrarProfesoresPorTipo(id_tipo, callback) {
+    const profesorSelect = document.getElementById('filtro_profesor');
+
+    fetch(`index.php?url=profesores/getByTipo&id_tipo=${id_tipo}`)
+        .then(response => response.json())
+        .then(profesores => {
+            profesorSelect.innerHTML = '<option value="0">Todos</option>'; // Opción por defecto
+            profesores.forEach(profesor => {
+                const option = document.createElement('option');
+                option.value = profesor.id_profesor;
+                option.textContent = `${profesor.nombres} ${profesor.apellidos}`;
+                profesorSelect.appendChild(option);
+            });
+            // Ejecutar el callback si existe (para encadenar la búsqueda de horarios)
+            if (typeof callback === 'function') {
+                callback();
+            }
+        })
+        .catch(error => console.error('Error al filtrar profesores:', error));
+}
 
 
 // Lógica para horarios
