@@ -47,6 +47,7 @@ require_once __DIR__ . '/../partials/header.php';
                 <th>ID</th>
                 <th>Nombres</th>
                 <th>Apellidos</th>
+                <th>Tipo de Profesor</th>
                 <th>Email</th>
                 <th>Teléfono</th>
                 <th>Estado</th>
@@ -56,7 +57,7 @@ require_once __DIR__ . '/../partials/header.php';
         <tbody>
             <?php if (empty($profesores)): ?>
                 <tr>
-                    <td colspan="7">No hay profesores registrados.</td>
+                    <td colspan="8">No hay profesores registrados.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($profesores as $profesor): ?>
@@ -64,6 +65,7 @@ require_once __DIR__ . '/../partials/header.php';
                         <td><?php echo htmlspecialchars($profesor['id_profesor']); ?></td>
                         <td><?php echo htmlspecialchars($profesor['nombres']); ?></td>
                         <td><?php echo htmlspecialchars($profesor['apellidos']); ?></td>
+                        <td><?php echo htmlspecialchars($profesor['tipo_profesor_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($profesor['email']); ?></td>
                         <td><?php echo htmlspecialchars($profesor['telefono']); ?></td>
                         <td>
