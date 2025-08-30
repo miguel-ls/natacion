@@ -319,7 +319,101 @@ class MatriculaController {
      */
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            die("El formulario fue enviado correctamente al servidor.");
+            $this->auth->verifyCsrfToken();
+            $db = Database::getInstance()->getConnection();
+
+            // Validar DNI de nuevo alumno si se proporciona
+            if (empty($_POST['id_alumno']) && !empty($_POST['nuevo_alumno_nombres'])) {
+                $dni = $_POST['nuevo_alumno_documento'];
+
+                if (!$this->validateDni($dni)) {
+                    $_SESSION['error_message'] = "El Documento de Identidad del nuevo alumno debe tener 8 dígitos numéricos.";
+                    $_SESSION['form_data'] = $_POST;
+                    header('Location: index.php?url=matriculas/create');
+                    exit;
+                }
+
+                // Verificar duplicado
+                $stmt_check_dni = $db->prepare("CALL sp_check_alumno_by_dni(?, ?)");
+                $stmt_check_dni->execute([$dni, null]);
+                $result = $stmt_check_dni->fetch(PDO::FETCH_ASSOC);
+                $stmt_check_dni->closeCursor();
+
+                if ($result['count'] > 0) {
+                    $_SESSION['error_message'] = "El Documento de Identidad del nuevo alumno ya está registrado.";
+                    $_SESSION['form_data'] = $_POST;
+                    header('Location: index.php?url=matriculas/create');
+                    exit;
+                }
+            }
+
+            $db->beginTransaction();
+
+            try {
+                $id_alumno = $_POST['id_alumno'];
+
+                // Si no hay ID de alumno pero sí datos de nuevo alumno, crearlo primero
+                if (empty($id_alumno) && !empty($_POST['nuevo_alumno_nombres'])) {
+                    $stmt_nuevo_alumno = $db->prepare("CALL sp_create_alumno_simple(?, ?, ?, ?, ?, ?)");
+                    $stmt_nuevo_alumno->execute([
+                        $_POST['nuevo_alumno_nombres'],
+                        $_POST['nuevo_alumno_apellidos'],
+                        $_POST['nuevo_alumno_id_tipo_documento'],
+                        $_POST['nuevo_alumno_documento'],
+                        $_POST['nuevo_alumno_telefono'],
+                        $_POST['nuevo_alumno_email']
+                    ]);
+                    $result_alumno = $stmt_nuevo_alumno->fetch(PDO::FETCH_ASSOC);
+                    $id_alumno = $result_alumno['nuevo_alumno_id'];
+                    $stmt_nuevo_alumno->closeCursor();
+                }
+
+                if (empty($id_alumno)) {
+                    throw new Exception("No se ha seleccionado ni creado un alumno.");
+                }
+
+                // 1. Crear la matrícula (Lógica corregida)
+                $stmt_matricula = $db->prepare("CALL sp_create_matricula(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt_matricula->execute([
+                    $id_alumno,
+                    $_POST['id_horario'],
+                    $_SESSION['user_id'],
+                    $_POST['fecha_inicio'],
+                    $_POST['fecha_fin'],
+                    $_POST['precio_base'], // Se envía el precio base
+                    $_POST['descuento'],
+                    $_POST['id_forma_pago'],
+                    $_POST['observaciones'],
+                    null // id_grupo_matricula es null para matrículas individuales
+                ]);
+                $result = $stmt_matricula->fetch(PDO::FETCH_ASSOC);
+                $new_matricula_id = $result['nueva_matricula_id'];
+                $stmt_matricula->closeCursor();
+
+                // 2. Generar los días de clase
+                // (El SP `sp_get_horarios_disponibles_por_curso` ya nos dio los dias_semana)
+                $dias_semana = $_POST['dias_semana_hidden']; // Se pasará desde el form
+
+                $stmt_dias = $db->prepare("CALL sp_generate_dias_clase(?, ?, ?, ?)");
+                $stmt_dias->execute([
+                    $new_matricula_id,
+                    $_POST['fecha_inicio'],
+                    $_POST['fecha_fin'],
+                    $dias_semana
+                ]);
+                $stmt_dias->closeCursor();
+
+                $db->commit();
+                // Redirigir a una página de éxito o al detalle de la matrícula
+                header('Location: index.php?url=matriculas');
+                exit;
+
+            } catch (Exception $e) {
+                $db->rollBack();
+                $_SESSION['error_message'] = "Error al crear la matrícula: " . $e->getMessage();
+                header('Location: index.php?url=matriculas/create');
+                exit;
+            }
         }
     }
 

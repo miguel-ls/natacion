@@ -461,6 +461,7 @@ document.getElementById('fecha_inicio').addEventListener('change', actualizarPre
 
 // Form validation
 document.getElementById('form-matricula').addEventListener('submit', function(event) {
+    console.log("Form submission attempted!"); // DEBUGGING
     if (!document.getElementById('id_alumno').value && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
         alert('Por favor, seleccione un alumno existente o registre uno nuevo.');
         event.preventDefault();
