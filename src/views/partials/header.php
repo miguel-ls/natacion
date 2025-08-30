@@ -71,7 +71,6 @@ if (!defined('BASE_URL')) {
             <div class="nav-links">
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="<?php echo BASE_URL; ?>index.php?url=inicio">Inicio</a>
-                    <a href="<?php echo BASE_URL; ?>index.php?url=dashboard">Monitor</a>
 
                     <div class="dropdown">
                         <a href="#">Configuración &#9662;</a>
@@ -91,6 +90,7 @@ if (!defined('BASE_URL')) {
                     <div class="dropdown">
                         <a href="#">Operaciones &#9662;</a>
                         <div class="dropdown-content">
+                            <a href="<?php echo BASE_URL; ?>index.php?url=dashboard">Monitor</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Clientes</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=profesores">Profesores</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=matriculas">Matriculas</a>
