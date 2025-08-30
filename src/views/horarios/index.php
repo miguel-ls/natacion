@@ -45,7 +45,7 @@ require_once __DIR__ . '/../partials/header.php';
                 <th>ID</th>
                 <th>Curso</th>
                 <th>Profesor</th>
-                <th>Piscina y Carril</th>
+                <th>Area y Sub Area</th>
                 <th>Días</th>
                 <th>Horario</th>
                 <th>Vigencia Inicio</th>
