@@ -80,7 +80,7 @@ function get_spanish_day_name($date_str) {
 
     <div class="dias-clase-container">
         <h3>Días de Clase Programados</h3>
-        <table class="dias-table">
+        <table class="dias-table" id="dias-clase-table">
             <thead>
                 <tr>
                     <th>Día</th>
@@ -115,6 +115,7 @@ function get_spanish_day_name($date_str) {
                 <?php endif; ?>
             </tbody>
         </table>
+        <div id="pagination-container" style="text-align: center; margin-top: 1rem;"></div>
     </div>
 
     <div class="recuperacion-form">
@@ -182,6 +183,50 @@ document.getElementById('form-recuperacion').addEventListener('submit', function
         }
     })
     .catch(error => console.error('Error:', error));
+});
+
+// Lógica de Paginación
+document.addEventListener('DOMContentLoaded', function() {
+    const table = document.getElementById('dias-clase-table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const rowsPerPage = 12;
+    const pageCount = Math.ceil(rows.length / rowsPerPage);
+    const paginationContainer = document.getElementById('pagination-container');
+    let currentPage = 1;
+
+    function displayPage(page) {
+        currentPage = page;
+        tbody.innerHTML = ''; // Limpiar tabla
+
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedItems = rows.slice(start, end);
+
+        paginatedItems.forEach(item => tbody.appendChild(item));
+        updatePaginationControls();
+    }
+
+    function updatePaginationControls() {
+        paginationContainer.innerHTML = '';
+
+        for (let i = 1; i <= pageCount; i++) {
+            const button = document.createElement('button');
+            button.innerText = i;
+            button.classList.add('btn', 'btn-sm');
+            if (i === currentPage) {
+                button.classList.add('btn-primary');
+            } else {
+                button.classList.add('btn-secondary');
+            }
+            button.addEventListener('click', () => displayPage(i));
+            paginationContainer.appendChild(button);
+        }
+    }
+
+    if(rows.length > 0) {
+        displayPage(1);
+    }
 });
 </script>
 

@@ -80,7 +80,7 @@ require_once __DIR__ . '/../partials/header.php';
             <canvas id="ventasPorFormaPagoChart"></canvas>
         </div>
         <div class="chart-container">
-            <h3>Ventas por Tipo de Piscina (<?php echo $title_period_text; ?>)</h3>
+            <h3>Ventas por Tipo de Area (<?php echo $title_period_text; ?>)</h3>
             <canvas id="ventasPorPiscinaChart"></canvas>
         </div>
         <div class="chart-container">
