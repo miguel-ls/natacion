@@ -23,8 +23,8 @@ class PiscinaController {
     public function create() {
         $db = Database::getInstance()->getConnection();
         // Fetch pool types for the dropdown
-        $stmt = $db->prepare("CALL sp_get_all_tipos_piscina()");
-        $stmt->execute();
+        $stmt = $db->prepare("CALL sp_get_all_tipos_piscina(?)");
+        $stmt->execute(['']);
         $tipos_piscina = $stmt->fetchAll(PDO::FETCH_ASSOC);
         require_once __DIR__ . '/../views/piscinas/create.php';
     }
@@ -55,8 +55,8 @@ class PiscinaController {
 
         if ($piscina) {
             // Fetch all pool types for the dropdown
-            $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_piscina()");
-            $stmt_tipos->execute();
+            $stmt_tipos = $db->prepare("CALL sp_get_all_tipos_piscina(?)");
+            $stmt_tipos->execute(['']);
             $tipos_piscina = $stmt_tipos->fetchAll(PDO::FETCH_ASSOC);
             require_once __DIR__ . '/../views/piscinas/edit.php';
         } else {
