@@ -44,6 +44,7 @@ require_once __DIR__ . '/../partials/header.php';
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
+                <th>Tipo de Curso</th>
                 <th>Descripción</th>
                 <th>Codigo ERP</th>
                 <th>Acciones</th>
@@ -52,13 +53,14 @@ require_once __DIR__ . '/../partials/header.php';
         <tbody>
             <?php if (empty($cursos)): ?>
                 <tr>
-                    <td colspan="5">No hay cursos registrados.</td>
+                    <td colspan="6">No hay cursos registrados.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($cursos as $curso): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($curso['id_curso']); ?></td>
                         <td><?php echo htmlspecialchars($curso['nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($curso['tipo_curso_nombre']); ?></td>
                         <td><?php echo htmlspecialchars($curso['descripcion']); ?></td>
                         <td><?php echo htmlspecialchars($curso['codigo_erp']); ?></td>
                         <td class="action-links">
