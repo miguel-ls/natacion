@@ -14,7 +14,7 @@ DROP PROCEDURE IF EXISTS `sp_get_all_horarios_details`;
 DROP PROCEDURE IF EXISTS `sp_get_all_carriles`;
 
 -- Recrear `sp_get_all_horarios_details` con la nueva concatenación
-CREATE PROCEDURE `sp_get_all_horarios_details`()
+CREATE PROCEDURE `sp_get_all_horarios_details`(IN p_search_term VARCHAR(255))
 BEGIN
     SELECT
         h.id_horario,
@@ -32,6 +32,10 @@ BEGIN
     JOIN carriles ca ON h.id_carril = ca.id_carril
     JOIN piscinas pi ON ca.id_piscina = pi.id_piscina
     JOIN tipos_horario th ON h.id_tipo_horario = th.id_tipo_horario
+    WHERE p_search_term = ''
+       OR c.nombre LIKE CONCAT('%', p_search_term, '%')
+       OR p.nombres LIKE CONCAT('%', p_search_term, '%')
+       OR p.apellidos LIKE CONCAT('%', p_search_term, '%')
     ORDER BY h.id_horario;
 END$$
 
