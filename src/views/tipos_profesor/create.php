@@ -17,7 +17,7 @@ $auth = new AuthController();
 </style>
 
 <div class="form-container">
-    <h2>Añadir Nuevo Tipo de Profesor</h2>
+    <h2>Añadir Nuevo Tipo de Curso</h2>
 
     <?php
     if (isset($_SESSION['error_message'])) {

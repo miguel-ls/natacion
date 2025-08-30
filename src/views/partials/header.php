@@ -80,7 +80,7 @@ if (!defined('BASE_URL')) {
                             <a href="<?php echo BASE_URL; ?>index.php?url=carriles">Sub Area</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=formas_pago">Forma de pago</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_documento">Tipo de Documento</a>
-                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_profesor">Tipo de Profesor</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=tipos_profesor">Tipo de Curso</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_piscina">Tipo de Area</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_precio">Tipo de Precio</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=tipos_horario">Tipo de horario</a>
