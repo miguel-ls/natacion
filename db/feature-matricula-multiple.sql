@@ -50,7 +50,8 @@ DELIMITER $$
 CREATE PROCEDURE `sp_create_matricula_multiple`(
     IN `p_id_alumno` INT,
     IN `p_id_usuario` INT,
-    IN `p_selected_schedules_json` TEXT -- JSON array of schedule IDs, e.g., "[1, 2, 3]"
+    IN `p_selected_schedules_json` TEXT, -- JSON array of schedule IDs, e.g., "[1, 2, 3]"
+    IN `p_id_grupo_matricula` INT
 )
 BEGIN
     DECLARE v_schedule_id INT;
@@ -92,7 +93,8 @@ BEGIN
                 v_precio_base,          -- Usar el precio base encontrado
                 0,                      -- descuento
                 1,                      -- id_forma_pago (default a 'Efectivo' o similar)
-                'Matrícula múltiple'    -- observaciones
+                'Matrícula múltiple',   -- observaciones
+                p_id_grupo_matricula    -- Nuevo ID de grupo
             );
 
             -- Get the ID of the matricula just created

@@ -310,6 +310,8 @@ switch ($route) {
         $action = $parts[1] ?? 'index';
         switch($action) {
             case 'index': $matriculaMultipleController->index(); break;
+            case 'create': $matriculaMultipleController->create(); break;
+            case 'show': $matriculaMultipleController->show(); break;
             case 'getAvailableAreas': $matriculaMultipleController->getAvailableAreas(); break;
             case 'store': $matriculaMultipleController->store(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Matrícula Múltiple</h1>"; break;
