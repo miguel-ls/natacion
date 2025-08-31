@@ -48,11 +48,12 @@ class CalendarioController {
                 // Crear el título directamente
                 $formatted_time = date('h:i A', strtotime($evento['hora_inicio']));
                 $title = sprintf(
-                    "%s %s\n%s\n%s",
+                    "%s %s - %s\n%s\nAlumno: %s",
                     $formatted_time,
                     $evento['curso_nombre'],
                     $evento['profesor_nombre'],
-                    $evento['area_nombre'] . ': ' . $evento['sub_area_descripcion'] . ' ' . $evento['sub_area_numero']
+                    $evento['area_nombre'] . ': ' . $evento['sub_area_descripcion'] . ' ' . $evento['sub_area_numero'],
+                    $evento['alumno_nombre']
                 );
 
                 $calendar_events[] = [

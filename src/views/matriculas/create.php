@@ -221,49 +221,10 @@ const searchInput = document.getElementById('alumno_search');
 const searchResults = document.getElementById('alumno-search-results');
 const hiddenInputId = document.getElementById('id_alumno');
 const nuevoAlumnoForm = document.getElementById('nuevo-alumno-form');
-const nuevoAlumnoInputs = document.querySelectorAll('#nuevo-alumno-form input, #nuevo-alumno-form select');
-
-// Función para habilitar/deshabilitar el formulario de nuevo alumno
-function toggleNuevoAlumnoForm(enabled) {
-    if (enabled) {
-        nuevoAlumnoForm.style.display = 'block';
-        nuevoAlumnoInputs.forEach(input => {
-            input.disabled = false;
-            // Solo añadir 'required' a los campos que realmente lo son
-            if (input.name === 'nuevo_alumno_documento' || input.name === 'nuevo_alumno_id_tipo_documento') {
-                input.required = true;
-            }
-        });
-    } else {
-        nuevoAlumnoForm.style.display = 'none';
-        nuevoAlumnoInputs.forEach(input => {
-            input.disabled = true;
-            input.required = false;
-            input.value = ''; // Limpiar valores
-        });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Deshabilitar el formulario de nuevo alumno al cargar la página
-    // a menos que ya venga con datos de un error de servidor.
-    const hasNewStudentData = <?php echo !empty($form_data['nuevo_alumno_nombres']) ? 'true' : 'false'; ?>;
-    toggleNuevoAlumnoForm(hasNewStudentData);
-
-    // Llamar a la validación inicial para establecer el maxlength correcto al cargar la página
-    updateNuevoDocumentoValidation();
-
-    // ... resto del código DOMContentLoaded
-    if (preselectedSchedule) {
-        // ... (código existente)
-    }
-});
-
 
 searchInput.addEventListener('keyup', function() {
     const term = this.value;
     hiddenInputId.value = '';
-    toggleNuevoAlumnoForm(false); // Deshabilitar al empezar a buscar
     if (term.length < 2) {
         searchResults.innerHTML = '';
         return;
@@ -281,7 +242,8 @@ searchInput.addEventListener('keyup', function() {
                     searchInput.value = this.textContent;
                     hiddenInputId.value = this.dataset.id;
                     searchResults.innerHTML = '';
-                    toggleNuevoAlumnoForm(false); // Deshabilitar al seleccionar uno existente
+                    nuevoAlumnoForm.style.display = 'none';
+                    document.querySelectorAll('#nuevo-alumno-form input').forEach(input => input.value = '');
                 });
                 searchResults.appendChild(item);
             });
@@ -289,10 +251,10 @@ searchInput.addEventListener('keyup', function() {
 });
 
 document.getElementById('btn-show-nuevo-alumno').addEventListener('click', function() {
+    nuevoAlumnoForm.style.display = 'block';
     searchInput.value = '';
     hiddenInputId.value = '';
     searchResults.innerHTML = '';
-    toggleNuevoAlumnoForm(true); // Habilitar al hacer clic en registrar nuevo
 });
 
 // Lógica para búsqueda de cursos
