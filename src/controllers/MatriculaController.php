@@ -372,8 +372,8 @@ class MatriculaController {
                     throw new Exception("No se ha seleccionado ni creado un alumno.");
                 }
 
-                // 1. Crear la matrícula (Lógica corregida)
-                $stmt_matricula = $db->prepare("CALL sp_create_matricula(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                // 1. Crear la matrícula (Lógica corregida y final)
+                $stmt_matricula = $db->prepare("CALL sp_create_matricula(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt_matricula->execute([
                     $id_alumno,
                     $_POST['id_horario'],
@@ -383,15 +383,15 @@ class MatriculaController {
                     $_POST['precio_base'], // Se envía el precio base
                     $_POST['descuento'],
                     $_POST['id_forma_pago'],
-                    $_POST['observaciones']
+                    $_POST['observaciones'],
+                    null // id_grupo_matricula es null para matrículas individuales
                 ]);
                 $result = $stmt_matricula->fetch(PDO::FETCH_ASSOC);
                 $new_matricula_id = $result['nueva_matricula_id'];
                 $stmt_matricula->closeCursor();
 
                 // 2. Generar los días de clase
-                // (El SP `sp_get_horarios_disponibles_por_curso` ya nos dio los dias_semana)
-                $dias_semana = $_POST['dias_semana_hidden']; // Se pasará desde el form
+                $dias_semana = $_POST['dias_semana_hidden'];
 
                 $stmt_dias = $db->prepare("CALL sp_generate_dias_clase(?, ?, ?, ?)");
                 $stmt_dias->execute([
@@ -403,7 +403,6 @@ class MatriculaController {
                 $stmt_dias->closeCursor();
 
                 $db->commit();
-                // Redirigir a una página de éxito o al detalle de la matrícula
                 header('Location: index.php?url=matriculas');
                 exit;
 
@@ -537,8 +536,6 @@ class MatriculaController {
                     $stmt = $db->prepare("CALL sp_delete_matricula(?)");
                     $stmt->execute([$id_matricula]);
                 } catch (PDOException $e) {
-                    // Consider logging the error message for debugging
-                    // error_log($e->getMessage());
                     $_SESSION['error_message'] = "Error al eliminar la matrícula. Es posible que tenga registros dependientes.";
                 }
             }
@@ -567,7 +564,6 @@ class MatriculaController {
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } catch (PDOException $e) {
-            // En caso de error, devolver 0.00 y registrar el error
             error_log($e->getMessage());
             echo json_encode(['precio' => 0.00]);
         }

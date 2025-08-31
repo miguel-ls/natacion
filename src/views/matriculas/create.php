@@ -44,6 +44,13 @@ unset($_SESSION['form_data']);
 <div class="form-container">
     <h2>Nueva Matrícula</h2>
 
+    <?php
+    if (isset($_SESSION['error_message'])) {
+        echo '<div style="padding: 1rem; margin-bottom: 1rem; border: 1px solid red; color: red; background-color: #fdd;">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
+        unset($_SESSION['error_message']);
+    }
+    ?>
+
     <form id="form-matricula" action="index.php?url=matriculas/store" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
 
@@ -180,33 +187,53 @@ unset($_SESSION['form_data']);
 <script>
 function formatDateDDMMYYYY(dateString) {
     if (!dateString) return 'No definida';
-    // El formato de la DB es YYYY-MM-DD, que JS puede interpretar como UTC.
-    // Para evitar que la fecha cambie por la zona horaria, la ajustamos.
     const date = new Date(dateString);
     const userTimezoneOffset = date.getTimezoneOffset() * 60000;
     const adjustedDate = new Date(date.getTime() + userTimezoneOffset);
 
     const day = String(adjustedDate.getDate()).padStart(2, '0');
-    const month = String(adjustedDate.getMonth() + 1).padStart(2, '0'); // Los meses son base 0
+    const month = String(adjustedDate.getMonth() + 1).padStart(2, '0');
     const year = adjustedDate.getFullYear();
     return `${day}/${month}/${year}`;
 }
 
-// Lógica para pre-selección desde el dashboard
 const preselectedSchedule = <?php echo isset($selected_schedule) ? json_encode($selected_schedule) : 'null'; ?>;
+const searchInput = document.getElementById('alumno_search');
+const searchResults = document.getElementById('alumno-search-results');
+const hiddenInputId = document.getElementById('id_alumno');
+const nuevoAlumnoForm = document.getElementById('nuevo-alumno-form');
+const nuevoAlumnoInputs = document.querySelectorAll('#nuevo-alumno-form input, #nuevo-alumno-form select');
+
+function toggleNuevoAlumnoForm(enabled) {
+    if (enabled) {
+        nuevoAlumnoForm.style.display = 'block';
+        nuevoAlumnoInputs.forEach(input => {
+            input.disabled = false;
+            if (input.name === 'nuevo_alumno_documento' || input.name === 'nuevo_alumno_id_tipo_documento') {
+                input.required = true;
+            }
+        });
+    } else {
+        nuevoAlumnoForm.style.display = 'none';
+        nuevoAlumnoInputs.forEach(input => {
+            input.disabled = true;
+            input.required = false;
+            input.value = '';
+        });
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
+    const hasNewStudentData = <?php echo !empty($form_data['nuevo_alumno_nombres']) ? 'true' : 'false'; ?>;
+    toggleNuevoAlumnoForm(hasNewStudentData);
+    updateNuevoDocumentoValidation();
+
     if (preselectedSchedule) {
-        // Pre-llenar el campo de búsqueda de curso
         const cursoSearchInput = document.getElementById('curso_search');
         const cursoHiddenInputId = document.getElementById('id_curso');
         cursoSearchInput.value = preselectedSchedule.curso_nombre;
         cursoHiddenInputId.value = preselectedSchedule.id_curso;
-
-        // Deshabilitar la búsqueda de curso para evitar cambios
         cursoSearchInput.disabled = true;
-
-        // Buscar y seleccionar el horario
         buscarHorarios(function() {
             const horarioItem = document.querySelector(`.horario-item[data-id='${preselectedSchedule.id_horario}']`);
             if (horarioItem) {
@@ -216,15 +243,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Lógica para búsqueda de alumnos
-const searchInput = document.getElementById('alumno_search');
-const searchResults = document.getElementById('alumno-search-results');
-const hiddenInputId = document.getElementById('id_alumno');
-const nuevoAlumnoForm = document.getElementById('nuevo-alumno-form');
-
 searchInput.addEventListener('keyup', function() {
     const term = this.value;
     hiddenInputId.value = '';
+    toggleNuevoAlumnoForm(false);
     if (term.length < 2) {
         searchResults.innerHTML = '';
         return;
@@ -242,8 +264,7 @@ searchInput.addEventListener('keyup', function() {
                     searchInput.value = this.textContent;
                     hiddenInputId.value = this.dataset.id;
                     searchResults.innerHTML = '';
-                    nuevoAlumnoForm.style.display = 'none';
-                    document.querySelectorAll('#nuevo-alumno-form input').forEach(input => input.value = '');
+                    toggleNuevoAlumnoForm(false);
                 });
                 searchResults.appendChild(item);
             });
@@ -251,13 +272,12 @@ searchInput.addEventListener('keyup', function() {
 });
 
 document.getElementById('btn-show-nuevo-alumno').addEventListener('click', function() {
-    nuevoAlumnoForm.style.display = 'block';
     searchInput.value = '';
     hiddenInputId.value = '';
     searchResults.innerHTML = '';
+    toggleNuevoAlumnoForm(true);
 });
 
-// Lógica para búsqueda de cursos
 const cursoSearchInput = document.getElementById('curso_search');
 const cursoSearchResults = document.getElementById('curso-search-results');
 const cursoHiddenInputId = document.getElementById('id_curso');
@@ -265,7 +285,7 @@ const cursoHiddenInputId = document.getElementById('id_curso');
 cursoSearchInput.addEventListener('keyup', function() {
     const term = this.value;
     cursoHiddenInputId.value = '';
-    document.getElementById('horarios-disponibles-container').innerHTML = '<p>Por favor, seleccione un curso.</p>'; // Clear schedules
+    document.getElementById('horarios-disponibles-container').innerHTML = '<p>Por favor, seleccione un curso.</p>';
     if (term.length < 2) {
         cursoSearchResults.innerHTML = '';
         return;
@@ -279,13 +299,11 @@ cursoSearchInput.addEventListener('keyup', function() {
                 item.className = 'search-result-item';
                 item.textContent = curso.nombre;
                 item.dataset.id = curso.id_curso;
-                item.dataset.tipoId = curso.id_tipo_profesor; // Guardar el id del tipo
+                item.dataset.tipoId = curso.id_tipo_profesor;
                 item.addEventListener('click', function() {
                     cursoSearchInput.value = this.textContent;
                     cursoHiddenInputId.value = this.dataset.id;
                     cursoSearchResults.innerHTML = '';
-
-                    // Filtrar profesores y luego buscar horarios
                     filtrarProfesoresPorTipo(this.dataset.tipoId, buscarHorarios);
                 });
                 cursoSearchResults.appendChild(item);
@@ -295,18 +313,16 @@ cursoSearchInput.addEventListener('keyup', function() {
 
 function filtrarProfesoresPorTipo(id_tipo, callback) {
     const profesorSelect = document.getElementById('filtro_profesor');
-
     fetch(`index.php?url=profesores/getByTipo&id_tipo=${id_tipo}`)
         .then(response => response.json())
         .then(profesores => {
-            profesorSelect.innerHTML = '<option value="0">Todos</option>'; // Opción por defecto
+            profesorSelect.innerHTML = '<option value="0">Todos</option>';
             profesores.forEach(profesor => {
                 const option = document.createElement('option');
                 option.value = profesor.id_profesor;
                 option.textContent = `${profesor.nombres} ${profesor.apellidos}`;
                 profesorSelect.appendChild(option);
             });
-            // Ejecutar el callback si existe (para encadenar la búsqueda de horarios)
             if (typeof callback === 'function') {
                 callback();
             }
@@ -314,8 +330,6 @@ function filtrarProfesoresPorTipo(id_tipo, callback) {
         .catch(error => console.error('Error al filtrar profesores:', error));
 }
 
-
-// Lógica para horarios
 let precioBaseCurso = 0;
 
 function calcularPrecioFinal() {
@@ -325,7 +339,7 @@ function calcularPrecioFinal() {
     document.getElementById('precio_base').value = precioBaseCurso;
 }
 
-function buscarHorarios(callback) { // Aceptar un callback
+function buscarHorarios(callback) {
     const cursoId = document.getElementById('id_curso').value;
     const profesorId = document.getElementById('filtro_profesor').value;
     const horaInicio = document.getElementById('filtro_hora_inicio').value;
@@ -335,17 +349,15 @@ function buscarHorarios(callback) { // Aceptar un callback
     document.getElementById('precio_final').value = '';
     document.getElementById('descuento').value = 0;
     precioBaseCurso = 0;
-
     const container = document.getElementById('horarios-disponibles-container');
     container.innerHTML = '<p>Cargando horarios...</p>';
     document.getElementById('id_horario').value = '';
-    fechaFinInput.readOnly = false; // Desbloquear la fecha final si se busca de nuevo
+    fechaFinInput.readOnly = false;
 
     if (!cursoId) {
         container.innerHTML = '<p>Por favor, seleccione un curso.</p>';
         return;
     }
-
     let fetchUrl = `index.php?url=matriculas/getHorariosByCurso&id_curso=${cursoId}&id_profesor=${profesorId}`;
     if (horaInicio) fetchUrl += `&hora_inicio=${horaInicio}`;
     if (horaFin) fetchUrl += `&hora_fin=${horaFin}`;
@@ -361,13 +373,11 @@ function buscarHorarios(callback) { // Aceptar un callback
                     const div = document.createElement('div');
                     div.className = 'horario-item';
                     div.dataset.id = horario.id_horario;
-                    // Ya no se obtiene el precio aquí, se buscará dinámicamente
                     div.dataset.dias = horario.dias_semana;
-                    div.dataset.fechaInicioCurso = horario.fecha_inicio; // Guardar la fecha de inicio del curso
+                    div.dataset.fechaInicioCurso = horario.fecha_inicio;
                     div.dataset.fechaFinCurso = horario.fecha_fin;
                     const fechaInicioFormatted = formatDateDDMMYYYY(horario.fecha_inicio);
                     const fechaFinFormatted = formatDateDDMMYYYY(horario.fecha_fin);
-
                     div.innerHTML = `<strong>Profesor:</strong> ${horario.profesor_nombre}<br>
                                      <strong>Periodo:</strong> ${fechaInicioFormatted} - ${fechaFinFormatted}<br>
                                      <strong>Lugar:</strong> ${horario.carril_nombre}<br>
@@ -379,42 +389,28 @@ function buscarHorarios(callback) { // Aceptar un callback
                         this.classList.add('selected');
                         document.getElementById('id_horario').value = this.dataset.id;
                         document.getElementById('dias_semana_hidden').value = this.dataset.dias;
-
-                        // Lógica para auto-seleccionar fechas
                         const fechaInicioInput = document.getElementById('fecha_inicio');
                         const fechaFinInput = document.getElementById('fecha_fin');
                         const cursoInicio = this.dataset.fechaInicioCurso;
                         const cursoFin = this.dataset.fechaFinCurso;
-
                         if (cursoInicio && cursoFin) {
-                            // Establecer fecha de fin
                             fechaFinInput.value = cursoFin;
-
-                            // Establecer fecha de inicio
                             const hoy = new Date();
-                            hoy.setHours(0, 0, 0, 0); // Normalizar a medianoche
+                            hoy.setHours(0, 0, 0, 0);
                             const fechaCursoInicio = new Date(cursoInicio);
-
-                            // La fecha de la DB viene en YYYY-MM-DD, que new Date() interpreta como UTC.
-                            // Para evitar problemas de zona horaria, se ajusta.
                             fechaCursoInicio.setMinutes(fechaCursoInicio.getMinutes() + fechaCursoInicio.getTimezoneOffset());
-
                             if (hoy > fechaCursoInicio) {
-                                // Si el curso ya empezó, la fecha de inicio es hoy
                                 const hoyString = hoy.toISOString().split('T')[0];
                                 fechaInicioInput.value = hoyString;
                             } else {
-                                // Si el curso no ha empezado, la fecha de inicio es la del curso
                                 fechaInicioInput.value = cursoInicio;
                             }
-                            // Disparar el evento change para que se actualice el precio
                             fechaInicioInput.dispatchEvent(new Event('change'));
                         }
                     });
                     container.appendChild(div);
                 });
             }
-            // Ejecutar el callback si existe
             if (typeof callback === 'function') {
                 callback();
             }
@@ -422,21 +418,16 @@ function buscarHorarios(callback) { // Aceptar un callback
 }
 
 document.getElementById('descuento').addEventListener('input', calcularPrecioFinal);
-
 document.getElementById('btn-filtrar-horarios').addEventListener('click', buscarHorarios);
-
-// --- Nueva Lógica de Precio Dinámico ---
 
 function actualizarPrecio() {
     const cursoId = document.getElementById('id_curso').value;
     const fechaInicio = document.getElementById('fecha_inicio').value;
-
     if (!cursoId || !fechaInicio) {
         precioBaseCurso = 0;
         calcularPrecioFinal();
         return;
     }
-
     fetch(`index.php?url=matriculas/getPrecioByFecha&id_curso=${cursoId}&fecha=${fechaInicio}`)
         .then(response => response.json())
         .then(data => {
@@ -449,10 +440,8 @@ function actualizarPrecio() {
             calcularPrecioFinal();
         });
 }
-
 document.getElementById('fecha_inicio').addEventListener('change', actualizarPrecio);
 
-// Form validation
 document.getElementById('form-matricula').addEventListener('submit', function(event) {
     if (!document.getElementById('id_alumno').value && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
         alert('Por favor, seleccione un alumno existente o registre uno nuevo.');
@@ -464,13 +453,11 @@ document.getElementById('form-matricula').addEventListener('submit', function(ev
     }
 });
 
-// DNI validation for new student
 const nuevoTipoDocumentoSelect = document.getElementById('nuevo_alumno_id_tipo_documento');
 const nuevoDocumentoInput = document.getElementById('nuevo_alumno_documento');
 const nuevoDocumentoError = document.getElementById('nuevo-dni-error');
 const mainForm = document.getElementById('form-matricula');
 const submitButton = document.querySelector('#form-matricula button[type="submit"]');
-
 let isNuevoDocumentoDuplicate = false;
 let isNuevoDocumentoInvalid = false;
 
@@ -484,14 +471,12 @@ function updateNuevoDocumentoValidation() {
 function validateNuevoDocumentoFormat() {
     const documento = nuevoDocumentoInput.value.trim();
     const longitud = nuevoDocumentoInput.maxLength;
-
     if (documento === '') {
         nuevoDocumentoError.style.display = 'none';
         isNuevoDocumentoInvalid = false;
         updateSubmitButtonState();
         return;
     }
-
     if (documento.length !== parseInt(longitud)) {
         nuevoDocumentoError.textContent = `El número de documento debe tener ${longitud} caracteres.`;
         nuevoDocumentoError.style.display = 'block';
@@ -510,7 +495,6 @@ function checkNuevoDocumentoDuplication() {
         updateSubmitButtonState();
         return;
     }
-
     fetch(`index.php?url=alumnos/checkDni&dni=${documento}`)
         .then(response => response.json())
         .then(data => {
@@ -536,27 +520,20 @@ function checkNuevoDocumentoDuplication() {
 function updateSubmitButtonState() {
     const isAlumnoSelected = !!document.getElementById('id_alumno').value;
     const isNuevoAlumnoFormVisible = document.getElementById('nuevo-alumno-form').style.display === 'block';
-
     if (isAlumnoSelected || !isNuevoAlumnoFormVisible) {
         submitButton.disabled = false;
         return;
     }
-
     submitButton.disabled = isNuevoDocumentoDuplicate || isNuevoDocumentoInvalid;
 }
 
-// Event listeners
 nuevoTipoDocumentoSelect.addEventListener('change', updateNuevoDocumentoValidation);
 nuevoDocumentoInput.addEventListener('input', validateNuevoDocumentoFormat);
 nuevoDocumentoInput.addEventListener('blur', checkNuevoDocumentoDuplication);
 
-// Initial validation
-updateNuevoDocumentoValidation();
-
 mainForm.addEventListener('submit', function(event) {
     const isAlumnoSelected = !!document.getElementById('id_alumno').value;
     const isNuevoAlumnoFormVisible = document.getElementById('nuevo-alumno-form').style.display === 'block';
-
     if (!isAlumnoSelected && isNuevoAlumnoFormVisible) {
         validateNuevoDocumentoFormat();
         if (isNuevoDocumentoInvalid) {
@@ -570,7 +547,6 @@ mainForm.addEventListener('submit', function(event) {
             return;
         }
     }
-
     if (!isAlumnoSelected && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
         alert('Por favor, seleccione un cliente existente o registre uno nuevo.');
         event.preventDefault();
