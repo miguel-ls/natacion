@@ -34,6 +34,7 @@ $auth = new AuthController();
     <form id="form-change-horario" action="index.php?url=matriculas/update" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
         <input type="hidden" name="id_matricula" value="<?php echo htmlspecialchars($matricula['id_matricula']); ?>">
+        <input type="hidden" name="original_id_horario" value="<?php echo htmlspecialchars($matricula['id_horario']); ?>">
 
         <input type="hidden" id="id_horario" name="id_horario" value="<?php echo htmlspecialchars($matricula['id_horario']); ?>" required>
 
@@ -75,14 +76,20 @@ $auth = new AuthController();
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form-change-horario');
+    const idHorarioInput = document.getElementById('id_horario');
+    const originalIdHorarioInput = document.querySelector('input[name="original_id_horario"]');
     const fechaInicioInput = document.getElementById('fecha_inicio');
     const fechaFinInput = document.getElementById('fecha_fin');
+
+    let isHorarioSelected = false;
 
     document.querySelectorAll('.horario-item').forEach(item => {
         item.addEventListener('click', function() {
             document.querySelectorAll('.horario-item').forEach(el => el.classList.remove('selected'));
             this.classList.add('selected');
-            document.getElementById('id_horario').value = this.dataset.id;
+            idHorarioInput.value = this.dataset.id;
+            isHorarioSelected = true;
 
             // Lógica para auto-seleccionar fechas
             const horarioInicio = this.dataset.fechaInicio;
@@ -99,20 +106,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 fechaHorarioInicio.setMinutes(fechaHorarioInicio.getMinutes() + fechaHorarioInicio.getTimezoneOffset());
 
                 if (hoy > fechaHorarioInicio) {
-                    // Si el horario ya empezó, la fecha de inicio es hoy
                     fechaInicioInput.value = hoy.toISOString().split('T')[0];
                 } else {
-                    // Si el horario no ha empezado, la fecha de inicio es la del horario
                     fechaInicioInput.value = horarioInicio;
                 }
             }
         });
     });
 
-    document.getElementById('form-change-horario').addEventListener('submit', function(event) {
-        const horarioId = document.getElementById('id_horario').value;
-        if (!horarioId) {
-            alert('Por favor, seleccione un nuevo horario.');
+    form.addEventListener('submit', function(event) {
+        // Defensive check: If the user has not explicitly selected a new schedule,
+        // ensure the submitted id_horario is the original one.
+        if (!isHorarioSelected) {
+            idHorarioInput.value = originalIdHorarioInput.value;
+        }
+
+        // Final validation to ensure a value is present.
+        if (!idHorarioInput.value) {
+            alert('Error: No se ha podido determinar el horario. Por favor, recargue la página y vuelva a intentarlo.');
             event.preventDefault();
         }
     });
