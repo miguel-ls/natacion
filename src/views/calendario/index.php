@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
+        eventDisplay: 'block', // Muestra el evento como un bloque de color
         initialView: 'dayGridMonth',
         locale: 'es', // Establecer el idioma a español
         headerToolbar: {
