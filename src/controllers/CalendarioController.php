@@ -40,7 +40,8 @@ class CalendarioController {
 
             // Formatear para FullCalendar y asignar colores pastel de forma determinista
             $calendar_events = [];
-            $pastel_colors = ['#a8d8ea', '#fce38a', '#eaffd0', '#f4b6c2', '#b39ddb', '#ffcc80', '#b2dfdb', '#ffAB91', '#c5e1a5'];
+            // Paleta de colores pastel actualizada para forzar el reenvío del cambio.
+            $pastel_colors = ['#a8d8ea', '#fce38a', '#eaffd0', '#f4b6c2', '#b39ddb', '#ffcc80', '#b2dfdb', '#ffAB91', '#c5e1a5', '#FDD835'];
 
             foreach ($eventos as $evento) {
                 $id_curso = $evento['id_curso'];
