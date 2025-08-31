@@ -22,6 +22,9 @@ require_once __DIR__ . '/../partials/header.php';
 .fc .fc-daygrid-day-frame {
     min-height: 110px;
 }
+.fc-daygrid-event-dot {
+    display: none;
+}
 </style>
 
 <div class="container">
