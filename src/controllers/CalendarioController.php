@@ -38,12 +38,25 @@ class CalendarioController {
             $stmt->execute([$start_date, $end_date]);
             $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Formatear para FullCalendar
+            // Formatear para FullCalendar y asignar colores
             $calendar_events = [];
+            $colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#5a5c69'];
+            $course_colors = [];
+            $color_index = 0;
+
             foreach ($eventos as $evento) {
+                $id_curso = $evento['id_curso'];
+                if (!isset($course_colors[$id_curso])) {
+                    $course_colors[$id_curso] = $colors[$color_index % count($colors)];
+                    $color_index++;
+                }
+                $event_color = $course_colors[$id_curso];
+
                 $calendar_events[] = [
                     'start' => $evento['start_datetime'],
                     'end' => $evento['end_datetime'],
+                    'backgroundColor' => $event_color,
+                    'borderColor' => $event_color,
                     'extendedProps' => [
                         'formatted_time' => date('h:i A', strtotime($evento['hora_inicio'])),
                         'curso_nombre' => $evento['curso_nombre'],

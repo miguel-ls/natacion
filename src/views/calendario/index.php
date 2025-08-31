@@ -3,7 +3,7 @@ require_once __DIR__ . '/../partials/header.php';
 ?>
 
 <style>
-/* Añadimos algunos estilos básicos para el calendario */
+/* Estilos para el calendario */
 .container {
     padding: 2rem;
 }
@@ -12,12 +12,19 @@ require_once __DIR__ . '/../partials/header.php';
     margin: 0 auto;
 }
 /* Forzar el ajuste de texto en los eventos del calendario */
-.fc-event-title {
+.fc-event-title, .fc-event-main-frame {
     white-space: normal !important;
-    overflow-wrap: break-word;
+    overflow-wrap: break-word !important;
+    font-size: 0.85em;
+    line-height: 1.3;
 }
-.fc-event-main-frame {
-    font-size: 0.8em;
+/* Permitir que las filas y los eventos crezcan */
+.fc-daygrid-day-frame {
+    min-height: 110px;
+}
+.fc-daygrid-event {
+    height: auto !important;
+    margin-bottom: 2px;
 }
 </style>
 

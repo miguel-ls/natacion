@@ -199,6 +199,7 @@ CREATE PROCEDURE `sp_get_clases_for_calendar`(
 BEGIN
     SELECT
         md.id_matricula_dia,
+        c.id_curso,
         c.nombre AS curso_nombre,
         h.hora_inicio,
         CONCAT(p.nombres, ' ', p.apellidos) AS profesor_nombre,
