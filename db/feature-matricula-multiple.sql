@@ -1,2 +1,0 @@
--- Este archivo está ahora vacío porque el SP sp_create_matricula_multiple ha sido eliminado.
--- La lógica ahora reside en el controlador.

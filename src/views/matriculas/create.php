@@ -44,13 +44,6 @@ unset($_SESSION['form_data']);
 <div class="form-container">
     <h2>Nueva Matrícula</h2>
 
-    <?php
-    if (isset($_SESSION['error_message'])) {
-        echo '<div style="padding: 1rem; margin-bottom: 1rem; border: 1px solid red; color: red; background-color: #fdd;">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
-        unset($_SESSION['error_message']);
-    }
-    ?>
-
     <form id="form-matricula" action="index.php?url=matriculas/store" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo $auth->getCsrfToken(); ?>">
 
@@ -228,36 +221,10 @@ const searchInput = document.getElementById('alumno_search');
 const searchResults = document.getElementById('alumno-search-results');
 const hiddenInputId = document.getElementById('id_alumno');
 const nuevoAlumnoForm = document.getElementById('nuevo-alumno-form');
-const nuevoAlumnoInputs = document.querySelectorAll('#nuevo-alumno-form input, #nuevo-alumno-form select');
-
-// Función para habilitar/deshabilitar el formulario de nuevo alumno
-function toggleNuevoAlumnoForm(enabled) {
-    if (enabled) {
-        nuevoAlumnoForm.style.display = 'block';
-        nuevoAlumnoInputs.forEach(input => {
-            input.disabled = false;
-            // Solo añadir 'required' a los campos que realmente lo son
-            if (input.name === 'nuevo_alumno_documento' || input.name === 'nuevo_alumno_id_tipo_documento') {
-                input.required = true;
-            }
-        });
-    } else {
-        nuevoAlumnoForm.style.display = 'none';
-        nuevoAlumnoInputs.forEach(input => {
-            input.disabled = true;
-            input.required = false;
-            input.value = ''; // Limpiar valores
-        });
-    }
-}
-
-// Deshabilitar el formulario de nuevo alumno al cargar la página
-toggleNuevoAlumnoForm(false);
 
 searchInput.addEventListener('keyup', function() {
     const term = this.value;
     hiddenInputId.value = '';
-    toggleNuevoAlumnoForm(false); // Deshabilitar al empezar a buscar
     if (term.length < 2) {
         searchResults.innerHTML = '';
         return;
@@ -275,7 +242,8 @@ searchInput.addEventListener('keyup', function() {
                     searchInput.value = this.textContent;
                     hiddenInputId.value = this.dataset.id;
                     searchResults.innerHTML = '';
-                    toggleNuevoAlumnoForm(false); // Deshabilitar al seleccionar uno existente
+                    nuevoAlumnoForm.style.display = 'none';
+                    document.querySelectorAll('#nuevo-alumno-form input').forEach(input => input.value = '');
                 });
                 searchResults.appendChild(item);
             });
@@ -283,10 +251,10 @@ searchInput.addEventListener('keyup', function() {
 });
 
 document.getElementById('btn-show-nuevo-alumno').addEventListener('click', function() {
+    nuevoAlumnoForm.style.display = 'block';
     searchInput.value = '';
     hiddenInputId.value = '';
     searchResults.innerHTML = '';
-    toggleNuevoAlumnoForm(true); // Habilitar al hacer clic en registrar nuevo
 });
 
 // Lógica para búsqueda de cursos
@@ -486,7 +454,6 @@ document.getElementById('fecha_inicio').addEventListener('change', actualizarPre
 
 // Form validation
 document.getElementById('form-matricula').addEventListener('submit', function(event) {
-    console.log("Form submission attempted!"); // DEBUGGING
     if (!document.getElementById('id_alumno').value && !document.querySelector('[name="nuevo_alumno_nombres"]').value) {
         alert('Por favor, seleccione un alumno existente o registre uno nuevo.');
         event.preventDefault();

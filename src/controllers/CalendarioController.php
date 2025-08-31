@@ -38,10 +38,22 @@ class CalendarioController {
             $stmt->execute([$start_date, $end_date]);
             $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Formatear para FullCalendar
             $calendar_events = [];
             foreach ($eventos as $evento) {
+                $formatted_time = date('h:i A', strtotime($evento['hora_inicio']));
+                $title = sprintf(
+                    "%s %s - %s\n%s: %s %s",
+                    $formatted_time,
+                    $evento['curso_nombre'],
+                    $evento['profesor_nombre'],
+                    $evento['area_nombre'],
+                    $evento['sub_area_descripcion'],
+                    $evento['sub_area_numero']
+                );
+
                 $calendar_events[] = [
-                    'title' => $evento['title'],
+                    'title' => $title,
                     'start' => $evento['start_datetime'],
                     'end' => $evento['end_datetime']
                 ];
