@@ -167,33 +167,20 @@ class MatriculaController {
             $this->auth->verifyCsrfToken();
             $id_matricula = $_POST['id_matricula'] ?? null;
             $new_id_horario = $_POST['id_horario'] ?? null;
-            $original_id_horario = $_POST['original_id_horario'] ?? null;
             $fecha_inicio = $_POST['fecha_inicio'] ?? null;
             $fecha_fin = $_POST['fecha_fin'] ?? null;
 
-            if (!$id_matricula || !$new_id_horario || !$original_id_horario || !$fecha_inicio || !$fecha_fin) {
-                $_SESSION['error_message'] = "Faltan datos para actualizar la matrícula.";
-                header('Location: index.php?url=matriculas/show&id=' . $id_matricula);
-                exit;
-            }
-
-            $db = Database::getInstance()->getConnection();
-            try {
-                if ($new_id_horario != $original_id_horario) {
-                    // El horario ha cambiado, se llama al procedimiento para cambiarlo.
+            if ($id_matricula && $new_id_horario && $fecha_inicio && $fecha_fin) {
+                $db = Database::getInstance()->getConnection();
+                try {
                     $stmt = $db->prepare("CALL sp_change_horario_matricula(?, ?, ?, ?)");
                     $stmt->execute([$id_matricula, $new_id_horario, $fecha_inicio, $fecha_fin]);
-                } else {
-                    // El horario es el mismo, solo cambian las fechas. Se llama al nuevo procedimiento.
-                    $stmt = $db->prepare("CALL sp_update_matricula_dates(?, ?, ?)");
-                    $stmt->execute([$id_matricula, $fecha_inicio, $fecha_fin]);
+                } catch (PDOException $e) {
+                    $_SESSION['error_message'] = "Error al actualizar la matrícula: " . $e->getMessage();
                 }
-                $_SESSION['success_message'] = "Matrícula actualizada correctamente.";
-
-            } catch (PDOException $e) {
-                $_SESSION['error_message'] = "Error al actualizar la matrícula: " . $e->getMessage();
+            } else {
+                $_SESSION['error_message'] = "Faltan datos para actualizar la matrícula.";
             }
-
             header('Location: index.php?url=matriculas/show&id=' . $id_matricula);
             exit;
         }
