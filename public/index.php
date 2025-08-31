@@ -30,6 +30,7 @@ require_once '../src/controllers/TipoPrecioController.php';
 require_once '../src/controllers/PrecioCursoController.php';
 require_once '../src/controllers/DashboardController.php';
 require_once '../src/controllers/InicioController.php';
+require_once '../src/controllers/CalendarioController.php';
 
 
 // Simple enrutador basado en el parámetro 'url'
@@ -81,6 +82,17 @@ switch ($route) {
             case 'checkDni': $alumnoController->checkDni(); break;
             case 'show': $alumnoController->show(); break;
             default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Alumnos</h1>"; break;
+        }
+        break;
+
+    // Ruta del Calendario
+    case 'calendario':
+        $calendarioController = new CalendarioController();
+        $action = $parts[1] ?? 'index';
+        switch($action) {
+            case 'index': $calendarioController->index(); break;
+            case 'getEventos': $calendarioController->getEventos(); break;
+            default: http_response_code(404); echo "<h1>404 - Acción no encontrada en Calendario</h1>"; break;
         }
         break;
 
