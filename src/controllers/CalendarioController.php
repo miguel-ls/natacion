@@ -41,21 +41,17 @@ class CalendarioController {
             // Formatear para FullCalendar
             $calendar_events = [];
             foreach ($eventos as $evento) {
-                $formatted_time = date('h:i A', strtotime($evento['hora_inicio']));
-                $title = sprintf(
-                    "%s %s - %s\n%s: %s %s",
-                    $formatted_time,
-                    $evento['curso_nombre'],
-                    $evento['profesor_nombre'],
-                    $evento['area_nombre'],
-                    $evento['sub_area_descripcion'],
-                    $evento['sub_area_numero']
-                );
-
                 $calendar_events[] = [
-                    'title' => $title,
                     'start' => $evento['start_datetime'],
-                    'end' => $evento['end_datetime']
+                    'end' => $evento['end_datetime'],
+                    'extendedProps' => [
+                        'formatted_time' => date('h:i A', strtotime($evento['hora_inicio'])),
+                        'curso_nombre' => $evento['curso_nombre'],
+                        'profesor_nombre' => $evento['profesor_nombre'],
+                        'area_nombre' => $evento['area_nombre'],
+                        'sub_area_descripcion' => $evento['sub_area_descripcion'],
+                        'sub_area_numero' => $evento['sub_area_numero']
+                    ]
                 ];
             }
 
