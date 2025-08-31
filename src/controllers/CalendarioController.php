@@ -38,25 +38,21 @@ class CalendarioController {
             $stmt->execute([$start_date, $end_date]);
             $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Formatear para FullCalendar y asignar colores
+            // Formatear para FullCalendar y asignar colores pastel de forma determinista
             $calendar_events = [];
-            $colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#5a5c69'];
-            $course_colors = [];
-            $color_index = 0;
+            $pastel_colors = ['#a8d8ea', '#fce38a', '#eaffd0', '#f4b6c2', '#b39ddb', '#ffcc80', '#b2dfdb', '#ffAB91', '#c5e1a5'];
 
             foreach ($eventos as $evento) {
                 $id_curso = $evento['id_curso'];
-                if (!isset($course_colors[$id_curso])) {
-                    $course_colors[$id_curso] = $colors[$color_index % count($colors)];
-                    $color_index++;
-                }
-                $event_color = $course_colors[$id_curso];
+                // Asignación de color determinista basada en el ID del curso
+                $event_color = $pastel_colors[$id_curso % count($pastel_colors)];
 
                 $calendar_events[] = [
                     'start' => $evento['start_datetime'],
                     'end' => $evento['end_datetime'],
                     'backgroundColor' => $event_color,
                     'borderColor' => $event_color,
+                    'textColor' => '#333333', // Un color de texto oscuro para que sea legible
                     'extendedProps' => [
                         'formatted_time' => date('h:i A', strtotime($evento['hora_inicio'])),
                         'curso_nombre' => $evento['curso_nombre'],
