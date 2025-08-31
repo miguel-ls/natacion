@@ -42,8 +42,8 @@ class CalendarioController {
             $pastel_colors = ['#a8d8ea', '#fce38a', '#eaffd0', '#f4b6c2', '#b39ddb', '#ffcc80', '#b2dfdb', '#ffAB91', '#c5e1a5'];
 
             foreach ($eventos as $evento) {
-                // Asignación de color determinista por horario
-                $event_color = $pastel_colors[$evento['id_horario'] % count($pastel_colors)];
+                // Asignación de color determinista por matrícula
+                $event_color = $pastel_colors[$evento['id_matricula'] % count($pastel_colors)];
 
                 // Crear el título directamente
                 $formatted_time = date('h:i A', strtotime($evento['hora_inicio']));

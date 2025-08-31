@@ -204,6 +204,7 @@ CREATE PROCEDURE `sp_get_clases_for_calendar`(
 BEGIN
     SELECT
         md.id_matricula_dia,
+        m.id_matricula,
         h.id_horario,
         c.id_curso,
         c.nombre AS curso_nombre,
