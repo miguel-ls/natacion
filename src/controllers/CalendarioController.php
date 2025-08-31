@@ -54,7 +54,7 @@ class CalendarioController {
                 } else {
                     // Si no, usamos una lógica no determinista como fallback para al menos ver colores diferentes
                     if (!isset($course_colors[$evento['curso_nombre']])) {
-                        $course_colors[$evento['curso_nombre']] = $colors[$color_index % count($colors)];
+                        $course_colors[$evento['curso_nombre']] = $pastel_colors[$color_index % count($pastel_colors)];
                         $color_index++;
                     }
                     $event_color = $course_colors[$evento['curso_nombre']];
