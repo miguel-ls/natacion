@@ -38,42 +38,30 @@ class CalendarioController {
             $stmt->execute([$start_date, $end_date]);
             $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Formatear para FullCalendar y asignar colores pastel de forma robusta
             $calendar_events = [];
             $pastel_colors = ['#a8d8ea', '#fce38a', '#eaffd0', '#f4b6c2', '#b39ddb', '#ffcc80', '#b2dfdb', '#ffAB91', '#c5e1a5'];
-            $course_colors = [];
-            $color_index = 0;
 
             foreach ($eventos as $evento) {
-                // Lógica de color robusta
-                $event_color = $pastel_colors[0]; // Color por defecto
-                if (isset($evento['id_curso'])) {
-                    // Si el SP devuelve id_curso, usamos la lógica determinista (ideal)
-                    $id_curso = $evento['id_curso'];
-                    $event_color = $pastel_colors[$id_curso % count($pastel_colors)];
-                } else {
-                    // Si no, usamos una lógica no determinista como fallback para al menos ver colores diferentes
-                    if (!isset($course_colors[$evento['curso_nombre']])) {
-                        $course_colors[$evento['curso_nombre']] = $pastel_colors[$color_index % count($pastel_colors)];
-                        $color_index++;
-                    }
-                    $event_color = $course_colors[$evento['curso_nombre']];
-                }
+                // Asignación de color determinista
+                $event_color = $pastel_colors[$evento['id_curso'] % count($pastel_colors)];
+
+                // Crear el título directamente
+                $formatted_time = date('h:i A', strtotime($evento['hora_inicio']));
+                $title = sprintf(
+                    "%s %s\n%s\n%s",
+                    $formatted_time,
+                    $evento['curso_nombre'],
+                    $evento['profesor_nombre'],
+                    $evento['area_nombre'] . ': ' . $evento['sub_area_descripcion'] . ' ' . $evento['sub_area_numero']
+                );
 
                 $calendar_events[] = [
+                    'title' => $title,
                     'start' => $evento['start_datetime'],
                     'end' => $evento['end_datetime'],
                     'backgroundColor' => $event_color,
                     'borderColor' => $event_color,
-                    'textColor' => '#333333',
-                    'extendedProps' => [
-                        'formatted_time' => date('h:i A', strtotime($evento['hora_inicio'])),
-                        'curso_nombre' => $evento['curso_nombre'],
-                        'profesor_nombre' => $evento['profesor_nombre'],
-                        'area_nombre' => $evento['area_nombre'],
-                        'sub_area_descripcion' => $evento['sub_area_descripcion'],
-                        'sub_area_numero' => $evento['sub_area_numero']
-                    ]
+                    'textColor' => '#333333'
                 ];
             }
 
