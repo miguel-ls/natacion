@@ -45,29 +45,20 @@ class CalendarioController {
                 // Asignación de color determinista por matrícula
                 $event_color = $pastel_colors[$evento['id_matricula'] % count($pastel_colors)];
 
-                // Crear el título con el nuevo formato solicitado
-                $start_time = date('h:i A', strtotime($evento['start_datetime']));
-                $end_time = date('h:i A', strtotime($evento['end_datetime']));
-                $time_range = $start_time . ' - ' . $end_time;
-                $sub_area_info = $evento['sub_area_descripcion'] . ' - ' . $evento['sub_area_numero'];
-
-                $title = sprintf(
-                    "%s\n%s\n%s\n%s\nProf: %s\nAlum: %s",
-                    $time_range,
-                    $evento['curso_nombre'],
-                    $evento['area_nombre'],
-                    $sub_area_info,
-                    $evento['profesor_nombre'],
-                    $evento['alumno_nombre']
-                );
-
                 $calendar_events[] = [
-                    'title' => $title,
                     'start' => $evento['start_datetime'],
                     'end' => $evento['end_datetime'],
                     'backgroundColor' => $event_color,
                     'borderColor' => $event_color,
-                    'textColor' => '#333333'
+                    'textColor' => '#333333',
+                    'extendedProps' => [
+                        'curso_nombre' => $evento['curso_nombre'],
+                        'area_nombre' => $evento['area_nombre'],
+                        'sub_area_descripcion' => $evento['sub_area_descripcion'],
+                        'sub_area_numero' => $evento['sub_area_numero'],
+                        'profesor_nombre' => $evento['profesor_nombre'],
+                        'alumno_nombre' => $evento['alumno_nombre']
+                    ]
                 ];
             }
 

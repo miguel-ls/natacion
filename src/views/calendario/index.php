@@ -40,17 +40,38 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        eventDisplay: 'block', // Muestra el evento como un bloque de color
+        eventDisplay: 'block',
         initialView: 'dayGridMonth',
-        locale: 'es', // Establecer el idioma a español
+        locale: 'es',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        // El backend ahora envía el 'title' y los colores directamente.
-        // FullCalendar los usará por defecto.
-        events: 'index.php?url=calendario/getEventos'
+        events: 'index.php?url=calendario/getEventos',
+        eventContent: function(arg) {
+            let props = arg.event.extendedProps;
+
+            // Formateo de la hora
+            let startTime = new Date(arg.event.start).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true });
+            let endTime = new Date(arg.event.end).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true });
+            let timeRange = startTime + ' - ' + endTime;
+
+            let subAreaInfo = props.sub_area_descripcion + ' - ' + props.sub_area_numero;
+
+            let html = `
+                <div style="font-size: 0.8em; line-height: 1.2;">
+                    ${timeRange}<br>
+                    <strong>${props.curso_nombre}</strong><br>
+                    ${props.area_nombre}<br>
+                    ${subAreaInfo}<br>
+                    Prof: ${props.profesor_nombre}<br>
+                    Alum: ${props.alumno_nombre}
+                </div>
+            `;
+
+            return { html: html };
+        }
     });
 
     calendar.render();
