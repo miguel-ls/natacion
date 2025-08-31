@@ -95,6 +95,7 @@ if (!defined('BASE_URL')) {
                             <a href="<?php echo BASE_URL; ?>index.php?url=alumnos">Clientes</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=profesores">Profesores</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=matriculas">Matriculas</a>
+                            <a href="<?php echo BASE_URL; ?>index.php?url=calendario">Calendario</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=horarios">Programar horarios</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=asistencias_profesor">Asistencia Profesores</a>
                             <a href="<?php echo BASE_URL; ?>index.php?url=asistencias_alumnos">Asistencia Clientes</a>
