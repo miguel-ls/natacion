@@ -38,22 +38,34 @@ class CalendarioController {
             $stmt->execute([$start_date, $end_date]);
             $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Formatear para FullCalendar y asignar colores pastel de forma determinista
+            // Formatear para FullCalendar y asignar colores pastel de forma robusta
             $calendar_events = [];
-            // Paleta de colores pastel actualizada para forzar el reenvío del cambio.
-            $pastel_colors = ['#a8d8ea', '#fce38a', '#eaffd0', '#f4b6c2', '#b39ddb', '#ffcc80', '#b2dfdb', '#ffAB91', '#c5e1a5', '#FDD835'];
+            $pastel_colors = ['#a8d8ea', '#fce38a', '#eaffd0', '#f4b6c2', '#b39ddb', '#ffcc80', '#b2dfdb', '#ffAB91', '#c5e1a5'];
+            $course_colors = [];
+            $color_index = 0;
 
             foreach ($eventos as $evento) {
-                $id_curso = $evento['id_curso'];
-                // Asignación de color determinista basada en el ID del curso
-                $event_color = $pastel_colors[$id_curso % count($pastel_colors)];
+                // Lógica de color robusta
+                $event_color = $pastel_colors[0]; // Color por defecto
+                if (isset($evento['id_curso'])) {
+                    // Si el SP devuelve id_curso, usamos la lógica determinista (ideal)
+                    $id_curso = $evento['id_curso'];
+                    $event_color = $pastel_colors[$id_curso % count($pastel_colors)];
+                } else {
+                    // Si no, usamos una lógica no determinista como fallback para al menos ver colores diferentes
+                    if (!isset($course_colors[$evento['curso_nombre']])) {
+                        $course_colors[$evento['curso_nombre']] = $colors[$color_index % count($colors)];
+                        $color_index++;
+                    }
+                    $event_color = $course_colors[$evento['curso_nombre']];
+                }
 
                 $calendar_events[] = [
                     'start' => $evento['start_datetime'],
                     'end' => $evento['end_datetime'],
                     'backgroundColor' => $event_color,
                     'borderColor' => $event_color,
-                    'textColor' => '#333333', // Un color de texto oscuro para que sea legible
+                    'textColor' => '#333333',
                     'extendedProps' => [
                         'formatted_time' => date('h:i A', strtotime($evento['hora_inicio'])),
                         'curso_nombre' => $evento['curso_nombre'],
