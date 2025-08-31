@@ -167,7 +167,7 @@ class MatriculaController {
             $this->auth->verifyCsrfToken();
             $id_matricula = $_POST['id_matricula'] ?? null;
             $new_id_horario = $_POST['id_horario'] ?? null;
-            $original_id_horario = $_POST['original_id_horario'] ?? null; // Este campo se añadirá en el formulario
+            $original_id_horario = $_POST['original_id_horario'] ?? null;
             $fecha_inicio = $_POST['fecha_inicio'] ?? null;
             $fecha_fin = $_POST['fecha_fin'] ?? null;
 
@@ -180,7 +180,7 @@ class MatriculaController {
             $db = Database::getInstance()->getConnection();
             try {
                 if ($new_id_horario != $original_id_horario) {
-                    // El horario ha cambiado, se llama al procedimiento para cambiarlo
+                    // El horario ha cambiado, se llama al procedimiento para cambiarlo.
                     $stmt = $db->prepare("CALL sp_change_horario_matricula(?, ?, ?, ?)");
                     $stmt->execute([$id_matricula, $new_id_horario, $fecha_inicio, $fecha_fin]);
                 } else {
