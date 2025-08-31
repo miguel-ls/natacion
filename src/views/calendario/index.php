@@ -12,19 +12,15 @@ require_once __DIR__ . '/../partials/header.php';
     margin: 0 auto;
 }
 /* Forzar el ajuste de texto en los eventos del calendario */
-.fc-event-title, .fc-event-main-frame {
-    white-space: normal !important;
-    overflow-wrap: break-word !important;
+.fc-event-title {
+    white-space: normal !important; /* Permite que el texto se ajuste en múltiples líneas */
+    overflow-wrap: break-word;
     font-size: 0.85em;
     line-height: 1.3;
 }
-/* Permitir que las filas y los eventos crezcan */
-.fc-daygrid-day-frame {
+/* Opcional: Dar un poco más de altura a las celdas para que quepa el texto */
+.fc .fc-daygrid-day-frame {
     min-height: 110px;
-}
-.fc-daygrid-event {
-    height: auto !important;
-    margin-bottom: 2px;
 }
 </style>
 
@@ -46,20 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay' // Opciones de vista
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        events: 'index.php?url=calendario/getEventos',
-        eventContent: function(arg) {
-            let props = arg.event.extendedProps;
-            let titleHtml = `
-                <div class="fc-event-main-frame">
-                    <div style="font-weight: bold;">${props.formatted_time} - ${props.curso_nombre}</div>
-                    <div><small>${props.profesor_nombre}</small></div>
-                    <div><small>${props.area_nombre}: ${props.sub_area_descripcion} ${props.sub_area_numero}</small></div>
-                </div>
-            `;
-            return { html: titleHtml };
-        }
+        // El backend ahora envía el 'title' y los colores directamente.
+        // FullCalendar los usará por defecto.
+        events: 'index.php?url=calendario/getEventos'
     });
 
     calendar.render();
