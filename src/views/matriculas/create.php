@@ -250,6 +250,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const hasNewStudentData = <?php echo !empty($form_data['nuevo_alumno_nombres']) ? 'true' : 'false'; ?>;
     toggleNuevoAlumnoForm(hasNewStudentData);
 
+    // Llamar a la validación inicial para establecer el maxlength correcto al cargar la página
+    updateNuevoDocumentoValidation();
+
     // ... resto del código DOMContentLoaded
     if (preselectedSchedule) {
         // ... (código existente)
